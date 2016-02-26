@@ -1,0 +1,219 @@
+OBJECT Codeunit 104010 Create Field Checking Code
+{
+  OBJECT-PROPERTIES
+  {
+    Date=06.11.15;
+    Time=16:21:21;
+    Modified=Yes;
+    Version List=MIG-W15.00.01;
+  }
+  PROPERTIES
+  {
+    OnRun=VAR
+            MgtObject@1000 : Record 2000000001;
+            NoOfTables@1001 : Integer;
+          BEGIN
+            FileName := 'C:\NAVUpgrade\Busch\SQLMigrate\FIELDCHK.TXT';
+            TextFile.WRITEMODE := TRUE;
+            TextFile.TEXTMODE := TRUE;
+            TextFile.QUERYREPLACE := TRUE;
+            TextFile.CREATE(FileName);
+
+            Object.SETRANGE(Type,Object.Type::Table);
+            StateIndicate.Open('Reading tables',Object.COUNT);
+            IF Object.FIND('-') THEN BEGIN
+              REPEAT
+                StateIndicate.Update(1);
+                IF RangeChkMgt.IncludeTable(Object.ID) THEN BEGIN
+                  Object.MARK := TRUE;
+                  NoOfTables := NoOfTables + 1;
+                END;
+              UNTIL Object.NEXT = 0;
+            END;
+            Object.MARKEDONLY := TRUE;
+            CLEAR(StateIndicate);
+
+            StateIndicate.Open('Writing code',NoOfTables * 3);
+            MgtObject.GET(MgtObject.Type::Codeunit,'',CODEUNIT::"Field Check");
+            PrintLine(STRSUBSTNO('OBJECT Codeunit %1 %2',MgtObject.ID,MgtObject.Name));
+            PrintLine('{');
+            PrintLine('  PROPERTIES');
+            PrintLine('  {');
+            PrintLine('    OnRun=BEGIN');
+            PrintLine('            IF F.FirstTable THEN');
+            PrintLine('              REPEAT');
+            PrintLine('                CASE F.GetTableID OF');
+
+            IF Object.FIND('-') THEN BEGIN
+              REPEAT
+                StateIndicate.Update(1);
+                MakeTableCallCode;
+              UNTIL Object.NEXT = 0;
+            END;
+
+            PrintLine('                END;');
+            PrintLine('              UNTIL NOT F.NextTable;');
+            PrintLine('          END;');
+            PrintLine('  }');
+            PrintLine('  CODE');
+            PrintLine('  {');
+            PrintLine('    VAR');
+            PrintLine(STRSUBSTNO('      F@1000 : Codeunit %1;',CODEUNIT::"Data Check Management"));
+
+            IF Object.FIND('-') THEN BEGIN
+              REPEAT
+                StateIndicate.Update(1);
+                MakeTableVar;
+              UNTIL Object.NEXT = 0;
+            END;
+
+            Indentation := 4;
+            IF Object.FIND('-') THEN BEGIN
+              REPEAT
+                StateIndicate.Update(1);
+                MakeTableCodeBegin;
+                RangeChkMgt.SetFieldView(Field,Object.ID);
+                IF Field.FIND('-') THEN
+                  REPEAT
+                    CASE Field.Type OF
+                      Field.Type::Date:
+                        MakeFieldCheck('CheckDate');
+                      Field.Type::DateTime:
+                        MakeFieldCheck('CheckDateTime');
+                      Field.Type::Decimal:
+                        MakeFieldCheck('CheckDecimal');
+                      Field.Type::Text:
+                        MakeTextFieldCheck;
+                      Field.Type::Code:
+                        MakeCodeFieldCheck;
+                    END;
+                  UNTIL Field.NEXT = 0;
+                MakeTableCodeEnd;
+              UNTIL Object.NEXT = 0;
+            END;
+
+            Indentation := 0;
+            PrintLine('    BEGIN');
+            PrintLine('    END.');
+            PrintLine('  }');
+            PrintLine('}');
+            TextFile.CLOSE;
+
+            MESSAGE(
+              'The checking code was successfully created.\\' +
+              'Follow these steps to complete the check:\\' +
+              '1. Import codeunit %2 from the file %1.\' +
+              '2. Compile the codeunit.\' +
+              '3. Run the codeunit.',
+              FileName,MgtObject.ID);
+          END;
+
+  }
+  CODE
+  {
+    VAR
+      Object@1000 : Record 2000000001;
+      Field@1001 : Record 2000000041;
+      StateIndicate@1002 : Codeunit 104014;
+      RangeChkMgt@1003 : Codeunit 104011;
+      CodeChkMgt@1004 : Codeunit 104012;
+      FileName@1005 : Text[250];
+      TextFile@1006 : File;
+      Indentation@1007 : Integer;
+      VariableID@1009 : Integer;
+      ProcedureID@1008 : Integer;
+
+    PROCEDURE MakeTableCallCode@2();
+    BEGIN
+      PrintLine('                  %3:');
+      PrintLine('                    Table%3;');
+    END;
+
+    PROCEDURE MakeTableVar@3();
+    BEGIN
+      IF VariableID = 0 THEN
+        VariableID := 2000;
+      VariableID := VariableID + 1;
+
+      PrintLine('        %1@%5 : Record %3;');
+    END;
+
+    PROCEDURE MakeTableCodeBegin@5();
+    BEGIN
+      IF ProcedureID = 0 THEN
+        ProcedureID := 2000;
+      ProcedureID := ProcedureID + 1;
+
+      PrintLine('PROCEDURE Table%3@%6();');
+      PrintLine('VAR');
+      PrintLine('  %4@1000 : Record %3;');
+      PrintLine('BEGIN');
+      PrintLine('  %1.CHANGECOMPANY(F.GetCompanyName);');
+      PrintLine('  %4.CHANGECOMPANY(F.GetCompanyName);');
+      PrintLine('  F.UpdateKey(%1.CURRENTKEY);');
+      PrintLine('  %1.MARKEDONLY := F.Modify;');
+      PrintLine('  IF %1.FIND(''-'') THEN');
+      PrintLine('    REPEAT');
+
+      RangeChkMgt.SetFieldView(Field,Object.ID);
+      Field.SETRANGE(Type,Field.Type::BLOB);
+      IF Field.FIND('-') THEN
+        REPEAT
+          MakeCalcFieldCode;
+        UNTIL Field.NEXT = 0;
+
+      PrintLine('      %4 := %1;');
+      PrintLine('      %4.SETRECFILTER;');
+      PrintLine('      F.Update(%4.GETFILTERS);');
+    END;
+
+    PROCEDURE MakeCalcFieldCode@12();
+    BEGIN
+      PrintLine('      %1.CALCFIELDS(%2);');
+    END;
+
+    PROCEDURE MakeFieldCheck@8(FuncName@1000 : Text[30]);
+    BEGIN
+      PrintLine('      F.' + FuncName + '(%4.FIELDNAME(%2),%4.%2);');
+    END;
+
+    PROCEDURE MakeTextFieldCheck@4();
+    BEGIN
+      PrintLine('      F.CheckText(%4.FIELDNAME(%2),MAXSTRLEN(%4.%2),%4.%2);');
+    END;
+
+    PROCEDURE MakeCodeFieldCheck@10();
+    BEGIN
+      PrintLine('      F.CheckCode(%4.FIELDNO(%2),%4.FIELDNAME(%2),MAXSTRLEN(%4.%2),%4.%2);');
+    END;
+
+    PROCEDURE MakeTableCodeEnd@9();
+    BEGIN
+      PrintLine('      IF F.Modify THEN BEGIN');
+      PrintLine('        %1.DELETE;');
+      PrintLine('        %4.INSERT;');
+      PrintLine('      END ELSE');
+      PrintLine('        IF NOT %1.MARK THEN');
+      PrintLine('          %1.MARK := F.Mark;');
+      PrintLine('    UNTIL %1.NEXT = 0;');
+      PrintLine('END;');
+    END;
+
+    PROCEDURE PrintLine@1(NewLine@1000 : Text[250]);
+    BEGIN
+      TextFile.WRITE(
+        STRSUBSTNO(
+          PADSTR('',Indentation) + NewLine,
+          TableVarName(1),'"' + Field.FieldName + '"',Object.ID,TableVarName(2),VariableID,ProcedureID));
+    END;
+
+    PROCEDURE TableVarName@7(Number@1000 : Integer) : Text[250];
+    BEGIN
+      EXIT(COPYSTR('AB',Number,1) + FORMAT(Object.ID));
+    END;
+
+    BEGIN
+    END.
+  }
+}
+
