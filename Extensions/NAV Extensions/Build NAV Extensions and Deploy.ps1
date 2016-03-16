@@ -30,3 +30,10 @@ Write-Host 'Total Duration' ([Math]::Round(($StoppedDateTime - $StartedDateTime)
 #Open RTC Test-environment
 $CompanyName = (Get-NAVCompany -ServerInstance $TargetServerInstance -Tenant $TargetTenant)[0].CompanyName
 Start-NAVWindowsClient -ServerName ([net.dns]::GetHostName()) -ServerInstance $TargetServerInstance -Companyname $CompanyName
+
+#Uninstall-NAVApp -AppName $AppName -ServerInstance $TargetServerInstance -Tenant $TargetTenant -Force -Verbose
+
+#Unpublish-NAVApp -Name $AppName -ServerInstance $TargetServerInstance
+
+#Publish-NAVApp -ServerInstance $TargetServerInstance  -Path $AppPackage.PackageFile
+#Install-NAVApp -ServerInstance $TargetServerInstance  -Path $AppPackage.PackageFile -Tenant $TargetTenant -Force -Verbose
