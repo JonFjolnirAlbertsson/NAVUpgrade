@@ -1,136 +1,92 @@
-﻿# Comparing and merging
-#Busch Vakuumteknikk
-$CompanyFolderName = "Busch\2016"
-$CompanyOriginalFileName = "NAV_2016_CU0_NO_AllObjects.txt"
-$CompanyModifiedFileName = "Busch_NAV_2016_CU0_NO_AllObjects.txt"
-$CompanyTargetFileName = "NAV_2016_CU1_NO_AllObjects.txt"
-
-# Set the right folder path based on company folder and files name
-$RootFolderPath = "C:\NavUpgrade\"
-$SourceOriginal = $RootFolderPath + $CompanyFolderName + "\" + $CompanyOriginalFileName
-$SourceModified = $RootFolderPath + $CompanyFolderName + "\" + $CompanyModifiedFileName
-$SourceTarget = $RootFolderPath + $CompanyFolderName + "\" + $CompanyTargetFileName
-
-$DestinationOriginal = $RootFolderPath + $CompanyFolderName + "\Original\"
-$DestinationModified = $RootFolderPath + $CompanyFolderName + "\Modified\"
-$DestinationTarget = $RootFolderPath + $CompanyFolderName + "\Target\"
-
-$Delta = $RootFolderPath + $CompanyFolderName + "\Delta\"
-$Result = $RootFolderPath + $CompanyFolderName + "\Result\"
-#$Merged = $RootFolderPath + $CompanyFolderName + "\Merged\Ready2Import\"
-$Merged = $RootFolderPath + $CompanyFolderName + "\Merged\"
-
-# Check if folders exists. If not create them.
-if(!(Test-Path -Path $Delta )){
-    New-Item -ItemType directory -Path $Delta
-}
-if(!(Test-Path -Path $Result )){
-    New-Item -ItemType directory -Path $Result
-}
-if(!(Test-Path -Path $Merged )){
-    New-Item -ItemType directory -Path $Merged
-}
-# Set file name to merge or files (*.TXT)
-#$CompareObject = "TAB1500000*.TXT"
-#$UpdateObject = "TAB18.DELTA"
-$CompareObject = "*.TXT"
-
-#Set Source, modified, target and result values
-$OriginalCompareObject = $DestinationOriginal + $CompareObject
-$ModifiedCompareObject = $DestinationModified + $CompareObject
-$TargetCompareObject = $DestinationTarget + $CompareObject
-$DeltaUpdateObject = $Delta + $UpdateObject
-$JoinSource = $Merged + "ToBeJoined\" +$CompareObject
-$JoinDestination = $Merged + "all-merged-objects.txt"
-
-#Uprade process action
-#$UpgradeAction = "Split" # First step
-#$UpgradeAction = "Merge" # Second step
-$UpgradeAction = "Join" # Third step. When all objects er reday for import to new database
+﻿# Import settings
+. (Join-Path $PSScriptRoot 'Set-NAVEnvironmentSettings.ps1') -ErrorAction Stop
 
 
-$Version = '9.0*'
-if(([string]::Equals($Version, "7.1")) -or ($Version -eq "71")-or ($Version -eq "7.1*"))
-{
-    Import-Module "C:\Users\jal\OneDrive for Business\Files\NAV\Script\NAV2013R2\StartingISENAV71.ps1"  
-}
-if(([string]::Equals($Version, "8.0")) -or ($Version -eq "80")-or ($Version -like '8.0*'))
-{
-    Import-Module "C:\Users\jal\OneDrive for Business\Files\NAV\Script\NAV2015\StartingISENAV80.ps1" 
-}    
-if(([string]::Equals($Version, "9.0")) -or ($Version -eq "90")-or ($Version -like '9.0*'))
-{
-    Import-Module "C:\Users\jal\OneDrive for Business\Files\NAV\Script\NAV2016\StartingISENAV90.ps1" 
-} 
-# Split text files with many objects
-If($UpgradeAction -eq "Split")
-{
-    Remove-Item -Path "$DestinationOriginal*.*"
-    Remove-Item -Path "$DestinationModified*.*"
-    Remove-Item -Path "$DestinationTarget*.*"
+if (-not (Test-Path $ISODir)) {New-Item -Path $ISODir -ItemType directory | Out-null}
+if (-not (Test-Path $TmpLocation)) {New-Item -Path $TmpLocation -ItemType directory | Out-null}
+if (-not (Test-Path $InstallLog)) {New-Item -Path $InstallLog -ItemType directory | Out-null}
 
-    Split-NAVApplicationObjectFile  -Source $SourceOriginal -Destination $DestinationOriginal -PreserveFormatting -Force
-    Split-NAVApplicationObjectFile  -Source $SourceModified -Destination $DestinationModified -PreserveFormatting -Force
-    Split-NAVApplicationObjectFile  -Source $SourceTarget -Destination $DestinationTarget -PreserveFormatting -Force
-    
-    echo "The source file $SourceOriginal has been split to the destination $DestinationOriginal"
-    echo "The source file $SourceModified has been split to the destination $DestinationModified"
-    echo "The source file $SourceTarget has been split to the destination $DestinationModified"
-}
-ElseIf($UpgradeAction -eq "Merge")
-{
-# This merge command has been run.
-# If the MergedTool has also been runned and updated the merge. The new files are in the "Merged" folder. 
-    #Merge-NAVApplicationObject -Original $OriginalCompareObject -Modified $ModifiedCompareObject -Target $TargetCompareObject -Result $Result -Force -Verbose -ErrorAction Inquire  | Sort-Object ObjectType, Id | Format-Table
-    Merge-NAVApplicationObject -Modified $ModifiedCompareObject -Original $OriginalCompareObject -Result $Result -Target $TargetCompareObject -DateTimeProperty FromTarget -DocumentationConflict TargetFirst -ModifiedProperty FromModified -VersionListProperty FromTarget -Force
-     
-    $CODFolder = $Result + "COD\"
-    $TABFolder = $Result + "TAB\"
-    $PAGFolder = $Result + "PAG\"
-    $REPFolder = $Result + "REP\"
-    # Check if folders exists. If not create them.
-    if(!(Test-Path -Path $CODFolder )){
-        New-Item -ItemType directory -Path $CODFolder
-    }
-    if(!(Test-Path -Path $TABFolder )){
-        New-Item -ItemType directory -Path $TABFolder
-    }
-    if(!(Test-Path -Path $PAGFolder )){
-        New-Item -ItemType directory -Path $PAGFolder
-    }
-    if(!(Test-Path -Path $REPFolder )){
-        New-Item -ItemType directory -Path $REPFolder
-    }
-    
-    Remove-Item -Path "$CODFolder*.*"   
-    Remove-Item -Path "$TABFolder*.*"
-    Remove-Item -Path "$PAGFolder*.*"
-    Remove-Item -Path "$REPFolder*.*"
+#Looks like it must run in IE not Edge
+$Download = Get-NAVCumulativeUpdateFile -CountryCodes NO -versions $NAVVersion -DownloadFolder $TmpLocation
 
-    #get-childitem  -path $Result  | where-object {$_.Name -like "COD*.*"} | Out-Default
-    get-childitem  -path $Result  | where-object {$_.Name -like "COD*.*"} | Move-Item -Destination $CODFolder
-    get-childitem  -path $Result  | where-object {$_.Name -like "TAB*.*"} | Move-Item -Destination $TABFolder
-    get-childitem  -path $Result  | where-object {$_.Name -like "PAG*.*"} | Move-Item -Destination $PAGFolder
-    get-childitem  -path $Result  | where-object {$_.Name -like "REP*.*"} | Move-Item -Destination $REPFolder
+break
+#We only need to run this if we want ISO file
+#$NAVISOFile = New-NAVCumulativeUpdateISOFile -CumulativeUpdateFullPath $Download.filename -TmpLocation $TmpLocation -IsoDirectory $ISODir 
 
-    echo "The filter used to merge files was $CompareObject"
-    echo "Below you can see were the source files come from.."
-    echo $OriginalCompareObject
-    echo $ModifiedCompareObject
-    echo $TargetCompareObject
-    echo "The merged files are found in the folder $Result, and the related subfolders (COD,TAB,PAG and REP)."
+#$ZippedDVDfile  = 'C:\NAV Setup\NAV2016\Temp\489822_NOR_i386_zip.exe'
+$ZippedDVDfile  = $Download.filename
 
-    echo "Remember.."
-    echo "After the script has run the result files should be compared." 
-    echo "The result files should be compared to the Modified file and the target file."
+#Get-ChildItem -path (Join-Path $PSScriptRoot '..\PSFunctions\*.ps1') | foreach { . $_.FullName}
 
-}
-ElseIf($UpgradeAction -eq "Join")
-{
-    Join-NAVApplicationObjectFile -Source $JoinSource -Destination $JoinDestination -Force
+$VersionInfo = Get-NAVCumulativeUpdateDownloadVersionInfo -SourcePath $ZippedDVDfile
+$DVDDestination = "$NAVRootFolder\" + $VersionInfo.Product + $NAVVersion + $VersionInfo.Country +$Download.CUNo  + '_' + $VersionInfo.Build + "\DVD\"
 
-    echo "The filter used to join files was $CompareObject"
-    echo "The join files come from the $JoinSource"
-    echo "The join files are in the file $JoinDestination"
-}
-echo "Execution finished."
+if (-not (Test-Path $DVDDestination)) {New-Item -Path $DVDDestination -ItemType directory | Out-null}
+
+$InstallationPath = Unzip-NAVCumulativeUpdateDownload -SourcePath $ZippedDVDfile -DestinationPath $DVDDestination
+
+$InstallationResult = Install-NAV -DVDFolder $InstallationPath -Configfile $NAVInstallConfigFile -Log $InstallLog
+
+break
+
+Import-NAVServerLicense -ServerInstance $InstallationResult.ServerInstance -LicenseFile $Licensefile
+
+Break
+$WorkingFolder  = '$NAVRootFolder\WorkingFolder'
+Export-NAVApplicationObject `
+    -DatabaseServer ([Net.DNS]::GetHostName()) `
+    -DatabaseName $Databasename `
+    -Path (join-path $WorkingFolder ($VersionInfo.Build + '.txt')) `
+    -LogPath (join-path $WorkingFolder 'Export\Log') `
+    -ExportTxtSkipUnlicensed `
+    -Force    
+
+
+break
+
+#$UnInstallPath =$InstallationPath
+#$UnInstallPath = "C:\NAV Setup\NAV2016\NAV2016_NO_CU1\DVD\"
+#UnInstall-NAV -DVDFolder $UnInstallPath -Log $UnInstallLog
+
+New-NAVEnvironment -ServerInstance $OriginalServerInstance -BackupFile $Backupfile -ErrorAction Stop -EnablePortSharing -LicenseFile $License
+
+[UpgradeAction] $UpgradeAction = [UpgradeAction]::Split
+
+#Clear-Host
+
+UpgradeNAVCode -RootFolderPath $RootFolderPath  -CompanyFolderName $CompanyFolderName -Version $Version `
+                -CompanyOriginalFileName $CompanyOriginalFileName -CompanyModifiedFileName $CompanyModifiedFileName `
+                -CompanyTargetFileName $CompanyTargetFileName -UpgradeAction $UpgradeAction -CompareObject $CompareObject
+
+$UpgradeAction = [UpgradeAction]::Merge
+UpgradeNAVCode -RootFolderPath $RootFolderPath  -CompanyFolderName $CompanyFolderName -Version $Version `
+                -CompanyOriginalFileName $CompanyOriginalFileName -CompanyModifiedFileName $CompanyModifiedFileName `
+                -CompanyTargetFileName $CompanyTargetFileName -UpgradeAction $UpgradeAction `
+                #-CompareObject $CompareObject
+                -CompareObject $CompareObject -OpenConflictFilesInKdiff $False
+
+$UpgradeAction = [UpgradeAction]::Join
+UpgradeNAVCode -RootFolderPath $RootFolderPath  -CompanyFolderName $CompanyFolderName -Version $Version `
+                -CompanyOriginalFileName $CompanyOriginalFileName -CompanyModifiedFileName $CompanyModifiedFileName `
+                -CompanyTargetFileName $CompanyTargetFileName -UpgradeAction $UpgradeAction `
+                -CompareObject $CompareObject -RemoveOriginalFilesNotInTarget $True -RemoveModifyFilesNotInTarget $True
+                #-CompareObject $CompareObject
+
+
+RestoreDBFromFile -backupFile $BackupFilePath -dbNewname $dbName
+
+#SetNAVServiceUserPermission -DatabaseServer $DBServer -DBName $dbName -ADUser "NT-MYNDIGHET\NETTVERKSTJENESTE"
+SetNAVServiceUserPermission -DatabaseServer $DBServer -DBName $dbName -ADUser "SI-Data\SQL"
+
+CreateNAVServerInstance -DBServer $DBServer -DataBase $dbName -FirstPortNumber $FirstPort -NavServiceInstance $NavServiceInstance
+CreateNavUser -User si-data\jal -NavServiceInstance $NavServiceInstance 
+
+#Import-NAVServerLicense -LicenseFile $LicensFile -ServerInstance $NavServiceInstance 
+Import-NAVServerLicense $NavServiceInstance  -LicenseData ([Byte[]]$(Get-Content -Path $LicensFile -Encoding Byte))
+#Import-NAVServerLicense -LicenseFile $LicensFile -ServerInstance $NavServiceInstance -Database $dbName -Force
+
+Import-NAVApplicationObject $NAVAPPObjects2Import -DatabaseServer $DBServer -DatabaseName $dbName -ImportAction Overwrite -SynchronizeSchemaChanges No -LogPath $ImportLog -Verbose
+
+Compile-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $dbName -LogPath $ImportLog -Recompile -SynchronizeSchemaChanges No
+
+
