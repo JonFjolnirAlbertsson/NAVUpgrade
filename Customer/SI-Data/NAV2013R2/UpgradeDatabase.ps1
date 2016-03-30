@@ -1,6 +1,6 @@
 ﻿$Location = "C:\GitHub\NAVUpgrade\Customer\SI-Data\NAV2013R2"
-#. (join-path $PSScriptRoot 'Set-UpgradeSettings.ps1')
 . (join-path $Location 'Set-UpgradeSettings.ps1')
+
 
 clear-host
 
@@ -17,6 +17,8 @@ if (test-path $WorkingFolder){
 }
 
 New-NAVEnvironment -ServerInstance $ModifiedServerInstance -BackupFile $ModifiedDatabaseBackupLocation -ErrorAction Stop -EnablePortSharing -LicenseFile $NAVLicense
+Import-NAVServerLicense -LicenseFile $NAVLicense -ServerInstance $ModifiedServerInstance 
+Set-NAVServerInstance -ServerInstance $ModifiedServerInstance -Restart
 
 [UpgradeAction] $UpgradeAction = [UpgradeAction]::Split
 
@@ -29,26 +31,19 @@ $UpgradeAction = [UpgradeAction]::Merge
 UpgradeNAVCode -WorkingFolderPath $WorkingFolder -OriginalFileName $OriginalObjects -ModifiedFileName $ModifiedObjects -TargetFileName $TargetObjects `
                 -UpgradeAction $UpgradeAction -CompareObject $CompareObject -OpenConflictFilesInKdiff $True
 
-$UpgradeAction = [UpgradeAction]::Join
-UpgradeNAVCode -WorkingFolderPath $WorkingFolder -OriginalFileName $OriginalObjects -ModifiedFileName $ModifiedObjects -TargetFileName $TargetObjects `
-                -UpgradeAction $UpgradeAction -CompareObject $CompareObject
-                #-CompareObject $CompareObject -RemoveOriginalFilesNotInTarget $True -RemoveModifyFilesNotInTarget $True
+#$UpgradeAction = [UpgradeAction]::Join
+#UpgradeNAVCode -WorkingFolderPath $WorkingFolder -OriginalFileName $OriginalObjects -ModifiedFileName $ModifiedObjects -TargetFileName $TargetObjects `
+#                -UpgradeAction $UpgradeAction -CompareObject $CompareObject `
+#                -CompareObject $CompareObject -RemoveOriginalFilesNotInTarget $True -RemoveModifyFilesNotInTarget $True
 
-RestoreDBFromFile -backupFile $BackupFilePath -dbNewname $dbName
+RemoveOriginalFilesNotInTarget -WorkingFolderPath $WorkingFolder -OriginalFolder $OriginalFolder -TargetFolder $TargetFolder
+RemoveModifiedFilesNotInTarget -WorkingFolderPath $WorkingFolder -ModifiedFolder $ModifiedFolder -TargetFolder $TargetFolder
+Join-NAVApplicationObjectFile -Destination $DestinationFile -Source $JoinFolder -Force
 
-#SetNAVServiceUserPermission -DatabaseServer $DBServer -DBName $dbName -ADUser "NT-MYNDIGHET\NETTVERKSTJENESTE"
-SetNAVServiceUserPermission -DatabaseServer $DBServer -DBName $dbName -ADUser "SI-Data\SQL"
+#Import-NAVApplicationObject $DestinationFile -DatabaseServer $DBServer -DatabaseName $UpgradeName -ImportAction Overwrite -SynchronizeSchemaChanges No -LogPath $ImportLog -Verbose
+#Import-NAVApplicationObject2 -Path $DestinationFile -ServerInstance $ModifiedServerInstance -ImportAction Default -LogPath $WorkingFolder -NavServerName $NAVServer -SynchronizeSchemaChanges Yes
 
-CreateNAVServerInstance -DBServer $DBServer -DataBase $dbName -FirstPortNumber $FirstPort -NavServiceInstance $NavServiceInstance
-CreateNavUser -User si-data\jal -NavServiceInstance $NavServiceInstance 
-
-#Import-NAVServerLicense -LicenseFile $LicensFile -ServerInstance $NavServiceInstance 
-Import-NAVServerLicense $NavServiceInstance  -LicenseData ([Byte[]]$(Get-Content -Path $LicensFile -Encoding Byte))
-#Import-NAVServerLicense -LicenseFile $LicensFile -ServerInstance $NavServiceInstance -Database $dbName -Force
-
-Import-NAVApplicationObject $NAVAPPObjects2Import -DatabaseServer $DBServer -DatabaseName $dbName -ImportAction Overwrite -SynchronizeSchemaChanges No -LogPath $ImportLog -Verbose
-
-Compile-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $dbName -LogPath $ImportLog -Recompile -SynchronizeSchemaChanges No
+#Compile-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $UpgradeName -LogPath $ImportLog -Recompile -SynchronizeSchemaChanges No
 
   
 $StoppedDateTime = Get-Date

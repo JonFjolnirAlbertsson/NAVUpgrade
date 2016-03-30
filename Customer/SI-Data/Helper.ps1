@@ -9,6 +9,7 @@ $null = Set-NAVServerInstance -Start -ServerInstance $ServerInstance
         $null = $ServerInstanceObject | Import-NAVServerLicense -LicenseFile $LicenseFile -Force -WarningAction SilentlyContinue
     }
 $ServerInstance  = 'NAV71CU29SIData'  
+$ServerInstance  = 'NAV71SIData'  
 $ServerInstance  = 'DynamicsNAV71'            
 $null = sc.exe config (get-service NetTcpPortSharing).Name Start= Auto
 $null = Start-service NetTcpPortSharing
@@ -22,4 +23,6 @@ Sync-NAVTenant -ServerInstance $ServerInstance -Mode CheckOnly
 
 Join-NAVApplicationObjectFile -Source "C:\NAVUpgrade\Customer\SI-Data\NAV 2016\Incadea\Merged\ToBeJoined" -Destination "C:\NAVUpgrade\Customer\SI-Data\NAV 2016\Incadea\all-merged-objects.txt"
 
-Enable-NAVServerInstancePortSharing -ServerInstance $ModifiedServerInstance
+New-NAVServerInstance -ManagementServicesPort 7045 -ServerInstance $ServerInstance -ClientServicesCredentialType Windows -ClientServicesPort 7046 -DatabaseName $UpgradeName -DatabaseServer $DBServer -ODataServicesPort 7048 -SOAPServicesPort 7047
+Enable-NAVServerInstancePortSharing -ServerInstance $ServerInstance
+

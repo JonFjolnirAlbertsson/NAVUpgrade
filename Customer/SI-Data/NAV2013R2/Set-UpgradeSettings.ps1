@@ -9,7 +9,11 @@ $UpgradeCodeunitsFullPath = 'E:\UpgradeToolKit\Local Objects\Upgrade800900.NO.fo
 $VersionListPrefixes = 'NAVW1', 'NAVNO', 'I'
 $CUDownloadFile = 'C:\Temp\NAV\NAV2016\Temp\490370_NOR_i386_zip.exe'
 $IsoDirectory = 'C:\Temp\NAV\NAV2016\ISO'
+#$ImportLog = join-path $WorkingFolder 'Log'
 
+#Servers
+$DBServer = 'localhost'
+$NAVServer = 'localhost'
 
 #Constants
 $MergetoolPath     = 'C:\Program Files\KDiff3\kdiff3.exe'
@@ -17,16 +21,23 @@ $MergetoolPath     = 'C:\Program Files\KDiff3\kdiff3.exe'
 #Original Version
 $OriginalVersion = 'NAV2016_CU4_NO'
 $OriginalObjects = join-path $ObjectLibrary "$($OriginalVersion).txt"
+$OriginalFolder = join-path $WorkingFolder 'Original'
 
 #Modified Version
 $ModifiedServerInstance = $UpgradeName
 $ModifiedObjects = join-path $ModifiedFolder "$($ModifiedServerInstance).txt"
 $ModifiedDatabaseBackupLocation = join-path $ModifiedFolder "$($ModifiedServerInstance).bak"
+$ModifiedFolder = join-path $WorkingFolder 'Modified'
 
 #Target Version
 $TargetVersion = 'NAV2013_R2_CU29' 
 $TargetServerInstance = 'DynamicsNAV71'
 $TargetObjects = join-path $ObjectLibrary "$($TargetVersion).txt"
+$TargetFolder = join-path $WorkingFolder 'Target'
 
 #Result Version
 $ResultObjectFile = Join-Path $WorkingFolder 'Result.fob'
+
+#Join
+$JoinFolder = join-path $WorkingFolder 'Merged\ToBeJoined'
+$DestinationFile = join-path $WorkingFolder "$ModifiedServerInstance.txt"
