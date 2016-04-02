@@ -1,4 +1,4 @@
-﻿$Location = "C:\GitHub\NAVUpgrade\Customer\Elas\Script"
+﻿$Location = "C:\GitHub\NAVUpgrade\Customer\Busch\Script\CU5"
 . (join-path $Location 'Set-UpgradeSettings.ps1')
 
 clear-host
@@ -27,24 +27,15 @@ $MergeResult = Merge-NAVUpgradeObjects `
     -VersionListPrefixes $VersionListPrefixes `
     -Force
 
-# Reset Workingfolder
-if (test-path $WorkingFolderNAV2009){
-    if (Confirm-YesOrNo -title 'Remove WorkingFolder?' -message "Do you want to remove the WorkingFolder $WorkingFolderNAV2009 ?"){
-        Remove-Item -Path $WorkingFolderNAV2009 -Force -Recurse
-    } else {
-        write-error '$WorkingFolder already exists.  Overwrite not allowed.'
-        break
-    }
-}
-# Split object files and create folders for NAV 2009.
-$CompareObject = 'TAB*.TXT'
-Merge-NAVCode -WorkingFolderPath $WorkingFolderNAV2009 -OriginalFileName $OriginalObjects -ModifiedFileName $ModifiedObjects -TargetFileName $TargetNAV2009Objects -CompareObject $CompareObject -Split
+# Split object files and create folders.
+$CompareObject = '*.TXT'
+Merge-NAVCode -WorkingFolderPath $WorkingFolder -OriginalFileName $OriginalObjects -ModifiedFileName $ModifiedObjects -TargetFileName $TargetObjects -CompareObject $CompareObject -Split
 # Merge Customer database table objects and NAV 20009 table objects.
-Merge-NAVCode -WorkingFolderPath $WorkingFolderNAV2009 -OriginalFileName $OriginalObjects -ModifiedFileName $ModifiedObjects -TargetFileName $TargetNAV2009Objects  -CompareObject $CompareObject -Merge
-# Use Merge-Helper to merge NAv 2009 table objects
+Merge-NAVCode -WorkingFolderPath $WorkingFolder -OriginalFileName $OriginalObjects -ModifiedFileName $ModifiedObjects -TargetFileName $TargetObjects  -CompareObject $CompareObject -Merge
+# Use Merge-Helper to merge NAV conflict objects
 
 # Join Merged objects to one text file.
-Merge-NAVCode -WorkingFolderPath $WorkingFolderNAV2009 -CompareObject $CompareObject -Join
+Merge-NAVCode -WorkingFolderPath $WorkingFolder -CompareObject $CompareObject -Join
 
 <#
 [UpgradeAction] $UpgradeAction = [UpgradeAction]::Split
