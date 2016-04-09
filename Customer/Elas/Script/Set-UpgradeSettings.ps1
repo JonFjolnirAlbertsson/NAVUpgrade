@@ -1,6 +1,5 @@
 ﻿#Base Path
 $RootFolderPath = "F:\NavUpgrade"
-$MergetoolPath = 'C:\Program Files\KDiff3\kdiff3.exe'
 #Servers
 $DBServer = 'localhost'
 $NAVServer = 'localhost'
@@ -26,6 +25,7 @@ $ModifiedFolder = "$RootFolderPath\Customer\$CompanyName\CustomerDBs"
 $ModifiedObjectFile = 'NAV50SP1Elas.txt'
 $WorkingFolder = "$RootFolderPath\Customer\$CompanyFolder\Upgrade_$UpgradeName"
 $WorkingFolderNAV2009 = "$RootFolderPath\Customer\$CompanyFolder\NAV2009"
+$WorkingFolderNAV2015 = "$RootFolderPath\Customer\$CompanyFolder\NAV2015"
 #Original DB objects
 $ObjectLibrary = "$RootFolderPath\DB Original"
 #Database backup files
@@ -36,8 +36,10 @@ $NAV2015BackupFile = "$RootFolderPath\NAV\NAV2015\CU17\DVD\SQLDemoDatabase\Commo
 #Previous NAv versions naming
 $NAV2009DBName = 'NAV60' + $CompanyName 
 $NAV2015CU = 'CU17'
-$NAV2015DBName = 'NAV80' + $NAV2015CU + $CompanyName
 $NAV2009ObjectFile = 'NAV2009_R2_35179_NO.txt'
+$NAV2015DBName = 'NAV80' + $NAV2015CU + $CompanyName
+$NAV2015ObjectFile = 'NAV2015_' +$NAV2015CU  + '_NO.txt'
+$NAV2015ModifiedObjectFile = 'Busch_NAV2009_WithMerged_Tables.txt'
 
 #Putting the paths toghether
 $RootFolder = $RootFolderPath + $CompanyFolderName
@@ -61,6 +63,7 @@ $ModifiedServerInstance = $UpgradeName
 $ModifiedObjects = join-path $ModifiedFolder $ModifiedObjectFile
 $ModifiedDatabaseBackupLocation = join-path $ModifiedFolder "$($ModifiedServerInstance).bak"
 $ModifiedFolder = join-path $WorkingFolder 'Modified'
+$ModifiedNAV2015Objects = join-path $WorkingFolderNAV2009 $NAV2015ModifiedObjectFile
 
 #Target Version
 $TargetVersion = 'NAV' + $NAVVersion + '_' + $NAVCU + '_NO' 
@@ -68,6 +71,7 @@ $TargetServerInstance = 'DynamicsNAV90'
 $TargetObjects = join-path $ObjectLibrary "$($TargetVersion).txt"
 $TargetFolder = join-path $WorkingFolder 'Target'
 $TargetNAV2009Objects = join-path $ObjectLibrary $NAV2009ObjectFile
+$TargetNAV2015Objects = join-path $ObjectLibrary $NAV2015ObjectFile
 
 #Result Version
 $ResultObjectFile = Join-Path $WorkingFolder 'Result.fob'
