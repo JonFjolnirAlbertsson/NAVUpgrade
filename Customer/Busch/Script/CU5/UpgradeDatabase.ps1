@@ -151,7 +151,10 @@ Get-NAVDataUpgrade -ServerInstance $TargetServerInstance -ErrorOnly | ogv
 $BackupFileName = $UpgradeDataBaseName + "_Step11.bak"
 $BackupFilePath = join-path $BackupPath $BackupFileName 
 Backup-SqlDatabase -ServerInstance $DBServer -Database $UpgradeDataBaseName -BackupAction Database -BackupFile $BackupFilePath -CompressionOption Default
-
+#Step 12
+$BackupFileName = $UpgradeDataBaseName + "_Step12.bak"
+$BackupFilePath = join-path $BackupPath $BackupFileName 
+Backup-SqlDatabase -ServerInstance $DBServer -Database $UpgradeDataBaseName -BackupAction Database -BackupFile $BackupFilePath -CompressionOption Default
 
 $StoppedDateTime = Get-Date
   
