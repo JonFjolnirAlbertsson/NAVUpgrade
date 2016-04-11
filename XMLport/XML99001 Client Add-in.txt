@@ -1,0 +1,64 @@
+OBJECT XMLport 99001 Client Add-in
+{
+  OBJECT-PROPERTIES
+  {
+    Date=25.11.15;
+    Time=21:10:48;
+    Modified=Yes;
+    Version List=Upgrade;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Client Add-in;
+               NOR=Client Add-in];
+    TextEncoding=WINDOWS;
+    Format=Variable Text;
+  }
+  ELEMENTS
+  {
+    { [{DF976684-ED69-4BBC-B129-196367E14F77}];  ;Root                ;Element ;Text     }
+
+    { [{53474314-4922-4351-B70C-8AB74DF8061A}];1 ;ClientAddIn         ;Element ;Table   ;
+                                                  SourceTable=Table2000000069 }
+
+    { [{240DE6DA-089E-4C5D-9AE2-1D444717D09C}];2 ;ControlAddInName    ;Element ;Field   ;
+                                                  DataType=Text;
+                                                  SourceField=Add-in::Add-in Name }
+
+    { [{5E673869-B488-4C2F-B4BF-B373E6953AB2}];2 ;PublicKeyToken      ;Element ;Field   ;
+                                                  DataType=Text;
+                                                  SourceField=Add-in::Public Key Token }
+
+    { [{B4A68E37-2C81-4CFF-8A91-9F93ACC95A09}];2 ;Version             ;Element ;Field   ;
+                                                  DataType=Text;
+                                                  SourceField=Add-in::Version }
+
+    { [{B27E88E8-21BF-4AC6-8B6F-3E62E89AF631}];2 ;Category            ;Element ;Field   ;
+                                                  DataType=Option;
+                                                  SourceField=Add-in::Category }
+
+    { [{D81E8491-4AE3-4E4B-A5E1-011AF75FDB3F}];2 ;Description         ;Element ;Field   ;
+                                                  DataType=Text;
+                                                  SourceField=Add-in::Description }
+
+  }
+  EVENTS
+  {
+  }
+  REQUESTPAGE
+  {
+    PROPERTIES
+    {
+    }
+    CONTROLS
+    {
+    }
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

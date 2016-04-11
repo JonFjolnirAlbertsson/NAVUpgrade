@@ -1,0 +1,58 @@
+OBJECT XMLport 99002 ReportSelection
+{
+  OBJECT-PROPERTIES
+  {
+    Date=26.11.15;
+    Time=17:57:01;
+    Modified=Yes;
+    Version List=;
+  }
+  PROPERTIES
+  {
+    Encoding=ISO-8859-2;
+    Format=Variable Text;
+  }
+  ELEMENTS
+  {
+    { [{060DA3F4-E4B0-4A22-89A5-1FEDDAAC42AF}];  ;root                ;Element ;Text     }
+
+    { [{5D09EA28-250B-4FA8-B13B-ABBF39D37D60}];1 ;ReportSelection     ;Element ;Table   ;
+                                                  SourceTable=Table77 }
+
+    { [{6897EB12-1AA0-4788-8C19-74C66DB502C4}];2 ;Usage               ;Element ;Field   ;
+                                                  DataType=Option;
+                                                  SourceField=Report Selections::Usage }
+
+    { [{EF1C02A6-0D3C-4887-9210-5B4336D55ADB}];2 ;Sequence            ;Element ;Field   ;
+                                                  DataType=Code;
+                                                  SourceField=Report Selections::Sequence }
+
+    { [{81CCCD28-72B1-415A-97FD-61927AF19E4F}];2 ;ReportID            ;Element ;Field   ;
+                                                  DataType=Integer;
+                                                  SourceField=Report Selections::Report ID }
+
+    { [{4345CD4A-9F33-4729-B207-541240530F56}];2 ;ReportCaption       ;Element ;Field   ;
+                                                  DataType=Text;
+                                                  SourceField=Report Selections::Report Caption }
+
+  }
+  EVENTS
+  {
+  }
+  REQUESTPAGE
+  {
+    PROPERTIES
+    {
+    }
+    CONTROLS
+    {
+    }
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

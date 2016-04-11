@@ -1,0 +1,258 @@
+OBJECT XMLport 9170 Profile Import/Export
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09.09.14;
+    Time=12:00:00;
+    Version List=NAVW18.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Profile Import/Export;
+               NOR=Import/eksport av profil];
+    Format/Evaluate=XML Format/Evaluate;
+  }
+  ELEMENTS
+  {
+    { [{0693E620-37D5-4591-80BF-F0AD7B79ED27}];  ;Profiles            ;Element ;Text     }
+
+    { [{1ED86ECF-11EC-47F1-8F02-F788BA020668}];1 ;Profile             ;Element ;Table   ;
+                                                  SourceTable=Table2000000072 }
+
+    { [{C5C0E572-C83D-4CC7-969B-A46D08C5F941}];2 ;ID                  ;Attribute;Field  ;
+                                                  DataType=Code;
+                                                  SourceField=Profile::Profile ID }
+
+    { [{0D60AB78-73D4-41A1-8774-B53DF67F7126}];2 ;Description         ;Attribute;Field  ;
+                                                  DataType=Text;
+                                                  SourceField=Profile::Description }
+
+    { [{02D1A8F2-0400-4845-B67F-776C51AE0D0A}];2 ;RoleCenterID        ;Attribute;Field  ;
+                                                  DataType=Integer;
+                                                  SourceField=Profile::Role Center ID }
+
+    { [{9C795942-03D0-46A7-A88F-D59EC046AF01}];2 ;DefaultRoleCenter   ;Attribute;Field  ;
+                                                  DataType=Boolean;
+                                                  SourceField=Profile::Default Role Center;
+                                                  Import::OnAfterAssignField=VAR
+                                                                               Profile2@1000 : Record 2000000072;
+                                                                             BEGIN
+                                                                               IF Profile."Default Role Center" THEN BEGIN
+                                                                                 Profile2.SETRANGE("Default Role Center",TRUE);
+                                                                                 IF NOT Profile2.ISEMPTY THEN
+                                                                                   Profile."Default Role Center" := FALSE;
+                                                                               END;
+                                                                             END;
+                                                                              }
+
+    { [{36848BC0-B1F3-4850-9655-6421A3E7F432}];2 ;ProfileMetadata     ;Element ;Table   ;
+                                                  SourceTable=Table2000000074;
+                                                  LinkFields=Field3=FIELD(Field3);
+                                                  LinkTable=Profile;
+                                                  MinOccurs=Zero }
+
+    { [{79147405-8024-46F9-8FF1-D0B698F25EF2}];3 ;ProfileID           ;Attribute;Field  ;
+                                                  DataType=Code;
+                                                  SourceField=Profile Metadata::Profile ID }
+
+    { [{ED0C0605-9258-4278-9068-24C7B984EF76}];3 ;PageID              ;Attribute;Field  ;
+                                                  DataType=Integer;
+                                                  SourceField=Profile Metadata::Page ID }
+
+    { [{90BBD37E-82AB-4682-AACD-DFAA6E449AFD}];3 ;PersonalizationID   ;Attribute;Field  ;
+                                                  DataType=Code;
+                                                  SourceField=Profile Metadata::Personalization ID }
+
+    { [{97A87FCC-E974-4029-A9DB-7411378009CB}];3 ;PageMetadata        ;Element ;Text    ;
+                                                  TextType=BigText;
+                                                  Import::OnAfterAssignVariable=VAR
+                                                                                  MetadataOutStream@1001 : OutStream;
+                                                                                  streamWriter@1003 : DotNet "'mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089'.System.IO.StreamWriter";
+                                                                                  Encoding@1002 : DotNet "'mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089'.System.Text.Encoding";
+                                                                                BEGIN
+                                                                                  IF PageMetadata.LENGTH > 0 THEN BEGIN
+                                                                                    // OutStream cannot be used directly as it would write the input (metadata blob) as OEM even though it is stored as UTF-8 causing problems for characters not in OEM.
+                                                                                    // .Net StreamWriter can correctly write UTF-8.
+                                                                                    "Profile Metadata"."Page Metadata Delta".CREATEOUTSTREAM(MetadataOutStream);
+                                                                                    streamWriter := streamWriter.StreamWriter(MetadataOutStream,Encoding.UTF8);
+                                                                                    streamWriter.Write(PageMetadata);
+                                                                                  END;
+                                                                                END;
+
+                                                  Export::OnBeforePassVariable=VAR
+                                                                                 MetadataInStream@1000 : InStream;
+                                                                                 streamReader@1001 : DotNet "'mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089'.System.IO.StreamReader";
+                                                                                 Encoding@1002 : DotNet "'mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089'.System.Text.Encoding";
+                                                                                 stream@1003 : Text;
+                                                                               BEGIN
+                                                                                 CLEAR(PageMetadata);
+                                                                                 "Profile Metadata".CALCFIELDS("Page Metadata Delta");
+
+                                                                                 IF "Profile Metadata"."Page Metadata Delta".HASVALUE THEN BEGIN
+                                                                                   "Profile Metadata"."Page Metadata Delta".CREATEINSTREAM(MetadataInStream);
+                                                                                   // InStream cannot be used as it would read the input (metadata blob) as OEM even though it is stored as UTF-8 causing problems for characters not in OEM.
+                                                                                   // .Net StreamReader can correctly read UTF-8.
+                                                                                   streamReader := streamReader.StreamReader(MetadataInStream,Encoding.UTF8,TRUE);
+                                                                                   stream := streamReader.ReadToEnd();
+                                                                                   PageMetadata.ADDTEXT(stream);
+                                                                                 END;
+                                                                               END;
+                                                                                }
+
+  }
+  EVENTS
+  {
+  }
+  REQUESTPAGE
+  {
+    PROPERTIES
+    {
+    }
+    CONTROLS
+    {
+    }
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+
+OBJECT XMLport 9171 Import/Export Permission Sets
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09.09.14;
+    Time=12:00:00;
+    Version List=NAVW18.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Import/Export Permission Sets;
+               NOR=Tillatelsessett for import/eksport];
+    Format=Variable Text;
+  }
+  ELEMENTS
+  {
+    { [{9AA0C0BD-F3C1-48AD-A2FB-A38EAC807F76}];  ;Root                ;Element ;Text     }
+
+    { [{8040A803-A933-4F6A-8F74-82563FC17C1C}];1 ;UserRole            ;Element ;Table   ;
+                                                  SourceTable=Table2000000004 }
+
+    { [{2612CEEB-5154-4A67-8BD3-734A00CA077A}];2 ;RoleID              ;Element ;Field   ;
+                                                  DataType=Code;
+                                                  SourceField=Permission Set::Role ID }
+
+    { [{E04CDDD2-7443-4414-B36D-D70E998FD383}];2 ;Name                ;Element ;Field   ;
+                                                  DataType=Text;
+                                                  SourceField=Permission Set::Name }
+
+  }
+  EVENTS
+  {
+  }
+  REQUESTPAGE
+  {
+    PROPERTIES
+    {
+    }
+    CONTROLS
+    {
+    }
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+
+OBJECT XMLport 9172 Import/Export Permissions
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09.09.14;
+    Time=12:00:00;
+    Version List=NAVW18.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Import/Export Permissions;
+               NOR=Tillatelser for import/eksport];
+    Format=Variable Text;
+  }
+  ELEMENTS
+  {
+    { [{1FB89DF0-26C1-415B-AC8D-3630ECAD5A7C}];  ;Root                ;Element ;Text     }
+
+    { [{67628297-207D-4D1D-B0CE-DA83AA56D9F0}];1 ;Permission          ;Element ;Table   ;
+                                                  SourceTable=Table2000000005 }
+
+    { [{A902F2AF-889D-4A91-BB2A-126770DD0356}];2 ;RoleID              ;Element ;Field   ;
+                                                  DataType=Code;
+                                                  SourceField=Permission::Role ID }
+
+    { [{C19872D0-75D8-4F00-9C8F-5219A7520A27}];2 ;RoleName            ;Element ;Field   ;
+                                                  DataType=Text;
+                                                  SourceField=Permission::Role Name }
+
+    { [{AFBF9882-1F00-4848-A30F-FC77C7AEA52E}];2 ;ObjectType          ;Element ;Field   ;
+                                                  DataType=Option;
+                                                  SourceField=Permission::Object Type }
+
+    { [{6D86DB89-772A-4EFD-8090-EB217CF26F6F}];2 ;ObjectID            ;Element ;Field   ;
+                                                  DataType=Integer;
+                                                  SourceField=Permission::Object ID }
+
+    { [{E1606D03-830D-4C49-BAFB-58D4D2063F96}];2 ;ObjectName          ;Element ;Field   ;
+                                                  DataType=Text;
+                                                  SourceField=Permission::Object Name }
+
+    { [{8E1D82CE-8839-4E16-A633-C1844B2663A6}];2 ;ReadPermission      ;Element ;Field   ;
+                                                  DataType=Option;
+                                                  SourceField=Permission::Read Permission }
+
+    { [{E82868F2-5774-4176-9829-53257CF7C6AA}];2 ;InsertPermission    ;Element ;Field   ;
+                                                  DataType=Option;
+                                                  SourceField=Permission::Insert Permission }
+
+    { [{8F4A8D43-F841-4757-9E2E-8E964FF1C9DF}];2 ;ModifyPermission    ;Element ;Field   ;
+                                                  DataType=Option;
+                                                  SourceField=Permission::Modify Permission }
+
+    { [{0E6113D9-AF5B-4AA8-B231-81E53034D3A7}];2 ;DeletePermission    ;Element ;Field   ;
+                                                  DataType=Option;
+                                                  SourceField=Permission::Delete Permission }
+
+    { [{B39E3FD9-84EA-4835-B690-6EFF64B34A8E}];2 ;ExecutePermission   ;Element ;Field   ;
+                                                  DataType=Option;
+                                                  SourceField=Permission::Execute Permission }
+
+    { [{C9704BE3-CE1C-4508-BCE2-42CF5DF496FA}];2 ;SecurityFilter      ;Element ;Field   ;
+                                                  DataType=TableFilter;
+                                                  SourceField=Permission::Security Filter }
+
+  }
+  EVENTS
+  {
+  }
+  REQUESTPAGE
+  {
+    PROPERTIES
+    {
+    }
+    CONTROLS
+    {
+    }
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

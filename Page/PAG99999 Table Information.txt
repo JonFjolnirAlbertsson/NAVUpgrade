@@ -1,0 +1,50 @@
+OBJECT Page 99999 Table Information
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09.04.16;
+    Time=19:29:12;
+    Modified=Yes;
+    Version List=;
+  }
+  PROPERTIES
+  {
+    SourceTable=Table2000000028;
+    PageType=List;
+  }
+  CONTROLS
+  {
+    { 1101103000;0;Container;
+                ContainerType=ContentArea }
+
+    { 1101103001;1;Group  ;
+                Name=Group;
+                GroupType=Repeater }
+
+    { 1101103002;2;Field  ;
+                SourceExpr="Company Name" }
+
+    { 1101103003;2;Field  ;
+                SourceExpr="Table No." }
+
+    { 1101103004;2;Field  ;
+                SourceExpr="Table Name" }
+
+    { 1101103005;2;Field  ;
+                SourceExpr="No. of Records" }
+
+    { 1101103006;2;Field  ;
+                SourceExpr="Record Size" }
+
+    { 1101103007;2;Field  ;
+                SourceExpr="Size (KB)" }
+
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+
