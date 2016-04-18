@@ -26,3 +26,11 @@ Join-NAVApplicationObjectFile -Source "C:\NAVUpgrade\Customer\SI-Data\NAV 2016\I
 New-NAVServerInstance -ManagementServicesPort 7045 -ServerInstance $ServerInstance -ClientServicesCredentialType Windows -ClientServicesPort 7046 -DatabaseName $UpgradeName -DatabaseServer $DBServer -ODataServicesPort 7048 -SOAPServicesPort 7047
 Enable-NAVServerInstancePortSharing -ServerInstance $ServerInstance
 
+Export-NAVData -DatabaseServer JALW8 -DatabaseName 'Demo Database NAV (9-0) CU4' -FileName 'C:\temp\Demo Database NAV (9-0) CU4.navdata' -AllCompanies -IncludeApplicationData -IncludeGlobalData -IncludeApplication
+Import-NAVData -DatabaseServer SQL02 -DatabaseName 'NAV (9-0) CU4' -AllCompanies -FileName 'C:\temp\Demo Database NAV (9-0) CU4.navdata' -IncludeGlobalData -IncludeApplicationData -IncludeApplication
+
+$ServerInstance  = 'NAV71SIData'  
+$User = 'si-data\jal'
+Get-NAVServerInstance $ServerInstance | New-NAVServerUserPermissionSet -PermissionSetId SUPER -WindowsAccount $User
+
+New-NAVEnvironment -ServerInstance 'NAV90SIDataSQL02' -BackupFile '' -EnablePortSharing -LicenseFile $NAVLicense

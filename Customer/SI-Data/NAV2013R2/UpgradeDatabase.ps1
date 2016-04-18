@@ -94,21 +94,14 @@ Backup-SqlDatabase -ServerInstance $DBServer -Database $UpgradeName -BackupActio
 Sync-NAVTenant -ServerInstance nav71cu29sidata
 Sync-NAVTenant -ServerInstance nav71sidata
 Remove-NAVApplication -DatabaseName NAVSIData -DatabaseServer sql02
-#Export-NAVData -ServerInstance nav71cu29sidata -CompanyName 'SI-Data A/S' -FileName (join-path $BackupPath  ($UpgradeName + '.navdata')) 
-#Import-NAVData -ServerInstance NAV71SIData -FileName (join-path $BackupPath  ($UpgradeName + '.navdata')) -CompanyName 'SI-Data A/S' -Force
-#Export-NAVData -AllCompanies -DatabaseServer JALW8 -DatabaseName $UpgradeName -FileName (join-path $BackupPath  ($UpgradeName + '.navdata')) -IncludeGlobalData -IncludeApplicationData -Force
-Export-NAVData -DatabaseServer JALW8 -DatabaseName $UpgradeName -FileName (join-path $BackupPath  ($UpgradeName + '.navdata')) -CompanyName 'SI-Data A/S' -IncludeApplicationData -IncludeGlobalData -IncludeApplication
-Get-NAVCompany -ServerInstance NAV71SIData 
-Remove-NAVCompany -ServerInstance nav71sidata -CompanyName 'SI-Data A/S'
-Remove-NAVCompany -ServerInstance nav71sidata -CompanyName 'SI-Data ApS'
-Remove-NAVCompany -ServerInstance nav71sidata -CompanyName 'SI-DATA København A/S'
-Remove-NAVCompany -ServerInstance nav71sidata -CompanyName 'SI-Gruppen AB'
+
+#Export all data from database
+Export-NAVData -DatabaseServer JALW8 -DatabaseName $UpgradeName -FileName (join-path $BackupPath  ($UpgradeName + '.navdata')) -AllCompanies -IncludeApplicationData -IncludeGlobalData -IncludeApplication
+#Create new empty database on the server with the right Collation
+#Give server instance user DBOwner access on the database.
 Import-NAVData -DatabaseServer SQL02 -DatabaseName NAVSIData -AllCompanies -FileName (join-path $BackupPath  ($UpgradeName + '.navdata')) -IncludeGlobalData -IncludeApplicationData -IncludeApplication
-#Import-NAVApplicationObject $DestinationFile -DatabaseServer $DBServer -DatabaseName $UpgradeName -ImportAction Overwrite -SynchronizeSchemaChanges No -LogPath $ImportLog -Verbose
-#Import-NAVApplicationObject2 -Path $DestinationFile -ServerInstance $ModifiedServerInstance -ImportAction Default -LogPath $WorkingFolder -NavServerName $NAVServer -SynchronizeSchemaChanges Yes
 
-#Compile-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $UpgradeName -LogPath $ImportLog -Recompile -SynchronizeSchemaChanges No
-
+Copy-NAVCompany -DestinationCompanyName "Test 1" -ServerInstance nav71sidata -SourceCompanyName "SI-Data A/S"
   
 $StoppedDateTime = Get-Date
   
