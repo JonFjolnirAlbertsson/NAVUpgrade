@@ -19,6 +19,7 @@ $ZippedDVDfile  = "$RootFolderPath\NAV\NAV2016\Temp\490370_NOR_i386_zip.exe"
 #Company data
 $CompanyName = 'Elas'
 $UpgradeName = 'NAV' + $NAVShortVersion  + $NAVCU + $CompanyName
+$UpgradeDataBaseName = 'NAV90CU5Elas'
 $UpgradeObjectsName = 'NAV' + $NAVShortVersion  + $NAVCU + $CompanyName + 'Objects'
 $CompanyFolder = "$CompanyName\NAV2016\$NAVCU"
 $ModifiedFolder = "$RootFolderPath\Customer\$CompanyName\CustomerDBs"
@@ -29,6 +30,7 @@ $WorkingFolderNAV2015 = "$RootFolderPath\Customer\$CompanyFolder\NAV2015"
 #Original DB objects
 $ObjectLibrary = "$RootFolderPath\DB Original"
 #Database backup files
+$BackupPath = $ModifiedFolder
 $BackupfileCaompanyDB = join-path $ModifiedFolder 'Navision50_30032016.bak'
 $BackupfileTargetDB = "$RootFolderPath\NAV\NAV2016\NAV2016NO5_45243\DVD\NAV.9.0.45243.NO.DVD\SQLDemoDatabase\CommonAppData\Microsoft\Microsoft Dynamics NAV\90\Database\Demo Database NAV (9-0).bak"
 $NAV2009BackupFile = "$RootFolderPath\NAV\NAV2009\DVD\SQLDemoDatabase\CommonAppData\Microsoft\Microsoft Dynamics NAV\60\Database\Demo Database NAV (6-0).bak"

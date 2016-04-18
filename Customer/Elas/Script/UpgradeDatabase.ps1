@@ -64,20 +64,14 @@ Merge-NAVCode -WorkingFolderPath $WorkingFolderNAV2015 -CompareObject $CompareOb
 Merge-NAVCode -WorkingFolderPath $WorkingFolderNAV2015 -CompareObject $CompareObject -Join
 
 #NAV2016
+$CompareObject = '*.TXT'
+Merge-NAVCode -WorkingFolderPath $WorkingFolder -OriginalFileName $OriginalObjects -ModifiedFileName $ModifiedObjects -TargetFileName $TargetObjects -CompareObject $CompareObject -Split
 Merge-NAVCode -WorkingFolderPath $WorkingFolder -CompareObject $CompareObject -Join
 
-
-<#
-RemoveOriginalFilesNotInTarget -WorkingFolderPath $WorkingFolder -OriginalFolder $OriginalFolder -TargetFolder $TargetFolder
-RemoveModifiedFilesNotInTarget -WorkingFolderPath $WorkingFolder -ModifiedFolder $ModifiedFolder -TargetFolder $TargetFolder
-Join-NAVApplicationObjectFile -Destination $DestinationFile -Source $JoinFolder -Force
-#>
-
-#Import-NAVApplicationObject $DestinationFile -DatabaseServer $DBServer -DatabaseName $UpgradeName -ImportAction Overwrite -SynchronizeSchemaChanges No -LogPath $ImportLog -Verbose
-#Import-NAVApplicationObject2 -Path $DestinationFile -ServerInstance $ModifiedServerInstance -ImportAction Default -LogPath $WorkingFolder -NavServerName $NAVServer -SynchronizeSchemaChanges Yes
-
-#Compile-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $UpgradeName -LogPath $ImportLog -Recompile -SynchronizeSchemaChanges No
-
+#Step 1
+$BackupFileName = $UpgradeDataBaseName + "_Step1.bak"
+$BackupFilePath = join-path $BackupPath $BackupFileName 
+Backup-SqlDatabase -ServerInstance $DBServer -Database $UpgradeDataBaseName -BackupAction Database -BackupFile $BackupFilePath -CompressionOption Default
   
 $StoppedDateTime = Get-Date
   
