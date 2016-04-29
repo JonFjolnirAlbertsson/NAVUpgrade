@@ -1,5 +1,5 @@
 ﻿#Base Path
-$RootFolderPath = "C:\NavUpgrade"
+$RootFolderPath = "F:\NavUpgrade"
 #Servers
 $DBServer = 'localhost'
 $NAVServer = 'localhost'
@@ -29,7 +29,7 @@ $WorkingFolderNAV2015 = "$RootFolderPath\Customer\$CompanyFolder\NAV2015"
 #Original DB objects
 $ObjectLibrary = "$RootFolderPath\DB Original"
 #Database backup files
-$BackupfileCaompanyDB = join-path $ModifiedFolder 'Navision50_30032016.bak'
+$BackupfileCompanyDB = join-path $ModifiedFolder 'Navision50_30032016.bak'
 $BackupfileTargetDB = "$RootFolderPath\NAV\NAV2016\NAV2016NO5_45243\DVD\NAV.9.0.45243.NO.DVD\SQLDemoDatabase\CommonAppData\Microsoft\Microsoft Dynamics NAV\90\Database\Demo Database NAV (9-0).bak"
 $NAV2009BackupFile = "$RootFolderPath\NAV\NAV2009\DVD\SQLDemoDatabase\CommonAppData\Microsoft\Microsoft Dynamics NAV\60\Database\Demo Database NAV (6-0).bak"
 $NAV2015BackupFile = "$RootFolderPath\NAV\NAV2015\CU17\DVD\SQLDemoDatabase\CommonAppData\Microsoft\Microsoft Dynamics NAV\80\Database\Demo Database NAV (8-0).bak"
@@ -62,6 +62,7 @@ $ModifiedNAV2015Objects = join-path $WorkingFolderNAV2009 $NAV2015ModifiedObject
 $TargetVersion = 'NAV' + $NAVVersion + '_' + $NAVCU + '_NO' 
 $TargetServerInstance = 'DynamicsNAV90'
 $TargetObjects = join-path $ObjectLibrary "$($TargetVersion).txt"
+$TargetDBLocation = join-path $ObjectLibrary "$($TargetVersion).bak"
 $TargetFolder = join-path $WorkingFolder 'Target'
 $TargetNAV2009Objects = join-path $ObjectLibrary $NAV2009ObjectFile
 $TargetNAV2015Objects = join-path $ObjectLibrary $NAV2015ObjectFile
