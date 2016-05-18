@@ -1,4 +1,4 @@
-﻿$Location = "C:\GitHub\NAVUpgrade\Customer\SI-Data\NAV2013R2"
+﻿$Location = "C:\GitHub\NAVUpgrade\Customer\SI-Data\Script"
 . (join-path $Location 'Set-UpgradeSettings.ps1')
 
 
@@ -93,13 +93,18 @@ Backup-SqlDatabase -ServerInstance $DBServer -Database $UpgradeName -BackupActio
 
 Sync-NAVTenant -ServerInstance nav71cu29sidata
 Sync-NAVTenant -ServerInstance nav71sidata
+Sync-NAVTenant -ServerInstance nav71cu29sidataDen
+
 Remove-NAVApplication -DatabaseName NAVSIData -DatabaseServer sql02
 
 #Export all data from database
-Export-NAVData -DatabaseServer JALW8 -DatabaseName $UpgradeName -FileName (join-path $BackupPath  ($UpgradeName + '.navdata')) -AllCompanies -IncludeApplicationData -IncludeGlobalData -IncludeApplication
+Export-NAVData -DatabaseServer JALW8 -DatabaseName $UpgradeName -FileName (join-path $BackupPath  ($UpgradeName + '_AllCompanies.navdata')) -AllCompanies -IncludeApplicationData -IncludeGlobalData -IncludeApplication
 #Create new empty database on the server with the right Collation
 #Give server instance user DBOwner access on the database.
 Import-NAVData -DatabaseServer SQL02 -DatabaseName NAVSIData -AllCompanies -FileName (join-path $BackupPath  ($UpgradeName + '.navdata')) -IncludeGlobalData -IncludeApplicationData -IncludeApplication
+# starts at 13:40
+Import-NAVData -DatabaseServer SQL02 -DatabaseName NAVSIDataDen -AllCompanies -FileName (join-path $BackupPath  ($UpgradeName + '_AllCompanies.navdata')) -IncludeGlobalData -IncludeApplicationData -IncludeApplication
+#New-NAVEnvironment -Databasename NAVSIDataDen -DatabaseServer sql02 -EnablePortSharing -LicenseFile $NAVLicense -ServerInstance NAV71CU29SIDataDen
 
 Copy-NAVCompany -DestinationCompanyName "Test 1" -ServerInstance nav71sidata -SourceCompanyName "SI-Data A/S"
   

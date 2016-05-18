@@ -38,3 +38,5 @@ $MergeResult = Merge-NAVUpgradeObjects `
 Split-NAVApplicationObjectFile -Source $ResultFile -Destination $ResultFolder
 
 Merge-NAVCode -WorkingFolderPath $WorkingFolder -CompareObject $CompareObject -Join
+
+Split-NAVApplicationObjectFile -Source 'C:\NAVUpgrade\Customer\SI-Data\NAV2013R2\CU29\Incadea\FOB\Changesv10.txt' -Destination 'C:\NAVUpgrade\Customer\SI-Data\NAV2013R2\CU29\Incadea\FOB\Modified'
