@@ -1,5 +1,8 @@
 ﻿#Base Path
-$RootFolderPath = "F:\NavUpgrade"
+#Azure
+#$RootFolderPath = "F:\NavUpgrade"
+#SQLNAVUpgrade
+$RootFolderPath = "C:\NavUpgrade"
 #Servers
 $DBServer = 'localhost'
 $NAVServer = 'localhost'

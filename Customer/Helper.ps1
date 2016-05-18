@@ -10,7 +10,7 @@ $null = Set-NAVServerInstance -Start -ServerInstance $ServerInstance
     }
 $ServerInstance  = 'NAV71CU29SIData'  
 $ServerInstance  = 'NAV71SIData'  
-$ServerInstance  = 'DynamicsNAV71'  
+$ServerInstance  = 'DynamicsNAV90'  
 $ServerInstance  = 'NAV90_OsloFinerObject'          
 $null = sc.exe config (get-service NetTcpPortSharing).Name Start= Auto
 $null = Start-service NetTcpPortSharing
@@ -58,3 +58,15 @@ Get-NAVDataUpgrade -ServerInstance $TestDataBaseName -ErrorOnly | ogv
 
 $StoppedDateTime = Get-Date
 Write-Host 'Start at: ' + $StartedDateTime + ' . Finished at: ' + $StoppedDateTime + ' . Total time' + ($StoppedDateTime-$StartedDateTime) -ForegroundColor Yellow
+
+
+Restore-SQLBackupFile-SID -BackupFile 'C:\NavUpgrade\Elas\CustomerDBs\NAV90CU5Elas_Step12\NAV90CU5Elas_Step12.bak' -DatabaseName 'NAV90Elas'
+New-NAVEnvironment -Databasename 'NAV90Elas' -DatabaseServer localhost -EnablePortSharing -LicenseFile 'C:\NavUpgrade\License\NAV2016.flf' -ServerInstance 'NAV90Elas'
+New-NAVEnvironment -Databasename 'NAV2016CU1_Busch' -DatabaseServer localhost -EnablePortSharing -LicenseFile 'C:\NavUpgrade\License\NAV2016.flf' -ServerInstance 'NAV90Busch'
+
+$ADuser = "SQLNAVUPGRADE\jal"
+$NavServiceInstance = "NAV90Elas"
+$NavServiceInstance = "NAV90Busch"
+Sync-NAVTenant -ServerInstance $NavServiceInstance 
+Get-NAVServerInstance $NavServiceInstance | New-NAVServerUser -WindowsAccount $ADuser 
+Get-NAVServerInstance $NavServiceInstance | New-NAVServerUserPermissionSet –WindowsAccount $ADuser -PermissionSetId SUPER -Verbose
