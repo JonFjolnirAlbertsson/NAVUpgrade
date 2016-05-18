@@ -15,9 +15,9 @@ if (test-path $WorkingFolder){
     }
 }
 
-# Restore company database, to be upgraded.
-# New-NAVEnvironment -ServerInstance $UpgradeObjectsName  -BackupFile $BackupfileCaompanyDB -ErrorAction Stop -EnablePortSharing -LicenseFile $NAVLicense
-Restore-SQLBackupFile-SID -BackupFile $BackupfileCaompanyDB -DatabaseName $UpgradeName
+# Create new NAV 2016 company database, to migrate Objects
+New-NAVEnvironment -ServerInstance $UpgradeObjectsName  -BackupFile $TargetDBLocation -ErrorAction Stop -EnablePortSharing -LicenseFile $NAVLicense
+Restore-SQLBackupFile-SID -BackupFile $TargetDBLocation -DatabaseName $UpgradeObjectsName
 
 # Merge Customer database objects and NAV 2016 objects.
 $MergeResult = Merge-NAVUpgradeObjects `

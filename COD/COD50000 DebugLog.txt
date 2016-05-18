@@ -1,0 +1,44 @@
+OBJECT Codeunit 50000 DebugLog
+{
+  OBJECT-PROPERTIES
+  {
+    Date=26.04.16;
+    Time=17:11:17;
+    Modified=Yes;
+    Version List=;
+  }
+  PROPERTIES
+  {
+    OnRun=BEGIN
+            DebugLog('Start');
+            DebugLog('End');
+          END;
+
+  }
+  CODE
+  {
+
+    [Normal]
+    PROCEDURE DebugLog@1101103000(LogTextP@1101103000 : Text[250]);
+    VAR
+      FileL@1101103001 : File;
+      OutStreamL@1101103003 : OutStream;
+      FileNameL@1101103002 : Text[250];
+    BEGIN
+      FileNameL := 'C:\temp\NAVDebugLog.txt';
+      FileL.TEXTMODE(TRUE);
+      FileL.WRITEMODE(TRUE);
+      IF EXISTS(FileNameL) THEN
+        FileL.OPEN(FileNameL)
+      ELSE
+        FileL.CREATE(FileNameL);
+      FileL.SEEK(FileL.LEN);
+      FileL.WRITE(('Time;' + FORMAT(CURRENTDATETIME) + ';'  + LogTextP));
+      FileL.CLOSE;
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

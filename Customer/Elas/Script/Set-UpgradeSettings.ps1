@@ -1,5 +1,8 @@
 ﻿#Base Path
-$RootFolderPath = "F:\NavUpgrade"
+#Azure
+#$RootFolderPath = "F:\NavUpgrade"
+#SQLNAVUpgrade
+$RootFolderPath = "C:\NavUpgrade"
 #Servers
 $DBServer = 'localhost'
 $NAVServer = 'localhost'
@@ -13,7 +16,6 @@ $NAVCU = 'CU5'
 $VersionListPrefixes = 'NAVW1', 'NAVNO', 'I'
 $NAVInstallConfigFile = "C:\GitHub\NAVUpgrade\NAVSetup\FullInstallNAV2016.xml"
 $NAVLicense = "$RootFolderPath\License\NAV2016.flf"
-$UpgradeCodeunitsFullPath = 'F:\UpgradeToolKit\Local Objects\Upgrade800900.NO.fob'
 #$CUDownloadFile = 'C:\Temp\NAV\NAV2016\Temp\490370_NOR_i386_zip.exe'
 $ZippedDVDfile  = "$RootFolderPath\NAV\NAV2016\Temp\490370_NOR_i386_zip.exe"
 #Company data
@@ -41,8 +43,12 @@ $NAV2015CU = 'CU17'
 $NAV2009ObjectFile = 'NAV2009_R2_35179_NO.txt'
 $NAV2015DBName = 'NAV80' + $NAV2015CU + $CompanyName
 $NAV2015ObjectFile = 'NAV2015_' +$NAV2015CU  + '_NO.txt'
-$NAV2015ModifiedObjectFile = 'Busch_NAV2009_WithMerged_Tables.txt'
-
+$NAV2015ModifiedObjectFile = 'Elas_NAV2009_WithMerged_Tables.txt'
+#Upgrade objects 
+$NAV2015APPObjects2Import = join-path $WorkingFolderNAV2015 ($CompanyName +'_NAV2015' +$NAV2015CU  + 'NO.fob')
+$NAV2015UpgradeObjects2Import= join-path $WorkingFolderNAV2015 'Upgrade601800.NO.fob'
+$NAV2016APPObjects2Import = join-path $WorkingFolder ($CompanyName +'_NAV' + $NAVVersion + '_' + $NAVCU + '_' + 'NO.fob')
+$NAV2016UpgradeObjects2Import= join-path $WorkingFolder 'Upgrade800900.NO.fob'
 #Putting the paths toghether
 $RootFolder = $RootFolderPath + $CompanyFolderName
 $LogPath = "$RootFolder\Logs\"
