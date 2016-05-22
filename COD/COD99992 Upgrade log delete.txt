@@ -1,0 +1,56 @@
+OBJECT Codeunit 99992 Upgrade Data Cleanup NAV2013R2
+{
+  OBJECT-PROPERTIES
+  {
+    Date=12.11.14;
+    Time=10:26:54;
+    Modified=Yes;
+    Version List=;
+  }
+  PROPERTIES
+  {
+    OnRun=BEGIN
+
+            //NAV 2009 upgrade data
+            DeleteNAV2009UpgTmpTableData;
+          END;
+
+  }
+  CODE
+  {
+
+    PROCEDURE DeleteNAV2009UpgTmpTableData@1101103000();
+    VAR
+      UpgradeTimeLog@1101103000 : Record 104001;
+      StatusLog@1101103001 : Record 104002;
+    BEGIN
+      //Rem out when run after upgrade 1 for NAV 2009
+      //and delete the variable
+
+      UpgradeTimeLog.CHANGECOMPANY('SI-Data A/S');
+      UpgradeTimeLog.DELETEALL(TRUE);
+      UpgradeTimeLog.CHANGECOMPANY('SI-Data ApS');
+      UpgradeTimeLog.DELETEALL(TRUE);
+      UpgradeTimeLog.CHANGECOMPANY('SI-DATA K›benhavn A/S');
+      UpgradeTimeLog.DELETEALL(TRUE);
+      UpgradeTimeLog.CHANGECOMPANY('SI-Gruppen AB');
+      UpgradeTimeLog.DELETEALL(TRUE);
+
+      StatusLog.CHANGECOMPANY('SI-Data A/S');
+      StatusLog.DELETEALL(TRUE);
+      StatusLog.CHANGECOMPANY('SI-Data ApS');
+      StatusLog.DELETEALL(TRUE);
+      StatusLog.CHANGECOMPANY('SI-DATA K›benhavn A/S');
+      StatusLog.DELETEALL(TRUE);
+      StatusLog.CHANGECOMPANY('SI-Gruppen AB');
+      StatusLog.DELETEALL(TRUE);
+
+
+      MESSAGE('Finished deleting "Upgrade Time Log" data');
+    END;
+
+    BEGIN
+    END.
+  }
+}
+
