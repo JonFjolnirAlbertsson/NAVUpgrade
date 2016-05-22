@@ -103,8 +103,20 @@ Export-NAVData -DatabaseServer JALW8 -DatabaseName $UpgradeName -FileName (join-
 #Give server instance user DBOwner access on the database.
 Import-NAVData -DatabaseServer SQL02 -DatabaseName NAVSIData -AllCompanies -FileName (join-path $BackupPath  ($UpgradeName + '.navdata')) -IncludeGlobalData -IncludeApplicationData -IncludeApplication
 # starts at 13:40
-Import-NAVData -DatabaseServer SQL02 -DatabaseName NAVSIDataDen -AllCompanies -FileName (join-path $BackupPath  ($UpgradeName + '_AllCompanies.navdata')) -IncludeGlobalData -IncludeApplicationData -IncludeApplication
-#New-NAVEnvironment -Databasename NAVSIDataDen -DatabaseServer sql02 -EnablePortSharing -LicenseFile $NAVLicense -ServerInstance NAV71CU29SIDataDen
+#Get-NAVDataFile -FileName (join-path $BackupPath  ($UpgradeName + '_AllCompanies.navdata')) 
+#Remove-NAVApplication -DatabaseServer $DBServer -DatabaseName NAV71SIDataDev
+$StartedDateTime = Get-Date
+Import-NAVData -DatabaseServer $DBServer -DatabaseName NAV71SIDataDev  -CompanyName 'SI-DATA København A/S' -FileName (join-path $BackupPath  ($UpgradeName + '_AllCompanies.navdata')) -IncludeGlobalData -IncludeApplicationData -IncludeApplication
+$StoppedDateTime = Get-Date
+Write-Host 'Start at: ' + $StartedDateTime + ' . Finished at: ' + $StoppedDateTime + ' . Total time' + ($StoppedDateTime-$StartedDateTime) -ForegroundColor Yellow
+
+$StartedDateTime = Get-Date
+Import-NAVData -DatabaseServer $DBServer -DatabaseName NAV71SIDataDev  -CompanyName 'SI-Data A/S' -FileName (join-path $BackupPath  ($UpgradeName + '_AllCompanies.navdata'))  -IncludeApplicationData 
+$StoppedDateTime = Get-Date
+Write-Host 'Start at: ' + $StartedDateTime + ' . Finished at: ' + $StoppedDateTime + ' . Total time' + ($StoppedDateTime-$StartedDateTime) -ForegroundColor Yellow
+
+New-NAVEnvironment -Databasename NAV71SIDataDev -DatabaseServer sql02 -EnablePortSharing -LicenseFile $NAVLicense -ServerInstance NAV71SIDataDev
+Sync-NAVTenant -ServerInstance NAV71SIDataDev
 
 Copy-NAVCompany -DestinationCompanyName "Test 1" -ServerInstance nav71sidata -SourceCompanyName "SI-Data A/S"
   
