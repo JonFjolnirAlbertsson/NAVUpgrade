@@ -6,11 +6,11 @@ $VersionListPrefixes = 'NAVW1', 'NAVNO', 'I'
 #General
 $UpgradeName = 'NAV71CU29SIData'
 $CompanyFolder = 'SI-Data\NAV2013R2\CU29'
-$WorkingFolder = "C:\NAVUpgrade\Customer\$CompanyFolder\Upgrade_$UpgradeName"
-$ObjectLibrary = 'C:\NAVUpgrade\DB Original'
-$ModifiedFolder = "C:\NAVUpgrade\Customer\$CompanyFolder\CustomerDBs"
-$NAVLicense = 'C:\NAVUpgrade\License\NAV2016.flf'
-$UpgradeCodeunitsFullPath = 'E:\UpgradeToolKit\Local Objects\Upgrade800900.NO.fob'
+$WorkingFolder = "F:\NAVUpgrade\Customer\$CompanyFolder\Upgrade_$UpgradeName"
+$ObjectLibrary = 'F:\NAVUpgrade\DB Original'
+$ModifiedFolder = "F:\NAVUpgrade\Customer\$CompanyFolder\CustomerDBs"
+$NAVLicense = 'F:\NAVUpgrade\License\NAV2016.flf'
+#$UpgradeCodeunitsFullPath = 'E:\UpgradeToolKit\Local Objects\Upgrade800900.NO.fob'
 $VersionListPrefixes = 'NAVW1', 'NAVNO', 'I'
 $CUDownloadFile = 'C:\Temp\NAV\NAV2016\Temp\490370_NOR_i386_zip.exe'
 $IsoDirectory = 'C:\Temp\NAV\NAV2016\ISO'
@@ -23,8 +23,8 @@ $UpgradeName = 'NAV' + $NAVShortVersion  + $NAVCU + $CompanyName
 $DBServer = 'localhost'
 $NAVServer = 'localhost'
 #Database backup files
-$BackupPath = 'E:\Backup\SI-Data\UpgradeProcess'
-$BackupfileCaompanyDB = join-path 'E:\Backup\SI-Data\SQL02' 'Nav50_02042016.bak'
+$BackupPath = 'F:\NAVUpgrade\Customer\SI-Data\NAV2013R2\CU29\CustomerDBs'
+#$BackupfileCompanyDB = join-path 'F:\Backup\SI-Data\SQL02' 'Nav50_02042016.bak'
 
 #Original Version
 $OriginalVersion = 'NAV2016_CU4_NO'

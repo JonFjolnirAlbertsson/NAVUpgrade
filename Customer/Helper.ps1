@@ -11,7 +11,9 @@ $null = Set-NAVServerInstance -Start -ServerInstance $ServerInstance
 $ServerInstance  = 'NAV71CU29SIData'  
 $ServerInstance  = 'NAV71SIData'  
 $ServerInstance  = 'DynamicsNAV90'  
-$ServerInstance  = 'NAV90_OsloFinerObject'          
+$ServerInstance  = 'NAV90_OsloFinerObject' 
+$ServerInstance  = 'DynamicsNAV71' 
+$ServerInstance  = 'NAV71CU29SIData'          
 $null = sc.exe config (get-service NetTcpPortSharing).Name Start= Auto
 $null = Start-service NetTcpPortSharing
 $null = sc.exe config (get-service  "*$ServerInstance*").Name depend= HTTP/NetTcpPortSharing
@@ -65,8 +67,9 @@ New-NAVEnvironment -Databasename 'NAV90Elas' -DatabaseServer localhost -EnablePo
 New-NAVEnvironment -Databasename 'NAV2016CU1_Busch' -DatabaseServer localhost -EnablePortSharing -LicenseFile 'C:\NavUpgrade\License\NAV2016.flf' -ServerInstance 'NAV90Busch'
 
 $ADuser = "SQLNAVUPGRADE\jal"
+$ADuser = "SQLNAVUPGRADE\vmadmin"
 $NavServiceInstance = "NAV90Elas"
 $NavServiceInstance = "NAV90Busch"
 Sync-NAVTenant -ServerInstance $NavServiceInstance 
-Get-NAVServerInstance $NavServiceInstance | New-NAVServerUser -WindowsAccount $ADuser 
-Get-NAVServerInstance $NavServiceInstance | New-NAVServerUserPermissionSet –WindowsAccount $ADuser -PermissionSetId SUPER -Verbose
+Get-NAVServerInstance $UpgradeName | New-NAVServerUser -WindowsAccount $ADuser 
+Get-NAVServerInstance $UpgradeName | New-NAVServerUserPermissionSet –WindowsAccount $ADuser -PermissionSetId SUPER -Verbose
