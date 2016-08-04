@@ -101,10 +101,18 @@ Remove-NAVApplication -DatabaseName NAVSIData -DatabaseServer sql02
 Export-NAVData -DatabaseServer JALW8 -DatabaseName $UpgradeName -FileName (join-path $BackupPath  ($UpgradeName + '_AllCompanies.navdata')) -AllCompanies -IncludeApplicationData -IncludeGlobalData -IncludeApplication
 #Create new empty database on the server with the right Collation
 #Give server instance user DBOwner access on the database.
-Import-NAVData -DatabaseServer SQL02 -DatabaseName NAVSIData -AllCompanies -FileName (join-path $BackupPath  ($UpgradeName + '.navdata')) -IncludeGlobalData -IncludeApplicationData -IncludeApplication
+#Import-NAVData -DatabaseServer SQL02 -DatabaseName NAVSIData -AllCompanies -FileName (join-path $BackupPath  ($UpgradeName + '.navdata')) -IncludeGlobalData -IncludeApplicationData -IncludeApplication
 # starts at 13:40
-Import-NAVData -DatabaseServer SQL02 -DatabaseName NAVSIDataDen -AllCompanies -FileName (join-path $BackupPath  ($UpgradeName + '_AllCompanies.navdata')) -IncludeGlobalData -IncludeApplicationData -IncludeApplication
-#New-NAVEnvironment -Databasename NAVSIDataDen -DatabaseServer sql02 -EnablePortSharing -LicenseFile $NAVLicense -ServerInstance NAV71CU29SIDataDen
+$StartedDateTime = Get-Date
+$BackupPath = 'C:\NAVUpgrade\Customer\SI-Data\NAV2013R2\CU29\CustomerDBs'
+Import-NAVData -DatabaseServer SQL02 -DatabaseName NAVSIData -AllCompanies -FileName (join-path $BackupPath  ($UpgradeName + '_AllCompanies.navdata')) -IncludeGlobalData -IncludeApplicationData -IncludeApplication
+$StoppedDateTime = Get-Date
+Write-Host 'Start at: ' + $StartedDateTime + ' . Finished at: ' + $StoppedDateTime + ' . Total time' + ($StoppedDateTime-$StartedDateTime) -ForegroundColor Yellow
+
+$TestEnv = 'NAV71CU29SIDataDev'
+Restore-SQLBackupFile-SID -DatabaseServer jalw8 -BackupFile '\\FP03\Felles_SI\Temp\SQL02\NAVSIDataDev.bak' -DatabaseName $TestEnv
+New-NAVEnvironment -Databasename $TestEnv -DatabaseServer jalw8 -EnablePortSharing -LicenseFile $NAVLicense -ServerInstance $TestEnv
+#New-NAVServerUserPermissionSet -ServerInstance nav71sidata -WindowsAccount 'si-data\jal' -PermissionSetId Super -ErrorAction Continue
 
 Copy-NAVCompany -DestinationCompanyName "Test 1" -ServerInstance nav71sidata -SourceCompanyName "SI-Data A/S"
   
