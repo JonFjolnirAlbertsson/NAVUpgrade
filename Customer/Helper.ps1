@@ -73,8 +73,9 @@ Get-NAVServerInstance $NavServiceInstance | New-NAVServerUserPermissionSet –Wi
 
 $NavServiceInstance = "NAV71SIData"
 $NavServiceInstance = "NAV71SIDataTest"
-$LicenseFile = 'C:\Users\jal\OneDrive for Business\Files\SI-Data\License\NAV2016.flf' 
-Import-NAVServerLicense -LicenseFile $LicenseFile  -ServerInstance $NavServiceInstance
-$LicenseFile = 'C:\Users\jal\OneDrive for Business\Files\SI-Data\License\SI-Data License 4804449.flf' 
+$RootLicPath = 'C:\Users\jal\OneDrive for Business\Files\Incadea Norway AS\License'
+$LicenseFile =  join-path $RootLicPath 'NAV2016.flf' 
+$LicenseFile = join-path $RootLicPath 'SI-Data License 4804449.flf' 
 Import-NAVServerLicense -LicenseFile $LicenseFile  -ServerInstance $NavServiceInstance
 Set-NAVServerInstance -ServerInstance $NavServiceInstance -Restart
+Sync-NAVTenant -ServerInstance $NavServiceInstance

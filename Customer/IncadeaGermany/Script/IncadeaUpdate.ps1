@@ -1,4 +1,4 @@
-﻿$CompanyName = 'Incadea'
+﻿$CompanyName = 'IncadeaGermany'
 $Location = "C:\GitHub\NAVUpgrade\Customer\$CompanyName\Script"
 . (join-path $Location 'Set-IncadeaUpdateSettings.ps1')
 
