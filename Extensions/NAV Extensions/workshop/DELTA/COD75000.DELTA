@@ -1,0 +1,88 @@
+OBJECT Codeunit 75000 MyWorkshop
+{
+  OBJECT-PROPERTIES
+  {
+    Date=19.10.16;
+    Time=20:45:00;
+    Modified=Yes;
+    Version List=;
+  }
+  PROPERTIES
+  {
+    OnRun=BEGIN
+          END;
+
+  }
+  CODE
+  {
+    VAR
+      srcTableRef@1000 : RecordRef;
+      srcFieldRef@1001 : FieldRef;
+      ItemNo@1002 : Code[20];
+      ItemsTable@1003 : Record 27;
+      srcVersion@1004 : Text[20];
+
+    [EventSubscriber(Page,30,OnBeforeValidateEvent,Workshop)]
+    LOCAL PROCEDURE CheckOnValidateWorkshopField@1(VAR Rec@1000 : Record 27;VAR xRec@1001 : Record 27);
+    BEGIN
+      MESSAGE('Workshop');
+    END;
+
+    PROCEDURE OnNavAppUpgradePerDatabase@2();
+    VAR
+      ArchiveRecRef@1000 : RecordRef;
+    BEGIN
+      // Variables:
+      // ArchiveRecRef RecordRef
+         BEGIN
+           IF NAVAPP.GETARCHIVERECORDREF(75000, ArchiveRecRef)
+         THEN
+              NAVAPP.RESTOREARCHIVEDATA(75000)
+         ELSE
+              NAVAPP.LOADPACKAGEDATA(75000)
+         END;
+    END;
+
+    PROCEDURE OnNavAppUpgradePerCompany@3();
+    BEGIN
+      //
+      // Declared variables:
+      // srcTableRef RecordRef
+      // srcFieldRefFieldRef
+      // ItemNoCode 20
+      // ItemsTableRecord Item
+      // srcVersionText 20
+
+      IF NAVAPP.GETARCHIVERECORDREF(DATABASE::Item,srcTableRef) THEN
+        BEGIN
+
+      srcVersion := NAVAPP.GETARCHIVEVERSION;
+
+      IF srcTableRef.FINDFIRST THEN
+        REPEAT
+            srcFieldRef := srcTableRef.FIELDINDEX(1); // "No."
+            ItemNo      := srcFieldRef.VALUE;
+
+            IF ItemsTable.GET(ItemNo) THEN BEGIN
+              srcFieldRef := srcTableRef.FIELDINDEX(2);  // "Workshop"
+              ItemsTable.Workshop := srcFieldRef.VALUE; // copy data back to Item
+
+              IF srcVersion = '1.0.0.0' THEN BEGIN  // Upgrading from 1.0.0.0 to 2.0.0.0
+                ItemsTable."Workshop 2" := '(unassigned)';
+              END
+              ELSE BEGIN  // Re-installing version 2.0.0.0
+                srcFieldRef := srcTableRef.FIELDINDEX(3);
+                ItemsTable."Workshop 2" := srcFieldRef.VALUE;
+              END;
+
+              ItemsTable.MODIFY
+            END
+        UNTIL srcTableRef.NEXT = 0;
+      END;
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

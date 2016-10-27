@@ -1,0 +1,9 @@
+<Package xmlns="http://schemas.microsoft.com/navx/2015/manifest">
+  <App Id="d350d653-3aee-4654-abf4-a54bf4e4e604" Name="Demo" Publisher="Incadea Norge AS" Brief="" Description="DemoNAVPadApp" Version="1.0.0.2" CompatibilityId="1.0.0.0" PrivacyStatement="http://www.waldo.Be" EULA="http://www.waldo.Be" Help="http://www.waldo.Be" Url="http://www.waldo.Be" Logo="" />
+  <Capabilities />
+  <Prerequisites>
+    <Objects />
+  </Prerequisites>
+  <Dependencies />
+  <ScreenShots />
+</Package>

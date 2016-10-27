@@ -1,0 +1,31 @@
+OBJECT Modification Item(Table 27)
+{
+  OBJECT-PROPERTIES
+  {
+    Date=19.10.16;
+    Time=22:02:52;
+    Modified=Yes;
+    Version List=NAVW110.00;
+  }
+  PROPERTIES
+  {
+    Target=Item(Table 27);
+  }
+  CHANGES
+  {
+    { Insertion         ;InsertAfter="Identifier Code"(Field 7700);
+                         ChangedElements=FieldCollection
+                         {
+                           { 75000;  ;Workshop            ;Text100        }
+                           { 75001;  ;Workshop 2          ;Text100        }
+                         }
+                          }
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

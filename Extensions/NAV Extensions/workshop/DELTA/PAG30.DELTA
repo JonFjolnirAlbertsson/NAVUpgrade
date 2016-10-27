@@ -1,0 +1,38 @@
+OBJECT Modification "Item Card"(Page 30)
+{
+  OBJECT-PROPERTIES
+  {
+    Date=19.10.16;
+    Time=22:03:21;
+    Modified=Yes;
+    Version List=NAVW110.00;
+  }
+  PROPERTIES
+  {
+    Target="Item Card"(Page 30);
+  }
+  CHANGES
+  {
+    { PropertyInsertion ;Target=Control 4;
+                         Property=Visible;
+                         ModifiedValue=false }
+    { Insertion         ;InsertAfter=Control 2;
+                         ChangedElements=ControlCollection
+                         {
+                           { 82100;2  ;Field     ;
+                                       SourceExpr=Workshop }
+
+                           { 1101103000;2;Field  ;
+                                       SourceExpr="Workshop 2" }
+
+                         }
+                          }
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

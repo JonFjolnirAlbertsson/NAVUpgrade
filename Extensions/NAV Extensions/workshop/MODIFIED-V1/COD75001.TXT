@@ -1,0 +1,45 @@
+OBJECT Codeunit 75001 Demo Notificaiton
+{
+  OBJECT-PROPERTIES
+  {
+    Date=20.10.16;
+    Time=14:34:08;
+    Modified=Yes;
+    Version List=;
+  }
+  PROPERTIES
+  {
+    OnRun=BEGIN
+          END;
+
+  }
+  CODE
+  {
+
+    [EventSubscriber(Table,18,OnAfterValidateEvent,"E-Mail")]
+    LOCAL PROCEDURE OnAfterValidateEventEMail@1101103000(VAR Rec@1101103000 : Record 18;VAR xRec@1101103001 : Record 18;CurrFieldNo@1101103002 : Integer);
+    VAR
+      NotificationL@1101103003 : Notification;
+    BEGIN
+      IF STRPOS(Rec."E-Mail", '@') < 1 THEN BEGIN
+        //MESSAGE('OnAfterValidateEventEMail');
+
+        NotificationL.ID := 'C80FEEDA-802C-4879-B826-34A10FB77023';
+        NotificationL.SCOPE(NOTIFICATIONSCOPE::LocalScope);
+        NotificationL.MESSAGE('Email addressen valideres ikke.');
+        NotificationL.ADDACTION('Email validering',75001, 'EmailValidation');
+        NotificationL.SETDATA('Customer', Rec.Name);
+        NotificationL.SEND;
+      END;
+    END;
+
+    PROCEDURE EmailValidation@1101103003(VAR NotificationP@1101103000 : Notification);
+    BEGIN
+      MESSAGE('EmailValidation');
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

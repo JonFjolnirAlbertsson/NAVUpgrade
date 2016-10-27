@@ -1,0 +1,50 @@
+OBJECT Codeunit 75000 MyWorkshop
+{
+  OBJECT-PROPERTIES
+  {
+    Date=19.10.16;
+    Time=20:45:00;
+    Modified=Yes;
+    Version List=;
+  }
+  PROPERTIES
+  {
+    OnRun=BEGIN
+          END;
+
+  }
+  CODE
+  {
+
+    [EventSubscriber(Page,30,OnBeforeValidateEvent,Workshop)]
+    LOCAL PROCEDURE CheckOnValidateWorkshopField@1(VAR Rec@1000 : Record 27;VAR xRec@1001 : Record 27);
+    BEGIN
+      MESSAGE('Workshop');
+    END;
+
+    PROCEDURE OnNavAppUpgradePerDatabase@2();
+    VAR
+      ArchiveRecRef@1000 : RecordRef;
+    BEGIN
+      // Variables:
+      // ArchiveRecRef RecordRef
+         BEGIN
+           IF NAVAPP.GETARCHIVERECORDREF(75000, ArchiveRecRef)
+         THEN
+              NAVAPP.RESTOREARCHIVEDATA(75000)
+         ELSE
+              NAVAPP.LOADPACKAGEDATA(75000)
+         END;
+    END;
+
+    PROCEDURE OnNavAppUpgradePerCompany@3();
+    BEGIN
+      // OnNavAppUpgradePerCompany()
+      NAVAPP.RESTOREARCHIVEDATA(27);
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

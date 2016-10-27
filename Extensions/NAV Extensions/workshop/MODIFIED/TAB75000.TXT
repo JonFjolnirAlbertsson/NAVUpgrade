@@ -1,0 +1,33 @@
+OBJECT Table 75000 Workshop
+{
+  OBJECT-PROPERTIES
+  {
+    Date=19.10.16;
+    Time=20:45:00;
+    Modified=Yes;
+    Version List=;
+  }
+  PROPERTIES
+  {
+    DataPerCompany=No;
+  }
+  FIELDS
+  {
+    { 1   ;   ;Code                ;Code10         }
+    { 2   ;   ;Description         ;Text50         }
+  }
+  KEYS
+  {
+    {    ;Code                                    ;Clustered=Yes }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

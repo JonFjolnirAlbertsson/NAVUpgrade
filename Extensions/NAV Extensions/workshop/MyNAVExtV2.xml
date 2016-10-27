@@ -1,0 +1,9 @@
+<Package xmlns="http://schemas.microsoft.com/navx/2015/manifest">
+  <App Id="8332f3b1-f16b-440f-a6a8-b1b737a8c6f8" Name="Demo_Incadea" Publisher="Incadea Norge AS" Brief="" Description="DemoNAVINCApp" Version="2.0.0.0" CompatibilityId="1.0.0.0" PrivacyStatement="" EULA="" Help="" Url="" Logo="" />
+  <Capabilities />
+  <Prerequisites>
+    <Objects />
+  </Prerequisites>
+  <Dependencies />
+  <ScreenShots />
+</Package>
