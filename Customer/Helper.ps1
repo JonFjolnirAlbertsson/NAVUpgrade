@@ -11,7 +11,7 @@ $null = Set-NAVServerInstance -Start -ServerInstance $ServerInstance
 $ServerInstance  = 'NAV71CU29SIData'  
 $ServerInstance  = 'NAV71SIData'  
 $ServerInstance  = 'DynamicsNAV90'  
-$ServerInstance  = 'NAV90_OsloFinerObject'          
+$ServerInstance  = 'NAV100Elas'          
 $null = sc.exe config (get-service NetTcpPortSharing).Name Start= Auto
 $null = Start-service NetTcpPortSharing
 $null = sc.exe config (get-service  "*$ServerInstance*").Name depend= HTTP/NetTcpPortSharing
@@ -72,7 +72,7 @@ Get-NAVServerInstance $NavServiceInstance | New-NAVServerUser -WindowsAccount $A
 Get-NAVServerInstance $NavServiceInstance | New-NAVServerUserPermissionSet –WindowsAccount $ADuser -PermissionSetId SUPER -Verbose
 
 $NavServiceInstance = "NAV71SIData"
-$NavServiceInstance = "NAV71SIDataTest"
+$NavServiceInstance = "NAV100Elas"
 $RootLicPath = 'C:\Users\jal\OneDrive for Business\Files\Incadea Norway AS\License'
 $LicenseFile =  join-path $RootLicPath 'NAV2016.flf' 
 $LicenseFile = join-path $RootLicPath 'SI-Data License 4804449.flf' 

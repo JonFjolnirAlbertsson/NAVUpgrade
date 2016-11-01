@@ -1,0 +1,1 @@
+﻿Merge-NAVCode -WorkingFolderPath $WorkingFolder -CompareObject $CompareObject -Join
