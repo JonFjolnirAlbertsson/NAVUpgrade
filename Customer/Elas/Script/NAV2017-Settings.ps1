@@ -21,7 +21,7 @@ $ZippedDVDfile  = "$RootFolderPath\NAV\NAV2017\Temp\490370_NOR_i386_zip.exe"
 #Company data
 $CompanyName = 'Elas'
 $UpgradeName = 'NAV' + $NAVShortVersion  + $NAVCU + $CompanyName
-$UpgradeDataBaseName = 'NAV100CU0Elas'
+$UpgradeDataBaseName = 'NAV90Elas'
 $UpgradeObjectsName = 'NAV' + $NAVShortVersion  + $NAVCU + $CompanyName + 'Objects'
 $CompanyFolder = "$CompanyName\NAV2017\$NAVCU"
 $ModifiedFolder = "$RootFolderPath\Customer\$CompanyName\CustomerDBs"
@@ -49,6 +49,8 @@ $NAV2015APPObjects2Import = join-path $WorkingFolderNAV2015 ($CompanyName +'_NAV
 $NAV2015UpgradeObjects2Import= join-path $WorkingFolderNAV2015 'Upgrade601800.NO.fob'
 $NAV2016APPObjects2Import = join-path $WorkingFolder ($CompanyName +'_NAV' + $NAVVersion + '_' + $NAVCU + '_' + 'NO.fob')
 $NAV2016UpgradeObjects2Import= join-path $WorkingFolder 'Upgrade800900.NO.fob'
+$NAV2017APPObjects2Import = join-path $WorkingFolder ($CompanyName +'_NAV' + $NAVVersion + '_' + $NAVCU + '_' + 'NO.fob')
+$NAV2017UpgradeObjects2Import= join-path $WorkingFolder 'Upgrade9001000.NO.fob'
 #Putting the paths toghether
 $RootFolder = $RootFolderPath + $CompanyFolderName
 $LogPath = "$RootFolder\Logs\"
