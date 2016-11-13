@@ -2,28 +2,28 @@
 #Azure
 #$RootFolderPath = "F:\NavUpgrade"
 #SQLNAVUpgrade
-$RootFolderPath = "C:\NavUpgrade"
+$RootFolderPath = "F:\NavUpgrade"
 #Servers
 $DBServer = 'localhost'
 $NAVServer = 'localhost'
 #NAV Specific data
-$NAVShortVersion = '90'
+$NAVShortVersion = '100'
 $DBServer = "SQLNAVUpgrade"
-$NavServiceInstance = "DynamicsNAV90"
+$NavServiceInstance = "DynamicsNAV100"
 $NavServiceInstanceServer = "SQLNAVUpgrade"
-$NAVVersion = '2016'
-$NAVCU = 'CU5'
+$NAVVersion = '2017'
+$NAVCU = 'CU0'
 $VersionListPrefixes = 'NAVW1', 'NAVNO', 'I'
 $NAVInstallConfigFile = "C:\GitHub\NAVUpgrade\NAVSetup\FullInstallNAV2016.xml"
-$NAVLicense = "$RootFolderPath\License\NAV2016.flf"
+$NAVLicense = "$RootFolderPath\License\NAV2017.flf"
 #$CUDownloadFile = 'C:\Temp\NAV\NAV2016\Temp\490370_NOR_i386_zip.exe'
 $ZippedDVDfile  = "$RootFolderPath\NAV\NAV2016\Temp\490370_NOR_i386_zip.exe"
 #Company data
 $CompanyName = 'Elas'
 $UpgradeName = 'NAV' + $NAVShortVersion  + $NAVCU + $CompanyName
-$UpgradeDataBaseName = 'NAV90CU5Elas'
+$UpgradeDataBaseName = 'NAV100CU0Elas'
 $UpgradeObjectsName = 'NAV' + $NAVShortVersion  + $NAVCU + $CompanyName + 'Objects'
-$CompanyFolder = "$CompanyName\NAV2016\$NAVCU"
+$CompanyFolder = "$CompanyName\NAV$NAVVersion\$NAVCU"
 $ModifiedFolder = "$RootFolderPath\Customer\$CompanyName\CustomerDBs"
 $ModifiedObjectFile = 'NAV50SP1Elas.txt'
 $WorkingFolder = "$RootFolderPath\Customer\$CompanyFolder\Upgrade_$UpgradeName"
@@ -33,13 +33,13 @@ $WorkingFolderNAV2015 = "$RootFolderPath\Customer\$CompanyFolder\NAV2015"
 $ObjectLibrary = "$RootFolderPath\DB Original"
 #Database backup files
 $BackupPath = $ModifiedFolder
-$BackupfileCaompanyDB = join-path $ModifiedFolder 'Navision50_30032016.bak'
+$BackupfileCaompanyDB = join-path $ModifiedFolder 'NAV50ToBeUpgraded111116.bak'
 $BackupfileTargetDB = "$RootFolderPath\NAV\NAV2016\NAV2016NO5_45243\DVD\NAV.9.0.45243.NO.DVD\SQLDemoDatabase\CommonAppData\Microsoft\Microsoft Dynamics NAV\90\Database\Demo Database NAV (9-0).bak"
 $NAV2009BackupFile = "$RootFolderPath\NAV\NAV2009\DVD\SQLDemoDatabase\CommonAppData\Microsoft\Microsoft Dynamics NAV\60\Database\Demo Database NAV (6-0).bak"
-$NAV2015BackupFile = "$RootFolderPath\NAV\NAV2015\CU17\DVD\SQLDemoDatabase\CommonAppData\Microsoft\Microsoft Dynamics NAV\80\Database\Demo Database NAV (8-0).bak"
+$NAV2015BackupFile = "$RootFolderPath\NAV\NAV2015\CU24\DVD\SQLDemoDatabase\CommonAppData\Microsoft\Microsoft Dynamics NAV\80\Database\Demo Database NAV (8-0).bak"
 #Previous NAv versions naming
 $NAV2009DBName = 'NAV60' + $CompanyName 
-$NAV2015CU = 'CU17'
+$NAV2015CU = 'CU24'
 $NAV2009ObjectFile = 'NAV2009_R2_35179_NO.txt'
 $NAV2015DBName = 'NAV80' + $NAV2015CU + $CompanyName
 $NAV2015ObjectFile = 'NAV2015_' +$NAV2015CU  + '_NO.txt'
@@ -47,8 +47,8 @@ $NAV2015ModifiedObjectFile = 'Elas_NAV2009_WithMerged_Tables.txt'
 #Upgrade objects 
 $NAV2015APPObjects2Import = join-path $WorkingFolderNAV2015 ($CompanyName +'_NAV2015' +$NAV2015CU  + 'NO.fob')
 $NAV2015UpgradeObjects2Import= join-path $WorkingFolderNAV2015 'Upgrade601800.NO.fob'
-$NAV2016APPObjects2Import = join-path $WorkingFolder ($CompanyName +'_NAV' + $NAVVersion + '_' + $NAVCU + '_' + 'NO.fob')
-$NAV2016UpgradeObjects2Import= join-path $WorkingFolder 'Upgrade800900.NO.fob'
+$NAV2017APPObjects2Import = join-path $WorkingFolder ($CompanyName +'_NAV' + $NAVVersion + '_' + $NAVCU + '_' + 'NO.fob')
+$NAV2017UpgradeObjects2Import= join-path $WorkingFolder 'Upgrade8001000.NO.fob'
 #Putting the paths toghether
 $RootFolder = $RootFolderPath + $CompanyFolderName
 $LogPath = "$RootFolder\Logs\"

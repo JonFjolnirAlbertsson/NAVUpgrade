@@ -1,14 +1,9 @@
-use [NAV2015CU8_SIData]
+USE NAV100CU0Elas
 go
 
 DECLARE @UserToDelete nvarchar(30); 
-SET @UserToDelete = 'SI-DATA\FDA'; 
+SET @UserToDelete = 'SQLNAVUPGRADE\VMADMIN'; 
 --SELECT @find = 'SI-DATA\FDA'; 
-
-delete
-from
-[dbo].[User] 
-where [user].[User Name] = @UserToDelete 
 
 delete
 from
@@ -36,3 +31,11 @@ where [User Metadata].[User SID] =  (select [User Name] from [dbo].[User] where 
 delete from
 [dbo].[User Personalization] 
 where [User Personalization].[User SID] =  (select [User Name] from [dbo].[User] where [user].[User Name] = @UserToDelete)
+
+delete
+from
+[dbo].[User] 
+where [user].[User Name] = @UserToDelete 
+
+GO
+
