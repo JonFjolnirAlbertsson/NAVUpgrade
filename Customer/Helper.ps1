@@ -1,4 +1,8 @@
-﻿$ServerInstance  = 'NAV90SIDataUpgrade'
+﻿
+$ADuser = 'incadea\AlbertssonF'
+Get-NAVServerInstance | where-Object  {$_.Version -like “7.1*” -And $_.State –eq ‘Running’} -ErrorAction Continue | New-NAVServerUser -WindowsAccount $ADuser | New-NAVServerUserPermissionSet –WindowsAccount $ADuser -PermissionSetId SUPER -Verbose
+
+$ServerInstance  = 'NAV90SIDataUpgrade'
 
 Enable-NAVServerInstancePortSharing -ServerInstance $ServerInstance
 $null = Set-NAVServerInstance -Start -ServerInstance $ServerInstance
