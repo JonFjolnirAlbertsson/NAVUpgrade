@@ -1,0 +1,61 @@
+OBJECT Codeunit 50050 Single Instance CU
+{
+  OBJECT-PROPERTIES
+  {
+    Date=22.11.16;
+    Time=14:03:53;
+    Modified=Yes;
+    Version List=;
+  }
+  PROPERTIES
+  {
+    SingleInstance=Yes;
+    OnRun=BEGIN
+            IF NOT StoreToTempG THEN BEGIN
+              StoreToTempG := TRUE;
+            END ELSE
+              PAGE.RUNMODAL(0,TempGLEntryG);
+          END;
+
+  }
+  CODE
+  {
+    VAR
+      TempGLEntryG@1101103000 : TEMPORARY Record 17;
+      StoreToTempG@1101103001 : Boolean;
+
+    PROCEDURE InsertGL@1101103000(GLEntryP@1101103000 : Record 17);
+    BEGIN
+      IF StoreToTempG THEN BEGIN
+        TempGLEntryG := GLEntryP;
+        IF NOT TempGLEntryG.INSERT THEN BEGIN
+          TempGLEntryG.DELETEALL;
+          TempGLEntryG.INSERT;
+        END;
+      END;
+    END;
+
+    BEGIN
+    {
+      Add the code below in CodeUnit 12
+
+      FinishCodeunit()
+      WITH GenJnlLine DO BEGIN
+		IF GLEntryTmp.FIND('-') THEN BEGIN
+		  REPEAT
+		    GLEntry := GLEntryTmp;
+            IF GLSetup."Additional Reporting Currency" = '' THEN BEGIN
+              GLEntry."Additional-Currency Amount" := 0;
+              GLEntry."Add.-Currency Debit Amount" := 0;
+              GLEntry."Add.-Currency Credit Amount" := 0;
+            END;
+          GLEntry.INSERT;
+          //MOD01 Start
+          SingleCU.InsertGL(GLEntry);
+          //MOD01 End
+          IF NOT InsertFAAllocDim(GLEntry."Entry No.") THEN
+    }
+    END.
+  }
+}
+
