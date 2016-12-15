@@ -3,7 +3,7 @@ $NewServerInstance = 'NAV100Photocure'
 $License = 'C:\NAVUpgrade\License\NAV2016.flf'
 #Change the name of the Demo DB to reference the CU number
 $InstallConfig = 'C:\GitHub\NAVUpgrade\NAVSetup\FullInstallNAV2017.xml'
-$CopyFromServerInstance = Get-NAVServerInstance $DefaultServerInstance -ErrorAction Stop
+
 
 #$Backupfile = $CopyFromServerInstance | Backup-NAVDatabase -ErrorAction Stop
 #$CopyFromServerInstance | Enable-NAVServerInstancePortSharing
@@ -14,7 +14,10 @@ $DownloadFolder = 'C:\Temp\NAV'
 $DVDDestination = "C:\Temp\NAV\NAV$NAVVersion"
 $TmpLocation ='C:\Temp\NAV\NAV\Temp'
 $ISODir = 'C:\Temp\NAV\NAV\ISO'
-$LogFile = 'C:\Temp'
+#The log file must exists in the folder.
+$LogFile = 'C:\Temp\NAV\NAV\Log\Install.log'
+
+$CopyFromServerInstance = Get-NAVServerInstance $DefaultServerInstance -ErrorAction Stop
 $Download = Get-NAVCumulativeUpdateFile -versions $NAVVersion  -CountryCode $CountryCode -DownloadFolder $DownloadFolder
 
 $VersionInfo = Get-NAVCumulativeUpdateDownloadVersionInfo -SourcePath $Download.filename
@@ -23,8 +26,8 @@ $VersionInfo = Get-NAVCumulativeUpdateDownloadVersionInfo -SourcePath $Download.
 #$NAVISOFile = New-NAVCumulativeUpdateISOFile -CumulativeUpdateFullPath 'C:\Temp\NAV\NAV2017\NAV.10.0.14199.NO.DVD.zip' -TmpLocation $TmpLocation -IsoDirectory $ISODir 
 $InstallationPath = Unzip-NAVCumulativeUpdateDownload -SourcePath $ZippedDVDfile -DestinationPath $DVDDestination
 
-$InstallationResult = Install-NAV -DVDFolder $InstallationPath -Configfile $InstallConfig
-#$InstallationResult = Install-NAV -DVDFolder 'C:\Temp\NAV\NAV\Temp\NAV.10.0.14199.NO.DVD' -Configfile $InstallConfig -Log $LogFile
+$InstallationResult = Install-NAV -DVDFolder $InstallationPath -Configfile $InstallConfig -LicenseFile $License -Log $LogFile
+$InstallationResult = Install-NAV -DVDFolder 'C:\Temp\NAV\NAV2017\CU1\DVD' -Configfile $InstallConfig -LicenseFile $License -Log $LogFile
 #MODIFIED (DEV)
 #Restore-SQLBackupFile-SID -BackupFile $Backupfile -DatabaseName 'Demo Database NAV (7-1) CU29'
 New-NAVEnvironment -ServerInstance $NewServerInstance -BackupFile $Backupfile -ErrorAction Stop -EnablePortSharing -LicenseFile $License
