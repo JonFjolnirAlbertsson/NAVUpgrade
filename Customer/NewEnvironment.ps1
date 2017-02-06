@@ -27,7 +27,7 @@ $VersionInfo = Get-NAVCumulativeUpdateDownloadVersionInfo -SourcePath $Download.
 $InstallationPath = Unzip-NAVCumulativeUpdateDownload -SourcePath $ZippedDVDfile -DestinationPath $DVDDestination
 
 $InstallationResult = Install-NAV -DVDFolder $InstallationPath -Configfile $InstallConfig -LicenseFile $License -Log $LogFile
-$InstallationResult = Install-NAV -DVDFolder 'C:\Temp\NAV\NAV2017\CU1\DVD' -Configfile $InstallConfig -LicenseFile $License -Log $LogFile
+#$InstallationResult = Install-NAV -DVDFolder 'C:\Temp\NAV\NAV2017\CU1\DVD' -Configfile $InstallConfig -LicenseFile $License -Log $LogFile
 #MODIFIED (DEV)
 #Restore-SQLBackupFile-SID -BackupFile $Backupfile -DatabaseName 'Demo Database NAV (7-1) CU29'
 New-NAVEnvironment -ServerInstance $NewServerInstance -BackupFile $Backupfile -ErrorAction Stop -EnablePortSharing -LicenseFile $License
