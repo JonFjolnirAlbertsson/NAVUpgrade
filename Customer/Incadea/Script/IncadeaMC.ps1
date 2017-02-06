@@ -1,5 +1,5 @@
-﻿$WorkingFolder = 'C:\NAVUpgrade\Customer\Incadea\NAV2013R2\CU29\Incadea\FOB\MC\Original'
-$OriginalObjects = 'Tables.txt'
+﻿$WorkingFolder = 'C:\NAVUpgrade\Customer\Incadea\NAV2013R2\CU29\Incadea\FOB\MC\16.01.2017\MC_V7_3 - manual sales inv period calc'
+$OriginalObjects = '20170105_CAS-10390-M0Z0.txt'
 $OriginalObjects = join-path $WorkingFolder $OriginalObjects
 Merge-NAVCode -WorkingFolderPath $WorkingFolder -ModifiedFileName $OriginalObjects -Split
 $OriginalObjects = 'CodeUnits.txt'
