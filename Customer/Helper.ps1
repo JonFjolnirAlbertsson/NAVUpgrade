@@ -1,21 +1,28 @@
 ﻿
+$RootLicPath = 'C:\Users\jal\OneDrive for Business\Files\Incadea Norway AS\License'
+$LicenseFile =  join-path $RootLicPath 'NAV2017.flf' 
+$LicenseFile = join-path $RootLicPath 'SI-Data License 4804449.flf' 
+
+Get-NAVServerInstance -ServerInstance DynamicsNAV100 | Copy-NAVEnvironment -ToServerInstance NAV100_TP
+
 $ADuser = 'incadea\AlbertssonF'
 Get-NAVServerInstance | where-Object  {$_.Version -like “7.1*” -And $_.State –eq ‘Running’} -ErrorAction Continue | New-NAVServerUser -WindowsAccount $ADuser | New-NAVServerUserPermissionSet –WindowsAccount $ADuser -PermissionSetId SUPER -Verbose
 
 $ServerInstance  = 'NAV90SIDataUpgrade'
-
+$ServerInstance  = 'DynamicsNAV71'  
 Enable-NAVServerInstancePortSharing -ServerInstance $ServerInstance
 $null = Set-NAVServerInstance -Start -ServerInstance $ServerInstance
 
 
     if($LicenseFile){  
         Write-Host -ForegroundColor Green -Object 'Importing license..'
-        $null = $ServerInstanceObject | Import-NAVServerLicense -LicenseFile $LicenseFile -Force -WarningAction SilentlyContinue
+        $null = $ServerInstance | Import-NAVServerLicense -LicenseFile $LicenseFile -Force -WarningAction SilentlyContinue
     }
 $ServerInstance  = 'NAV71CU29SIData'  
 $ServerInstance  = 'NAV71SIData'  
 $ServerInstance  = 'DynamicsNAV90'  
 $ServerInstance  = 'NAV100Elas'          
+$ServerInstance  = 'DynamicsNav'
 $null = sc.exe config (get-service NetTcpPortSharing).Name Start= Auto
 $null = Start-service NetTcpPortSharing
 $null = sc.exe config (get-service  "*$ServerInstance*").Name depend= HTTP/NetTcpPortSharing
@@ -64,7 +71,7 @@ $StoppedDateTime = Get-Date
 Write-Host 'Start at: ' + $StartedDateTime + ' . Finished at: ' + $StoppedDateTime + ' . Total time' + ($StoppedDateTime-$StartedDateTime) -ForegroundColor Yellow
 
 
-Restore-SQLBackupFile-SID -BackupFile 'C:\NavUpgrade\Elas\CustomerDBs\NAV90CU5Elas_Step12\NAV90CU5Elas_Step12.bak' -DatabaseName 'NAV90Elas'
+Restore-SQLBackupFile-SID -BackupFile 'C:\NAVUpgrade\Customer\Øveraasen\CustomerDBs\Incadea_28022017\Incadea_28022017.bak' -DatabaseName 'NAV2009R2_Øveraasen'
 New-NAVEnvironment -Databasename 'NAV90Elas' -DatabaseServer localhost -EnablePortSharing -LicenseFile 'C:\NavUpgrade\License\NAV2016.flf' -ServerInstance 'NAV90Elas'
 New-NAVEnvironment -Databasename 'NAV2016CU1_Busch' -DatabaseServer localhost -EnablePortSharing -LicenseFile 'C:\NavUpgrade\License\NAV2016.flf' -ServerInstance 'NAV90Busch'
 
@@ -77,7 +84,6 @@ Get-NAVServerInstance $NavServiceInstance | New-NAVServerUserPermissionSet –Wi
 
 $NavServiceInstance = "NAV71SIData"
 $NavServiceInstance = "NAV100Elas"
-$RootLicPath = 'C:\Users\jal\OneDrive for Business\Files\Incadea Norway AS\License'
 $LicenseFile =  join-path $RootLicPath 'NAV2016.flf' 
 $LicenseFile = join-path $RootLicPath 'SI-Data License 4804449.flf' 
 Import-NAVServerLicense -LicenseFile $LicenseFile  -ServerInstance $NavServiceInstance
