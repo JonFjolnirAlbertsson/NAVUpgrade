@@ -1,6 +1,6 @@
 ﻿$DefaultServerInstance = 'DynamicsNAV100'
-$NewServerInstance = 'NAV100Photocure'
-$License = 'C:\NAVUpgrade\License\NAV2016.flf'
+$NewServerInstance = 'NAV100CU3_Overaasen'
+$License = 'C:\NAVUpgrade\License\NAV2017.flf'
 #Change the name of the Demo DB to reference the CU number
 $InstallConfig = 'C:\GitHub\NAVUpgrade\NAVSetup\FullInstallNAV2017.xml'
 
@@ -30,4 +30,9 @@ $InstallationResult = Install-NAV -DVDFolder $InstallationPath -Configfile $Inst
 #$InstallationResult = Install-NAV -DVDFolder 'C:\Temp\NAV\NAV2017\CU1\DVD' -Configfile $InstallConfig -LicenseFile $License -Log $LogFile
 #MODIFIED (DEV)
 #Restore-SQLBackupFile-SID -BackupFile $Backupfile -DatabaseName 'Demo Database NAV (7-1) CU29'
-New-NAVEnvironment -ServerInstance $NewServerInstance -BackupFile $Backupfile -ErrorAction Stop -EnablePortSharing -LicenseFile $License
+#$CopyFromServerInstance = Get-NAVServerInstance $DefaultServerInstance -ErrorAction Stop
+#New-NAVEnvironment -ServerInstance $NewServerInstance -BackupFile $Backupfile -ErrorAction Stop -EnablePortSharing -LicenseFile $License
+#$Backupfile = Backup-NAVDatabase -ServerInstance $DefaultServerInstance  -ErrorAction Stop
+$Backupfile = 'E:\Backup\Navision Demo\Demo Database NAV (10-0) CU3.bak'
+New-NAVEnvironment -Databasename $NewServerInstance -ServerInstance $NewServerInstance -BackupFile $Backupfile -DatabaseServer localhost -EnablePortSharing -LicenseFile $License 
+#New-NAVEnvironment -ServerInstance $NewServerInstance -BackupFile $Backupfile -ErrorAction Stop -EnablePortSharing -LicenseFile $License
