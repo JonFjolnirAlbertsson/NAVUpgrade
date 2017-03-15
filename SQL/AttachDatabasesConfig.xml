@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SQL>
+  <Databases>
+    <MDF>C:\MSSQL\data\NAV100CU3_Overaasen_1</MDF>
+    <LDF>C:\MSSQL\Logs\NAV100CU3_Overaasen_2</LDF>
+    <DB_Name>NAV100CU3_Overaasen</DB_Name>
+  </Databases>
+  <Databases>
+    <MDF>C:\MSSQL\data\NAV2009R2_Form2Page_Data</MDF>
+    <LDF>C:\MSSQL\Logs\NAV2009R2_Form2Page_Log</LDF>
+    <DB_Name>NAV2009R2_Form2Page</DB_Name>
+  </Databases>
+  <Databases>
+    <MDF>C:\MSSQL\data\NAV2009R2_Heydi_Data</MDF>
+    <LDF>C:\MSSQL\Logs\NAV2009R2_Heydi_Log</LDF>
+    <DB_Name>NAV2009R2_Heydi</DB_Name>
+  </Databases>
+  <Databases>
+    <MDF>C:\MSSQL\data\NAV2013CU18_UpgradeDB</MDF>
+    <LDF>C:\MSSQL\Logs\NAV2013CU18_UpgradeDB</LDF>
+    <DB_Name>NAV2013CU18_UpgradeDB</DB_Name>
+  </Databases>
+   <Databases>
+    <MDF>C:\MSSQL\data\NAVUpgradeDBHelper</MDF>
+    <LDF>C:\MSSQL\Logs\NAVUpgradeDBHelper_log</LDF>
+    <DB_Name>NAVUpgradeDBHelper</DB_Name>
+  </Databases>
+</SQL>
