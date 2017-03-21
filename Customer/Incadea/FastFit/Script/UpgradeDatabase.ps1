@@ -21,6 +21,7 @@ Restore-SQLBackupFile-SID -BackupFile $BackupfileAppDB -DatabaseName $AppDBName
 Restore-SQLBackupFile-SID -BackupFile $BackupfileDEALER1DB -DatabaseName $DEALER1DBName 
 Restore-SQLBackupFile-SID -BackupFile $BackupfileNAVTargetDemoDB -DatabaseName $TargetDemoDBName
 #Remove-SQLDatabase -DatabaseName $DEALER1DBName
+Write-host "Create Service Instance"
 New-NAVEnvironment  -EnablePortSharing -ServerInstance $AppDBName 
 # Set instance to Multitenant
 $CurrentServerInstance = Get-NAVServerInstance -ServerInstance $AppDBName
@@ -34,14 +35,13 @@ $CurrentServerInstance | Set-NAVServerInstance -start
 Write-host "Mount app"
 $CurrentServerInstance | Mount-NAVApplication -DatabaseServer $DBServer -DatabaseName $AppDBName 
  
-Write-host "Create Tenants and move companies"
+Write-host "Mount Tenants"
 #Mount-NAVTenant -ServerInstance DynamicsNAV71 -Id $MainTenant -DatabaseName $Databasename -AllowAppDatabaseWrite -OverwriteTenantIdInDatabase
 Mount-NAVTenant -ServerInstance $AppDBName -DatabaseName $DEALER1DBName -Id $Dealer1Tenant  -AllowAppDatabaseWrite -OverwriteTenantIdInDatabase
 
 Sync-NAVTenant -ServerInstance $AppDBName -Tenant $Dealer1Tenant
-Remove-NAVServerUser -ServerInstance $AppDBName -WindowsAccount $UserName -Tenant $Dealer1Tenant
-Remove-NAVServerUserPermissionSet -PermissionSetId SUPER -ServerInstance $AppDBName -WindowsAccount $UserName -Tenant $Dealer1Tenant
-
+#Remove-NAVServerUser -ServerInstance $AppDBName -WindowsAccount $UserName -Tenant $Dealer1Tenant
+#Remove-NAVServerUserPermissionSet -PermissionSetId SUPER -ServerInstance $AppDBName -WindowsAccount $UserName -Tenant $Dealer1Tenant
 New-NAVServerUser -ServerInstance $AppDBName -WindowsAccount $UserName -Tenant $Dealer1Tenant -LicenseType Full -State Enabled
 New-NAVServerUserPermissionSet -PermissionSetId SUPER -ServerInstance $AppDBName -WindowsAccount $UserName -Tenant $Dealer1Tenant 
 Get-NAVServerUser -ServerInstance $AppDBName -Tenant $Dealer1Tenant
