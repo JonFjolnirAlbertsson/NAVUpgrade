@@ -7,28 +7,25 @@ $NAVServer = 'localhost'
 $NAVShortVersion = '100'
 $NavServiceInstance = "DynamicsNAV100"
 $NAVVersion = '2017'
-$NAVCU = 'CU0'
+$NAVCU = 'CU04'
 $VersionListPrefixes = 'NAVW1', 'NAVNO', 'I'
 $NAVLicense = "$RootFolderPath\License\NAV2017.flf"
 
 #Company data
 $CompanyName = 'NOBI'
 $UpgradeName = 'NAV' + $NAVShortVersion  + $NAVCU + $CompanyName
-$UpgradeDataBaseName = 'NAV90Elas'
+$UpgradeDataBaseName = 'NAV100NOBI'
 $UpgradeObjectsName = 'NAV' + $NAVShortVersion  + $NAVCU + $CompanyName + 'Objects'
 $CompanyFolder = "$CompanyName\NAV2017\$NAVCU"
 $ModifiedFolder = "$RootFolderPath\Customer\$CompanyName\CustomerDBs"
-$ModifiedObjectFile = 'NAV2016_CU9_NOBI.txt'
+$ModifiedObjectFile = 'NAV2017_CU00_NOBI.txt'
 $WorkingFolder = "$RootFolderPath\Customer\$CompanyFolder\Upgrade_$UpgradeName"
 #Original DB objects
 $ObjectLibrary = "$RootFolderPath\DB Original"
 #Database backup files
 $BackupPath = $ModifiedFolder
 $BackupfileOriginalDB = join-path $ModifiedFolder 'Demo Database NAV (9-0).bak'
-$BackupfileTargetDB = 'E:\Backup\Navision Demo\Demo Database NAV (10-0).bak'
-#Upgrade objects 
-$NAV2017APPObjects2Import = join-path $WorkingFolder ($CompanyName +'_NAV' + $NAVVersion + '_' + $NAVCU + '_' + 'NO.fob')
-$NAV2017UpgradeObjects2Import= join-path $WorkingFolder 'Upgrade9001000.NO.fob'
+$BackupfileTargetDB = 'F:\Incadea\Backup\Navision Demo\Demo Database NAV (10-0) CU04.bak'
 #Putting the paths toghether
 $RootFolder = $RootFolderPath + $CompanyFolderName
 $LogPath = "$RootFolder\Logs\"
@@ -42,7 +39,7 @@ $InstallLogFolder = "$NAVRootFolder\Log"
 $InstallLog = "$InstallLogFolder\install.log"
 
 #Original Version
-$OriginalVersion = 'NAV2016_CU9_NO'
+$OriginalVersion = 'NAV2017_CU00_NO'
 $OriginalObjects = join-path $ObjectLibrary "$($OriginalVersion).txt"
 $OriginalFolder = join-path $WorkingFolder 'Original'
 
