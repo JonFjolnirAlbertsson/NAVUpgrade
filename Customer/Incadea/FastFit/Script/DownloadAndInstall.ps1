@@ -10,8 +10,8 @@ $InstallConfig = 'C:\GitHub\NAVUpgrade\NAVSetup\FullInstallNAV2017.xml'
 #$CopyFromServerInstance | Enable-NAVServerInstancePortSharing
 #$Backupfile = 'C:\Temp\NAV\NAV2013R2\CU29_NO_45254\DVD\NAV.7.1.45254.NO.DVD\SQLDemoDatabase\CommonAppData\Microsoft\Microsoft Dynamics NAV\71\Database\Demo Database NAV (7-1).bak'
 $NAVVersion = '2016'
-$CountryCode = 'NO'
-#$CountryCode = 'W1'
+#$CountryCode = 'NO'
+$CountryCode = 'W1'
 $CUNo = '17'
 $DownloadFolder = 'C:\Temp\NAV'
 $DVDDestination = "C:\Temp\NAV\NAV$NAVVersion"

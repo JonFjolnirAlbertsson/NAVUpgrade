@@ -31,7 +31,9 @@ $CurrentServerInstance | Set-NAVServerConfiguration -KeyName MultiTenant -KeyVal
 $CurrentServerInstance | Set-NAVServerConfiguration -KeyName DatabaseServer -KeyValue ""
 $CurrentServerInstance | Set-NAVServerConfiguration -KeyName DatabaseName -KeyValue ""
 $CurrentServerInstance | Set-NAVServerInstance -start
- 
+$CurrentServerInstance | Import-NAVServerLicense -LicenseFile $NAVLicense
+$CurrentServerInstance | Set-NAVServerInstance -Restart
+
 Write-host "Mount app"
 $CurrentServerInstance | Mount-NAVApplication -DatabaseServer $DBServer -DatabaseName $AppDBName 
  
@@ -40,6 +42,7 @@ Write-host "Mount Tenants"
 Mount-NAVTenant -ServerInstance $AppDBName -DatabaseName $DEALER1DBName -Id $Dealer1Tenant  -AllowAppDatabaseWrite -OverwriteTenantIdInDatabase
 
 Sync-NAVTenant -ServerInstance $AppDBName -Tenant $Dealer1Tenant
+Sync-NAVTenant -ServerInstance $AppDBName -Tenant $Dealer1Tenant -Mode ForceSync
 #Remove-NAVServerUser -ServerInstance $AppDBName -WindowsAccount $UserName -Tenant $Dealer1Tenant
 #Remove-NAVServerUserPermissionSet -PermissionSetId SUPER -ServerInstance $AppDBName -WindowsAccount $UserName -Tenant $Dealer1Tenant
 New-NAVServerUser -ServerInstance $AppDBName -WindowsAccount $UserName -Tenant $Dealer1Tenant -LicenseType Full -State Enabled
@@ -66,3 +69,10 @@ Merge-NAVCode -WorkingFolderPath $WorkingFolder -CompareObject $CompareObject -J
 Merge-NAVCode -WorkingFolderPath $WorkingFolderNAV2009 -CompareObject $CompareObject -Join
 #>
 
+# Backup
+$BackupFileName = $AppDBName + "_Without_DEU.bak"
+$BackupFilePath = join-path $BackupPath $BackupFileName 
+Backup-SqlDatabase -ServerInstance $DBServer -Database $AppDBName -BackupAction Database -BackupFile $BackupFilePath -CompressionOption Default
+$BackupFileName = $DEALER1DBName + "_Without_DEU.bak"
+$BackupFilePath = join-path $BackupPath $BackupFileName 
+Backup-SqlDatabase -ServerInstance $DBServer -Database $DEALER1DBName -BackupAction Database -BackupFile $BackupFilePath -CompressionOption Default
