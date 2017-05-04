@@ -22,9 +22,9 @@ Restore-SQLBackupFile-SID -BackupFile $BackupfileDEALER1DB -DatabaseName $DEALER
 Restore-SQLBackupFile-SID -BackupFile $BackupfileNAVTargetDemoDB -DatabaseName $TargetDemoDBName
 #Remove-SQLDatabase -DatabaseName $DEALER1DBName
 Write-host "Create Service Instance"
-New-NAVEnvironment  -EnablePortSharing -ServerInstance $AppDBName 
+New-NAVEnvironment  -EnablePortSharing -ServerInstance $FastFitInstance -DatabaseServer $DBServer
 # Set instance to Multitenant
-$CurrentServerInstance = Get-NAVServerInstance -ServerInstance $AppDBName
+$CurrentServerInstance = Get-NAVServerInstance -ServerInstance $FastFitInstance 
 Write-host "Prepare NST for MultiTenancy"
 $CurrentServerInstance | Set-NAVServerInstance -stop
 $CurrentServerInstance | Set-NAVServerConfiguration -KeyName MultiTenant -KeyValue "true"
@@ -39,15 +39,16 @@ $CurrentServerInstance | Mount-NAVApplication -DatabaseServer $DBServer -Databas
  
 Write-host "Mount Tenants"
 #Mount-NAVTenant -ServerInstance DynamicsNAV71 -Id $MainTenant -DatabaseName $Databasename -AllowAppDatabaseWrite -OverwriteTenantIdInDatabase
-Mount-NAVTenant -ServerInstance $AppDBName -DatabaseName $DEALER1DBName -Id $Dealer1Tenant  -AllowAppDatabaseWrite -OverwriteTenantIdInDatabase
+Mount-NAVTenant -ServerInstance $FastFitInstance -DatabaseName $DEALER1DBName -Id $Dealer1Tenant  -AllowAppDatabaseWrite -OverwriteTenantIdInDatabase
 
-Sync-NAVTenant -ServerInstance $AppDBName -Tenant $Dealer1Tenant
-Sync-NAVTenant -ServerInstance $AppDBName -Tenant $Dealer1Tenant -Mode ForceSync
+Sync-NAVTenant -ServerInstance $FastFitInstance -Tenant $Dealer1Tenant
+Sync-NAVTenant -ServerInstance $FastFitInstance -Tenant $Dealer1Tenant -Mode ForceSync
 #Remove-NAVServerUser -ServerInstance $AppDBName -WindowsAccount $UserName -Tenant $Dealer1Tenant
 #Remove-NAVServerUserPermissionSet -PermissionSetId SUPER -ServerInstance $AppDBName -WindowsAccount $UserName -Tenant $Dealer1Tenant
-New-NAVServerUser -ServerInstance $AppDBName -WindowsAccount $UserName -Tenant $Dealer1Tenant -LicenseType Full -State Enabled
-New-NAVServerUserPermissionSet -PermissionSetId SUPER -ServerInstance $AppDBName -WindowsAccount $UserName -Tenant $Dealer1Tenant 
-Get-NAVServerUser -ServerInstance $AppDBName -Tenant $Dealer1Tenant
+$UserName = 'SI-DEV\DEVJAL'
+New-NAVServerUser -ServerInstance $FastFitInstance -WindowsAccount $UserName -Tenant $Dealer1Tenant -LicenseType Full -State Enabled
+New-NAVServerUserPermissionSet -PermissionSetId SUPER -ServerInstance $FastFitInstance -WindowsAccount $UserName -Tenant $Dealer1Tenant 
+Get-NAVServerUser -ServerInstance $FastFitInstance -Tenant $Dealer1Tenant
 #Export all objects from Demo DB to text file.
 #Export-NAVApplicationObject2 -Path $TargetObjects -ServerInstance $NavServiceInstance -LogPath $LogPath
 

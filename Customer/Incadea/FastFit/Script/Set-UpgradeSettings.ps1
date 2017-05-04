@@ -1,7 +1,7 @@
 ﻿#Base Path
 $RootFolderPath = "C:\NavUpgrade"
 #Servers
-$DBServer = 'localhost'
+$DBServer = 'NO01DEVSQL01'
 $NAVServer = 'localhost'
 #NAV Specific data
 $NAVShortVersion = 'NAV90'
@@ -29,10 +29,11 @@ $TargetDemoDBName = 'Demo Database NAV (9-0) CU17'
 $BackupfileNAVTargetDemoDB = join-path $ObjectLibraryNO 'Demo Database NAV (9-0) CU17.bak'
 $BackupfileNAVDemoDB = join-path $ObjectLibraryW1 'Demo Database NAV (9-0) CU17.bak'
 $BackupfileAppDB = join-path $BackupPath '083000_W1_APP.bak'
-$AppDBName = 'fastfit_083000_W1_APP'
+$AppDBName = 'fastfit_083000_NO_APP'
 $BackupfileDEALER1DB = join-path $BackupPath '083000_W1_DEALER1.bak'
-$DEALER1DBName = 'fastfit_083000_W1_DEALER1'
+$DEALER1DBName = 'fastfit_083000_NO_DEALER1'
 $Dealer1Tenant= 'dealer1'
+$FastFitInstance = 'fastfit_083000_NO'
 #Putting the paths toghether
 $LogPath = "$RootFolder\Logs\"
 $CompileLog = $LogPath + "compile"
