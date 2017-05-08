@@ -14,9 +14,14 @@ Export-NAVApplication -DatabaseServer $DatabaseServer -DatabaseName $appDatabase
 # Reconfigure the CustomSettings.config to use the tenant database.
 Set-NAVServerConfiguration -ServerInstance $serverInstance -KeyName DatabaseName -KeyValue $tenantDatabaseName -WarningAction Ignore
 # Reconfigure the CustomSettings.config to use single-tenant mode
-# Set-NAVServerConfiguration -ServerInstance $serverInstance -KeyName Multitenant -KeyValue false -WarningAction Ignore
+ Set-NAVServerConfiguration -ServerInstance $serverInstance -KeyName Multitenant -KeyValue false -WarningAction Ignore
 # Start the server instance.
 Set-NAVServerInstance -ServerInstance $serverInstance -Start
 # Dismount all tenants that are not using the current tenant database.
 Get-NAVTenant -ServerInstance $serverInstance | where {$_.Database -ne $tenantDatabaseName} | foreach { Dismount-NAVTenant -ServerInstance $serverInstance -Tenant $_.Id }
 Write-Host "Operation complete." -foregroundcolor cyan 
+
+$UserName = 'SI-DEV\DEVJAL'
+New-NAVServerUser -ServerInstance $serverInstance -WindowsAccount $UserName  -LicenseType Full -State Enabled
+New-NAVServerUserPermissionSet -PermissionSetId SUPER -ServerInstance $serverInstance -WindowsAccount $UserName 
+Get-NAVServerUser -ServerInstance $serverInstance 
