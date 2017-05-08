@@ -1,8 +1,8 @@
 ﻿#Base Path
-$RootFolderPath = "C:\NavUpgrade"
+$RootFolderPath = "C:\incadea"
 #Servers
 $DBServer = 'NO01DEVSQL01'
-$NAVServer = 'localhost'
+$NAVServer = 'NO01DEV03'
 #NAV Specific data
 $NAVShortVersion = 'NAV90'
 $NavServiceInstance = "DynamicsNAV90"
@@ -11,11 +11,12 @@ $NAVCU = 'CU17'
 $FastFitNAVCU = 'CU17'
 $VersionListPrefixes = 'NAVW1', 'NAVNO', 'I'
 $NAVLicense = "$RootFolderPath\License\incadea.fastfit_8.X (NAV2016)_development_INS-NOR_4805448_20170321.flf"
-$UserName = 'incadea\albertssonf'
+#$UserName = 'incadea\albertssonf'
+$UserName = 'si-dev\devjal'
 #Company data
-$CompanyName = 'FastFit'
+$CompanyName = 'Fastfit'
 $VersionFolder = '083000'
-$CompanyFolder = "Customer\Incadea\$CompanyName\$VersionFolder"
+$CompanyFolder = "$CompanyName\$VersionFolder"
 $RootFolder = join-path $RootFolderPath $CompanyFolder
 $WorkingFolder = join-path $RootFolder "\$NAVVersion\$NAVCU\Upgrade_$CompanyName"
 #Original DB objects
@@ -28,10 +29,10 @@ $DemoDBName = 'Demo Database NAV (9-0) W1 CU17'
 $TargetDemoDBName = 'Demo Database NAV (9-0) CU17'
 $BackupfileNAVTargetDemoDB = join-path $ObjectLibraryNO 'Demo Database NAV (9-0) CU17.bak'
 $BackupfileNAVDemoDB = join-path $ObjectLibraryW1 'Demo Database NAV (9-0) CU17.bak'
-$BackupfileAppDB = join-path $BackupPath '083000_W1_APP.bak'
 $AppDBName = 'fastfit_083000_NO_APP'
-$BackupfileDEALER1DB = join-path $BackupPath '083000_W1_DEALER1.bak'
+$BackupfileAppDB = join-path $BackupPath 'fastfit_083000_W1_APP.bak'
 $DEALER1DBName = 'fastfit_083000_NO_DEALER1'
+$BackupfileDEALER1DB = join-path $BackupPath 'fastfit_083000_W1_DEALER1.bak'
 $Dealer1Tenant= 'dealer1'
 $FastFitInstance = 'fastfit_083000_NO'
 #Putting the paths toghether
@@ -56,7 +57,7 @@ $FastFitObjects = join-path $RootFolder 'Installation\NAV Objects\incadea.fastfi
 $FastFitFolder = join-path $WorkingFolder 'Modified'
 
 #Target Version
-$TargetVersion = $NAVVersion + '_' + $NAVCU + '_NO' 
+$TargetVersion = $NAVVersion + '_' + $NAVCU + '_NO' + '_Without_NOR.'
 $TargetServerInstance = $TargetVersion + '_' + $CompanyName
 $TargetObjects = join-path $ObjectLibrary "$($TargetVersion).txt"
 $TargetFolder = join-path $WorkingFolder 'Target'

@@ -16,15 +16,15 @@ if (test-path $WorkingFolder){
 }
 
 # Restore company database, to be upgraded.
-Restore-SQLBackupFile-SID -BackupFile $BackupfileNAVDemoDB -DatabaseName $DemoDBName 
-Restore-SQLBackupFile-SID -BackupFile $BackupfileAppDB -DatabaseName $AppDBName 
-Restore-SQLBackupFile-SID -BackupFile $BackupfileDEALER1DB -DatabaseName $DEALER1DBName 
-Restore-SQLBackupFile-SID -BackupFile $BackupfileNAVTargetDemoDB -DatabaseName $TargetDemoDBName
+Restore-SQLBackupFile-SID -BackupFile $BackupfileNAVDemoDB -DatabaseServer $DBServer -DatabaseName $DemoDBName
+Restore-SQLBackupFile-SID -BackupFile $BackupfileAppDB -DatabaseServer $DBServer -DatabaseName $AppDBName
+Restore-SQLBackupFile-SID -BackupFile $BackupfileDEALER1DB -DatabaseServer $DBServer -DatabaseName $DEALER1DBName 
+Restore-SQLBackupFile-SID -BackupFile $BackupfileNAVTargetDemoDB -DatabaseServer $DBServer -DatabaseName $TargetDemoDBName
 #Remove-SQLDatabase -DatabaseName $DEALER1DBName
 Write-host "Create Service Instance"
 New-NAVEnvironment  -EnablePortSharing -ServerInstance $FastFitInstance -DatabaseServer $DBServer
 # Set instance to Multitenant
-$CurrentServerInstance = Get-NAVServerInstance -ServerInstance $FastFitInstance 
+$CurrentServerInstance = Get-NAVServerInstance -ServerInstance $FastFitInstance
 Write-host "Prepare NST for MultiTenancy"
 $CurrentServerInstance | Set-NAVServerInstance -stop
 $CurrentServerInstance | Set-NAVServerConfiguration -KeyName MultiTenant -KeyValue "true"
@@ -45,7 +45,6 @@ Sync-NAVTenant -ServerInstance $FastFitInstance -Tenant $Dealer1Tenant
 Sync-NAVTenant -ServerInstance $FastFitInstance -Tenant $Dealer1Tenant -Mode ForceSync
 #Remove-NAVServerUser -ServerInstance $AppDBName -WindowsAccount $UserName -Tenant $Dealer1Tenant
 #Remove-NAVServerUserPermissionSet -PermissionSetId SUPER -ServerInstance $AppDBName -WindowsAccount $UserName -Tenant $Dealer1Tenant
-$UserName = 'SI-DEV\DEVJAL'
 New-NAVServerUser -ServerInstance $FastFitInstance -WindowsAccount $UserName -Tenant $Dealer1Tenant -LicenseType Full -State Enabled
 New-NAVServerUserPermissionSet -PermissionSetId SUPER -ServerInstance $FastFitInstance -WindowsAccount $UserName -Tenant $Dealer1Tenant 
 Get-NAVServerUser -ServerInstance $FastFitInstance -Tenant $Dealer1Tenant
@@ -59,7 +58,7 @@ $MergeResult = Merge-NAVUpgradeObjects `
     -WorkingFolder $WorkingFolder `
     -VersionListPrefixes $VersionListPrefixes `
     -Force
-
+Merge-NAVCode -WorkingFolderPath $WorkingFolder -OriginalFileName $OriginalObjects -ModifiedFileName $ModifiedObjects -TargetFileName $TargetObjects -CompareObject $CompareObject -Split
 <#
 $CompareObject = '*.TXT'
 Merge-NAVCode -WorkingFolderPath $WorkingFolder -OriginalFileName $OriginalObjects -ModifiedFileName $ModifiedObjects -TargetFileName $TargetObjects -CompareObject $CompareObject -Split
