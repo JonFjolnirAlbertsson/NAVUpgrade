@@ -30,11 +30,14 @@ $TargetDemoDBName = 'Demo Database NAV (9-0) CU17'
 $BackupfileNAVTargetDemoDB = join-path $ObjectLibraryNO 'Demo Database NAV (9-0) CU17.bak'
 $BackupfileNAVDemoDB = join-path $ObjectLibraryW1 'Demo Database NAV (9-0) CU17.bak'
 $AppDBName = 'fastfit_083000_NO_APP'
+$AppDBNameW1 = 'fastfit_083000_W1_APP'
 $BackupfileAppDB = join-path $BackupPath 'fastfit_083000_W1_APP.bak'
 $DEALER1DBName = 'fastfit_083000_NO_DEALER1'
 $BackupfileDEALER1DB = join-path $BackupPath 'fastfit_083000_W1_DEALER1.bak'
 $Dealer1Tenant= 'dealer1'
+$Dealer1TenantW1= 'dealer1_w1'
 $FastFitInstance = 'fastfit_083000_NO'
+$FastFitInstanceW1 = 'fastfit_083000_W1'
 #Putting the paths toghether
 $LogPath = "$RootFolder\Logs\"
 $CompileLog = $LogPath + "compile"
@@ -57,7 +60,7 @@ $FastFitObjects = join-path $RootFolder 'Installation\NAV Objects\incadea.fastfi
 $FastFitFolder = join-path $WorkingFolder 'Modified'
 
 #Target Version
-$TargetVersion = $NAVVersion + '_' + $NAVCU + '_NO' + '_Without_NOR.'
+$TargetVersion = $NAVVersion + '_' + $NAVCU + '_NO' + '_Without_NOR'
 $TargetServerInstance = $TargetVersion + '_' + $CompanyName
 $TargetObjects = join-path $ObjectLibrary "$($TargetVersion).txt"
 $TargetFolder = join-path $WorkingFolder 'Target'

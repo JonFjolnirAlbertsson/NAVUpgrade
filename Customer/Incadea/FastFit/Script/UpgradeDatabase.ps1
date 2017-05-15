@@ -1,5 +1,9 @@
-﻿$Location = 'C:\GitHub\NAVUpgrade\Customer\Incadea\FastFit\Script\'
+﻿#To start remote session on application server
+#Enter-PSSession -ComputerName NO01DEV03 -UseSSL -Credential (Get-Credential)
+
+$Location = 'C:\GitHub\NAVUpgrade\Customer\Incadea\FastFit\Script\'
 . (join-path $Location 'Set-UpgradeSettings.ps1')
+Import-Certificate -Filepath "C:\GitHub\NAVUpgrade\Customer\Incadea\FastFit\cert" -CertStoreLocation "Cert:\LocalMachine\Root"
 
 clear-host
 
