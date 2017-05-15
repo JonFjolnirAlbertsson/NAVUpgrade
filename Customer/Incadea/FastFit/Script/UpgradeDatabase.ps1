@@ -1,5 +1,10 @@
 ﻿#To start remote session on application server
-#Enter-PSSession -ComputerName NO01DEV03 -UseSSL -Credential (Get-Credential)
+$Location = 'C:\GitHub\NAVUpgrade\Customer\Incadea\FastFit\Script\'
+. (join-path $Location 'Set-UpgradeSettings.ps1')
+$InstanceSecurePassword = ConvertTo-SecureString $InstancePassword -AsPlainText -Force
+$InstanceCredential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $InstanceUserName, $InstanceSecurePassword 
+$UserCredential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $UserName , $InstanceSecurePassword 
+Enter-PSSession -ComputerName NO01DEV03 -UseSSL -Credential $UserCredential
 
 $Location = 'C:\GitHub\NAVUpgrade\Customer\Incadea\FastFit\Script\'
 . (join-path $Location 'Set-UpgradeSettings.ps1')
@@ -33,15 +38,18 @@ Write-host "Create Service Instance"
 New-NAVEnvironment  -EnablePortSharing -ServerInstance $FastFitInstance -DatabaseServer $DBServer
 # Set instance to Multitenant
 $CurrentServerInstance = Get-NAVServerInstance -ServerInstance $FastFitInstance
-#$CurrentServerInstance = Get-NAVServerInstance -ServerInstance $FastFitInstanceW1
+$CurrentServerInstance = Get-NAVServerInstance -ServerInstance $FastFitInstanceW1
 Write-host "Prepare NST for MultiTenancy"
 $CurrentServerInstance | Set-NAVServerInstance -stop
 $CurrentServerInstance | Set-NAVServerConfiguration -KeyName MultiTenant -KeyValue "true"
 $CurrentServerInstance | Set-NAVServerConfiguration -KeyName DatabaseServer -KeyValue ""
 $CurrentServerInstance | Set-NAVServerConfiguration -KeyName DatabaseName -KeyValue ""
+$CurrentServerInstance | Set-NAVServerConfiguration -KeyName  -KeyValue ""
+$CurrentServerInstance | Set-NAVServerInstance -ServiceAccountCredential $Credential -ServiceAccount User
 $CurrentServerInstance | Set-NAVServerInstance -start
 $CurrentServerInstance | Import-NAVServerLicense -LicenseFile $NAVLicense
-$CurrentServerInstance | Set-NAVServerInstance -Restart
+$CurrentServerInstance | Set-NAVServerInstance -Restart $InstanceUserName -ServiceAccount $InstanceUserName
+$CurrentServerInstance | Set-NAVServerInstance -Restart -ServiceAccount $InstanceUserName
 
 Write-host "Mount app"
 $CurrentServerInstance | Mount-NAVApplication -DatabaseServer $DBServer -DatabaseName $AppDBName 
@@ -49,7 +57,7 @@ $CurrentServerInstance | Mount-NAVApplication -DatabaseServer $DBServer -Databas
 Write-host "Mount Tenants"
 #Mount-NAVTenant -ServerInstance DynamicsNAV71 -Id $MainTenant -DatabaseName $Databasename -AllowAppDatabaseWrite -OverwriteTenantIdInDatabase
 Mount-NAVTenant -ServerInstance $FastFitInstance -DatabaseName $DEALER1DBName -Id $Dealer1Tenant  -AllowAppDatabaseWrite -OverwriteTenantIdInDatabase
-Mount-NAVTenant -ServerInstance $FastFitInstanceW1 -DatabaseName $DEALER1DBName -Id $Dealer1TenantW1  -AllowAppDatabaseWrite -OverwriteTenantIdInDatabase
+Mount-NAVTenant -ServerInstance $FastFitInstanceW1 -DatabaseName $DEALER1DBNameW1 -Id $Dealer1TenantW1  -AllowAppDatabaseWrite -OverwriteTenantIdInDatabase
 
 Sync-NAVTenant -ServerInstance $FastFitInstance -Tenant $Dealer1Tenant
 Sync-NAVTenant -ServerInstance $FastFitInstance -Tenant $Dealer1Tenant -Mode ForceSync

@@ -13,6 +13,8 @@ $VersionListPrefixes = 'NAVW1', 'NAVNO', 'I'
 $NAVLicense = "$RootFolderPath\License\incadea.fastfit_8.X (NAV2016)_development_INS-NOR_4805448_20170321.flf"
 #$UserName = 'incadea\albertssonf'
 $UserName = 'si-dev\devjal'
+$InstanceUserName = 'si-dev\nav_user'
+$InstancePassword = '1378Nesbru'
 #Company data
 $CompanyName = 'Fastfit'
 $VersionFolder = '083000'
