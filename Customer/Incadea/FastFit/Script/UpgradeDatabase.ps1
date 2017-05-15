@@ -19,19 +19,21 @@ if (test-path $WorkingFolder){
     }
 }
 
-# Restore company database, to be upgraded.
+# Restore company database, to be upgraded. Can be run locally.
 Restore-SQLBackupFile-SID -BackupFile $BackupfileNAVDemoDB -DatabaseServer $DBServer -DatabaseName $DemoDBName
 Restore-SQLBackupFile-SID -BackupFile $BackupfileAppDB -DatabaseServer $DBServer -DatabaseName $AppDBName
 Restore-SQLBackupFile-SID -BackupFile $BackupfileDEALER1DB -DatabaseServer $DBServer -DatabaseName $DEALER1DBName 
 Restore-SQLBackupFile-SID -BackupFile $BackupfileNAVTargetDemoDB -DatabaseServer $DBServer -DatabaseName $TargetDemoDBName
 Restore-SQLBackupFile-SID -BackupFile $BackupfileAppDB -DatabaseServer $DBServer -DatabaseName $AppDBNameW1
-Restore-SQLBackupFile-SID -BackupFile $BackupfileDEALER1DB -DatabaseServer $DBServer -DatabaseName $Dealer1TenantW1
+Restore-SQLBackupFile-SID -BackupFile $BackupfileDEALER1DB -DatabaseServer $DBServer -DatabaseName $DEALER1DBNameW1
+#Must run in remote session, if the server instance is run on another server.
 New-NAVEnvironment  -EnablePortSharing -ServerInstance $FastFitInstanceW1 -DatabaseServer $DBServer
 #Remove-SQLDatabase -DatabaseName $DEALER1DBName
 Write-host "Create Service Instance"
 New-NAVEnvironment  -EnablePortSharing -ServerInstance $FastFitInstance -DatabaseServer $DBServer
 # Set instance to Multitenant
 $CurrentServerInstance = Get-NAVServerInstance -ServerInstance $FastFitInstance
+#$CurrentServerInstance = Get-NAVServerInstance -ServerInstance $FastFitInstanceW1
 Write-host "Prepare NST for MultiTenancy"
 $CurrentServerInstance | Set-NAVServerInstance -stop
 $CurrentServerInstance | Set-NAVServerConfiguration -KeyName MultiTenant -KeyValue "true"
@@ -43,10 +45,11 @@ $CurrentServerInstance | Set-NAVServerInstance -Restart
 
 Write-host "Mount app"
 $CurrentServerInstance | Mount-NAVApplication -DatabaseServer $DBServer -DatabaseName $AppDBName 
- 
+#$CurrentServerInstance | Mount-NAVApplication -DatabaseServer $DBServer -DatabaseName $AppDBNameW1  
 Write-host "Mount Tenants"
 #Mount-NAVTenant -ServerInstance DynamicsNAV71 -Id $MainTenant -DatabaseName $Databasename -AllowAppDatabaseWrite -OverwriteTenantIdInDatabase
 Mount-NAVTenant -ServerInstance $FastFitInstance -DatabaseName $DEALER1DBName -Id $Dealer1Tenant  -AllowAppDatabaseWrite -OverwriteTenantIdInDatabase
+Mount-NAVTenant -ServerInstance $FastFitInstanceW1 -DatabaseName $DEALER1DBName -Id $Dealer1TenantW1  -AllowAppDatabaseWrite -OverwriteTenantIdInDatabase
 
 Sync-NAVTenant -ServerInstance $FastFitInstance -Tenant $Dealer1Tenant
 Sync-NAVTenant -ServerInstance $FastFitInstance -Tenant $Dealer1Tenant -Mode ForceSync
