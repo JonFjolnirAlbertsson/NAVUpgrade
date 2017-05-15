@@ -38,7 +38,7 @@ $DEALER1DBName = 'fastfit_083000_NO_DEALER1'
 $DEALER1DBNameW1 = 'fastfit_083000_W1_DEALER1'
 $BackupfileDEALER1DB = join-path $BackupPath 'fastfit_083000_W1_DEALER1.bak'
 $Dealer1Tenant= 'dealer1'
-$Dealer1TenantW1= 'dealer1_w1'
+$Dealer1TenantW1= 'dealer1w1'
 $FastFitInstance = 'fastfit_083000_NO'
 $FastFitInstanceW1 = 'fastfit_083000_W1'
 #Putting the paths toghether
