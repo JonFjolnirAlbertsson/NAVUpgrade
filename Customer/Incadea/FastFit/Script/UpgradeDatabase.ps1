@@ -81,16 +81,32 @@ $MergeResult = Merge-NAVUpgradeObjects `
     -VersionListPrefixes $VersionListPrefixes `
     -Force
 Merge-NAVCode -WorkingFolderPath $WorkingFolder -OriginalFileName $OriginalObjects -ModifiedFileName $ModifiedObjects -TargetFileName $TargetObjects -CompareObject $CompareObject -Split
-<#
-$CompareObject = '*.TXT'
-Merge-NAVCode -WorkingFolderPath $WorkingFolder -OriginalFileName $OriginalObjects -ModifiedFileName $ModifiedObjects -TargetFileName $TargetObjects -CompareObject $CompareObject -Split
-Merge-NAVCode -WorkingFolderPath $WorkingFolder -CompareObject $CompareObject -Merge
-Merge-NAVCode -WorkingFolderPath $WorkingFolder -CompareObject $CompareObject -Join
 
-# Join Merged objects to one text file.
-Merge-NAVCode -WorkingFolderPath $WorkingFolderNAV2009 -CompareObject $CompareObject -Join
-#>
+$fileNames = Get-ChildItem -Path $ConflictTarget -Recurse -Include *.txt
+foreach($filename in $fileNames)
+{
+    $Source = join-path $SourcePath  $filename.Name
+    $Destination = join-path $MergedPath  $filename.Name
+    Copy-Item $Source -Destination $Destination
+    Write-Host $Source + ' file copied to ' + $Destination
+}
+#Copy merged result items to the join folder
+$fileNames = Get-ChildItem -Path $SourcePath -Recurse -Include *.txt
+foreach($filename in $fileNames)
+{
+    $Source = join-path $SourcePath  $filename.Name
+    $Destination = join-path $JoinPath  $filename.Name
+    Copy-Item $Source -Destination $Destination
+    Write-Host $Source + ' file copied to ' + $Destination
+}
+#$NOObjects = join-path $WorkingFolder 'NO_Objects.txt'
+#Export-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $TargetDemoDBName -Username $DBUser -Password $InstancePassword -Path $NOObjects -Filter 'Id=10600..10699|15000000..15000999' -LogPath $LogPath
 
+#Join-NAVApplicationObjectFile -Destination $JoinFile -Source $Destination
+Merge-NAVCode -WorkingFolderPath $WorkingFolder -Join
+#Create Web client instance
+New-NAVWebServerInstance -WebServerInstance $FastFitInstance  -Server $NAVServer -ServerInstance $FastFitInstance 
+New-NAVWebServerInstance -WebServerInstance $FastFitInstanceDev  -Server $NAVServer -ServerInstance $FastFitInstanceDev 
 # Backup
 $BackupFileName = $AppDBName + "_Without_DEU.bak"
 $BackupFilePath = join-path $BackupPath $BackupFileName 

@@ -15,6 +15,7 @@ $NAVLicense = "$RootFolderPath\License\incadea.fastfit_8.X (NAV2016)_development
 $UserName = 'si-dev\devjal'
 $InstanceUserName = 'nav_user@si-dev.local'
 $InstancePassword = '1378Nesbru'
+$DBUser = 'NAV_Service'
 #Company data
 $CompanyName = 'Fastfit'
 $VersionFolder = '083000'
@@ -27,8 +28,8 @@ $ObjectLibraryW1 = "$RootFolderPath\DB Original\W1"
 $ObjectLibraryNO = "$RootFolderPath\DB Original\NO"
 #Database backup files
 $BackupPath = join-path $RootFolder 'Database Backups'
-$DemoDBName = 'Demo Database NAV (9-0) W1 CU17'
-$TargetDemoDBName = 'Demo Database NAV (9-0) CU17'
+$DemoDBName = 'Demo Database NAV (9-0) CU17 W1'
+$TargetDemoDBName = 'Demo Database NAV (9-0) CU17 NO'
 $BackupfileNAVTargetDemoDB = join-path $ObjectLibraryNO 'Demo Database NAV (9-0) CU17.bak'
 $BackupfileNAVDemoDB = join-path $ObjectLibraryW1 'Demo Database NAV (9-0) CU17.bak'
 $AppDBName = 'fastfit_083000_NO_APP'
@@ -40,7 +41,15 @@ $BackupfileDEALER1DB = join-path $BackupPath 'fastfit_083000_W1_DEALER1.bak'
 $Dealer1Tenant= 'dealer1'
 $Dealer1TenantW1= 'dealer1w1'
 $FastFitInstance = 'fastfit_083000_NO'
+$FastFitInstanceDev = 'fastfit_083000_NO_Dev'
 $FastFitInstanceW1 = 'fastfit_083000_W1'
+
+#Merging parameters
+$SourcePath = join-path $WorkingFolder 'MergeResult' 
+$ConflictTarget = join-path $SourcePath  'ConflictTarget' 
+$MergedPath = join-path $WorkingFolder 'Merged' 
+$JoinPath = Join-Path $WorkingFolder 'Merged\ToBeJoined\'
+$JoinFile = join-path $WorkingFolder 'all-merged-objects.txt'
 #Putting the paths toghether
 $LogPath = "$RootFolder\Logs\"
 $CompileLog = $LogPath + "compile"
