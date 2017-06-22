@@ -7,7 +7,7 @@ $WorkingFolder = 'C:\incadea\Customer\Øveraasen\NAV2017\CU03'
 #. (join-path $Location ('NAV2017-Settings.ps1'))
 #Open Files with conflict. Using the Merge Folder to merge the conflict
 #$ObjectName ='COD430'
-$ObjectName ='FOR21'
+$ObjectName ='FOR99000831'
 Open-File-SID -WorkingFolder $WorkingFolder -ObjectName $ObjectName -OpenInNotepadPlus -OpenOriginal -OpenModified #-OpenTarget -OpenMerged -OpenToBeJoined
 
 #Open Files with no conflict from MergedResult or the Result folder 
