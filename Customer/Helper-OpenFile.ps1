@@ -1,7 +1,7 @@
 ﻿$CompanyName = 'Øveraasen'
 #$CompanyName = 'NOBI'
 #$CompanyName = 'Incadea\FastFit'
-$Location = "C:\GitHub\NAVUpgrade\Customer\$CompanyName\Script"
+$Location = "C:\Git\NAVUpgrade\Customer\$CompanyName\Script"
 . (join-path $Location ('Set-UpgradeSettings.ps1'))
 $WorkingFolder = 'C:\incadea\Customer\Øveraasen\NAV2017\CU03'
 #. (join-path $Location ('NAV2017-Settings.ps1'))
