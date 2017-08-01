@@ -4,7 +4,7 @@ $DefaultServerInstance = 'DynamicsNAV100'
 $NewServerInstance = 'NAV100Øveraasen'
 $License = 'C:\NAVUpgrade\License\NAV2017.flf'
 #Change the name of the Demo DB to reference the CU number
-$InstallConfig = 'C:\GitHub\NAVUpgrade\NAVSetup\FullInstallNAV2017.xml'
+$InstallConfig = 'C:\Git\NAVUpgrade\NAVSetup\FullInstallNAV2017.xml'
 
 
 #$Backupfile = $CopyFromServerInstance | Backup-NAVDatabase -ErrorAction Stop
