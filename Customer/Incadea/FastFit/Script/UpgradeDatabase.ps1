@@ -1,13 +1,14 @@
 ﻿#To start remote session on application server
-$Location = 'C:\GitHub\NAVUpgrade\Customer\Incadea\FastFit\Script\'
-. (join-path $Location 'Set-UpgradeSettings.ps1')
+$Location = 'C:\Git\NAVUpgrade\Customer\Incadea\FastFit\Script\'
+#. (join-path $Location 'Set-UpgradeSettings.ps1')
+$scriptLocationPath = (join-path $Location 'Set-UpgradeSettings.ps1')
+. $scriptLocationPath
 $InstanceSecurePassword = ConvertTo-SecureString $InstancePassword -AsPlainText -Force
 $UserCredential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $UserName , $InstanceSecurePassword 
 Enter-PSSession -ComputerName NO01DEV03 -UseSSL -Credential $UserCredential
 
-$Location = 'C:\GitHub\NAVUpgrade\Customer\Incadea\FastFit\Script\'
-. (join-path $Location 'Set-UpgradeSettings.ps1')
-Import-Certificate -Filepath "C:\GitHub\NAVUpgrade\Customer\Incadea\FastFit\cert" -CertStoreLocation "Cert:\LocalMachine\Root"
+. $scriptLocationPath
+Import-Certificate -Filepath "C:\Git\NAVUpgrade\Customer\Incadea\FastFit\cert" -CertStoreLocation "Cert:\LocalMachine\Root"
 
 clear-host
 
