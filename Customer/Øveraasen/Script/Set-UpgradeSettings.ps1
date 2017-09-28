@@ -5,7 +5,7 @@
 $RootFolderPath = "C:\NavUpgrade"
 #Servers
 $DBServer = 'localhost'
-$NAVServer = 'localhost'
+$NAVServer = 'NO01DEV03'
 #NAV Specific data
 $NAVShortVersion = '100'
 $DBServer = "localhost"
