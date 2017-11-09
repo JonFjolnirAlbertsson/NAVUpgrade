@@ -9,7 +9,7 @@ $NAVServer = 'NO01DEV03'
 #NAV Specific data
 $NAVShortVersion = '100'
 $DBServer = "localhost"
-$NavServiceInstance = "DynamicsNAV100"
+$NavServiceInstance = "NAV100_Overaasen"
 $NavServiceInstanceServer = "localhost"
 $NAVVersion = '2017'
 $NAVCU = 'CU3'
