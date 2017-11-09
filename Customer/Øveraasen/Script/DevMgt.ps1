@@ -18,4 +18,9 @@ Import-Module "${env:ProgramFiles(x86)}\Microsoft Dynamics NAV\100\RoleTailored 
 Import-Module "${env:ProgramFiles(x86)}\Microsoft Dynamics NAV\100\RoleTailored Client\Microsoft.Dynamics.Nav.Apps.Tools.psd1" -WarningAction SilentlyContinue | Out-Null
 Import-Module "$env:ProgramFiles\Microsoft Dynamics NAV\100\Service\NavAdminTool.ps1" -WarningAction SilentlyContinue | Out-Null 
 
-Sync-NAVTenant -ServerInstance $FastFitInstanceDev
+Import-NAVServerLicense -ServerInstance $NavServiceInstance -LicenseFile $NAVLicense
+Import-NAVServerLicense -ServerInstance $NavServiceInstance -LicenseFile $NAVLicenseOAS
+Sync-NAVTenant -ServerInstance $NavServiceInstance
+$CurrentServerInstance = Get-NAVServerInstance -ServerInstance $NavServiceInstance
+$CurrentServerInstance | Set-NAVServerInstance -stop
+$CurrentServerInstance | Set-NAVServerInstance -Restart
