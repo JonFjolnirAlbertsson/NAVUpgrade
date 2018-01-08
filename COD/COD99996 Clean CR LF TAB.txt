@@ -1,0 +1,54 @@
+OBJECT Codeunit 99996 JAL FIX PO Comp.
+{
+  OBJECT-PROPERTIES
+  {
+    Date=23.11.17;
+    Time=10:32:41;
+    Modified=Yes;
+    Version List=;
+  }
+  PROPERTIES
+  {
+    OnRun=BEGIN
+            RemoveFromPOComponent();
+          END;
+
+  }
+  CODE
+  {
+
+    PROCEDURE CleanText@1101103000(VAR TextToCleanP@1101103000 : Text[250]);
+    VAR
+      TextL@1101103001 : Text[3];
+    BEGIN
+      TextL[1] := 9;
+      TextL[2] := 13;
+      TextL[3] := 10;
+      TextToCleanP := DELCHR(TextToCleanP, '=', TextL);
+    END;
+
+    PROCEDURE RemoveFromPOComponent@1101103002();
+    VAR
+      ProdOrderComponentL@1101103000 : Record 5407;
+      TextL@1101103001 : Text[250];
+    BEGIN
+      ProdOrderComponentL.SETRANGE(Status, ProdOrderComponentL.Status::Released);
+      //ProdOrderComponentL.SETRANGE("Prod. Order No.", 'PP-13062');
+      //ProdOrderComponentL.SETRANGE("Line No.", 3150000);
+      ProdOrderComponentL.SETFILTER("Beskrivelse 2", '<>%1', '');
+      //MESSAGE(TextL);
+      IF ProdOrderComponentL.FINDFIRST THEN
+        REPEAT
+             TextL := ProdOrderComponentL."Beskrivelse 2";
+             CleanText(TextL);
+      //       MESSAGE(TextL);
+             ProdOrderComponentL."Beskrivelse 2" := TextL;
+             ProdOrderComponentL.MODIFY;
+        UNTIL ProdOrderComponentL.NEXT = 0;
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

@@ -1,0 +1,76 @@
+OBJECT Codeunit 99990 Change Setup For Test Company
+{
+  OBJECT-PROPERTIES
+  {
+    Date=10.11.17;
+    Time=11.47.14;
+    Modified=Yes;
+    Version List=JAL;
+  }
+  PROPERTIES
+  {
+    TableNo=2000000006;
+    OnRun=BEGIN
+
+            ChangeSalesSetupForTestCompany(Rec);
+            ChangeSalesSetupForTestCompany(Rec);
+            ChangeServiceSetupForTestCompany(Rec);
+            MESSAGE('%1 %2 %3', Rec.Name, C_INC_TestCompanySetupChangedEHF, C_INC_TestCompanySetupChangedCompello);
+          END;
+
+  }
+  CODE
+  {
+    VAR
+      C_INC_TestCompanySetupChangedCompello@1101103001 : TextConst 'ENU=Compello Client Id have been changed.;NOR=Compello Client Id har blitt endret.';
+      C_INC_TestCompanySetupChangedEHF@1101103000 : TextConst 'ENU=EHF sales and service file paths have been changed.;NOR=EHF filstier for salg og service har blitt endret.';
+
+    PROCEDURE ChangeSalesSetupForTestCompany@1101103008(VAR CompanyP@1101103001 : Record 2000000006);
+    VAR
+      SalesReceivablesSetupL@1101103000 : Record 311;
+    BEGIN
+      SalesReceivablesSetupL.CHANGECOMPANY(CompanyP.Name);
+      IF SalesReceivablesSetupL.GET() THEN BEGIN
+        SalesReceivablesSetupL.VALIDATE("E-Invoice Sales Invoice Path", '\\Sp-server\ehf\Test\Invoice\');
+        SalesReceivablesSetupL.VALIDATE("E-Invoice Sales Cr. Memo Path", '\\Sp-server\ehf\Test\CreditMemo\');
+        SalesReceivablesSetupL.VALIDATE("E-Invoice Reminder Path", '\\Sp-server\ehf\Test\Reminder\');
+        SalesReceivablesSetupL.VALIDATE("E-Invoice Fin. Charge Path", '\\Sp-server\ehf\Test\Charge\');
+        SalesReceivablesSetupL.MODIFY();
+      END;
+    END;
+
+    PROCEDURE ChangeServiceSetupForTestCompany@1101103007(VAR CompanyP@1101103001 : Record 2000000006);
+    VAR
+      ServiceMgtSetupL@1101103000 : Record 5911;
+    BEGIN
+      ServiceMgtSetupL.CHANGECOMPANY(CompanyP.Name);
+      IF ServiceMgtSetupL.GET() THEN BEGIN
+        ServiceMgtSetupL.VALIDATE("E-Invoice Service Invoice Path", '\\Sp-server\ehf\Test\ServiceInvoice\');
+        ServiceMgtSetupL.VALIDATE("E-Invoice Serv. Cr. Memo Path", '\\Sp-server\ehf\Test\ServiceCreditMemo\');
+        ServiceMgtSetupL.MODIFY();
+      END;
+    END;
+
+    PROCEDURE ChangeCompelloSetupForTestCompany@1101103006(VAR CompanyP@1101103001 : Record 2000000006);
+    VAR
+      IntegrationToCompelloSetupL@1101103000 : Record 70000;
+    BEGIN
+      IntegrationToCompelloSetupL.CHANGECOMPANY(CompanyP.Name);
+      IF IntegrationToCompelloSetupL.GET() THEN BEGIN
+        IntegrationToCompelloSetupL.VALIDATE("Client ID", '999');
+        IntegrationToCompelloSetupL.MODIFY();
+      END;
+    END;
+
+    BEGIN
+    {
+      +---------------------------------------------+
+      | Incadea Norge AS                            |
+      +---------------------------------------------+
+      No. Date     Id  Description
+      01. 10.11.17 JAL CodeUnit to change setup for test company
+    }
+    END.
+  }
+}
+
