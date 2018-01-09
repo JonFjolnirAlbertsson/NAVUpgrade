@@ -1,4 +1,4 @@
-﻿$Location = "C:\Git\NAVUpgrade\Customer\TP\Script"
+﻿$Location = "C:\Git\NAVUpgrade\Customer\PP\Script"
 . (join-path $Location 'Set-UpgradeSettings.ps1')
 
 clear-host
