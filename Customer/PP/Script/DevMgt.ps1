@@ -25,6 +25,6 @@ $DemoInstance = 'DynamicsNAV80'
 $DemoInstance = 'DynamicsNAV110'
 $NAV2015Instance = 'NAV80_PP'
 $NAV2018Instance = 'NAV110_PP'
-Get-NAVServerInstance -ServerInstance $DemoInstance | Copy-NAVEnvironment -ToServerInstance $NAV2015Instance
-Get-NAVServerInstance -ServerInstance $DemoInstance | Copy-NAVEnvironment -ToServerInstance $NAV2018Instance
+#Get-NAVServerInstance -ServerInstance $DemoInstance | Copy-NAVEnvironment -ToServerInstance $NAV2015Instance
+#Get-NAVServerInstance -ServerInstance $DemoInstance | Copy-NAVEnvironment -ToServerInstance $NAV2018Instance
 #Sync-NAVTenant -ServerInstance $DemoInstance 
