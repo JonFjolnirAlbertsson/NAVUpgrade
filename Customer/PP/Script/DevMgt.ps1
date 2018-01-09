@@ -21,6 +21,9 @@ $gitpath = "C:\Git"
 $scriptfolderpath = "C:\Git\IncadeaNorway"   
 Import-module (Join-Path "$gitpath\Cloud.Ready.Software.PowerShell\PSModules" 'LoadModules.ps1')  
 Import-module (Join-Path $scriptfolderpath 'LoadModules.ps1')  
+# Get Sript config for remote session
+$Location = "C:\Git\NAVUpgrade\Customer\PP\Script"
+. (join-path $Location 'Set-UpgradeSettings.ps1')
 
 $DemoInstance = 'DynamicsNAV80'
 $DemoInstance = 'DynamicsNAV110'
