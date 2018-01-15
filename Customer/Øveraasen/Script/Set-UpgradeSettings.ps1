@@ -2,19 +2,20 @@
 #Azure
 #$RootFolderPath = "F:\NavUpgrade"
 #SQLNAVUpgrade
-$RootFolderPath = "C:\NavUpgrade"
+$RootFolderPath = "C:\Incadea"
 #Servers
 $DBServer = 'localhost'
-$NAVServer = 'localhost'
+$NAVServer = 'NO01DEV03'
 #NAV Specific data
 $NAVShortVersion = '100'
 $DBServer = "localhost"
-$NavServiceInstance = "DynamicsNAV100"
+$NavServiceInstance = "NAV100_Overaasen"
 $NavServiceInstanceServer = "localhost"
 $NAVVersion = '2017'
 $NAVCU = 'CU3'
 $VersionListPrefixes = 'NAVW1', 'NAVNO', 'I'
 $NAVLicense = "$RootFolderPath\License\NAV2017.flf"
+$NAVLicenseOAS = "$RootFolderPath\License\Øveraasen NAV 2017 5111316.flf"
 #Company data
 $CompanyName = 'Øveraasen'
 $UpgradeName = 'NAV' + $NAVShortVersion  + $NAVCU + $CompanyName

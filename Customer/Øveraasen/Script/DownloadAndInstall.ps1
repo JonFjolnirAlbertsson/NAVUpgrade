@@ -1,7 +1,7 @@
 ﻿#We only need to run this if we want ISO file
 #$NAVISOFile = New-NAVCumulativeUpdateISOFile -CumulativeUpdateFullPath $Download.filename -TmpLocation $TmpLocation -IsoDirectory $ISODir 
 $DefaultServerInstance = 'DynamicsNAV100'
-$NewServerInstance = 'NAV100Øveraasen'
+$NewServerInstance = 'NAV100_Overaasen'
 $License = 'C:\NAVUpgrade\License\NAV2017.flf'
 #Change the name of the Demo DB to reference the CU number
 $InstallConfig = 'C:\Git\NAVUpgrade\NAVSetup\FullInstallNAV2017.xml'
@@ -35,5 +35,6 @@ $InstallationResult = Install-NAV -DVDFolder $InstallationPath -Configfile $Inst
 #MODIFIED (DEV)
 #Restore-SQLBackupFile-SID -BackupFile $Backupfile -DatabaseName 'Demo Database NAV (7-1) CU29'
 #New-NAVEnvironment -ServerInstance $NewServerInstance -BackupFile $Backupfile -ErrorAction Stop -EnablePortSharing -LicenseFile $License
+New-NAVWebServerInstance -WebServerInstance $NewServerInstance  -Server $NAVServer -ServerInstance $NewServerInstance 
 
 
