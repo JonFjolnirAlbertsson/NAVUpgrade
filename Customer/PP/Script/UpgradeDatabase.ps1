@@ -1,6 +1,7 @@
-﻿Set-Location -Path F:
-(Get-Location).providerpath
-$Location = join-path (Get-Location).providerpath '\Git\NAVUpgrade\Customer\PP\Script'
+﻿Set-Location -Path (Split-Path $psise.CurrentFile.FullPath -Qualifier)
+#(Get-Location).providerpath
+#$Location = join-path (Get-Location).providerpath '\Git\NAVUpgrade\Customer\PP\Script'
+$Location = (Split-Path $psise.CurrentFile.FullPath)
 . (join-path $Location 'Set-UpgradeSettings.ps1')
 
 clear-host
