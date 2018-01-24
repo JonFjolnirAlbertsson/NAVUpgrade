@@ -1,8 +1,13 @@
 ﻿#Base Path
-$RootFolderPath = "C:\incadea"
+$RootFolderPath = Join-Path (Get-Location).providerpath 'incadea'
 #Servers
 $DBServer = 'NO01DEVSQL01'
 $NAVServer = 'NO01DEV03'
+$DBServer = 'localhost'
+$NAVServer = 'localhost'
+# Database
+$UpgradeDataBaseName = 'NAV2009R2_PP_ToUpgrade'
+$BackupPath = 'F:\Backup'
 #NAV Specific data
 $NAVShortVersion = 'NAV110'
 $NavServiceInstance = "NAV110_PP"
@@ -22,9 +27,7 @@ $RootFolder = join-path $RootFolderPath $CompanyFolder
 $WorkingFolder = join-path $RootFolder "\$NAVVersion\$NAVCU\Upgrade_$CompanyName"
 $ObjectLibrary = "$RootFolder\DB"
 #Original DB objects
-
 $OriginalObjectLibrary = "$RootFolder\DB Original"
-
 #Merging parameters
 $SourcePath = join-path $WorkingFolder 'MergeResult' 
 $ConflictTarget = join-path $SourcePath  'ConflictTarget' 

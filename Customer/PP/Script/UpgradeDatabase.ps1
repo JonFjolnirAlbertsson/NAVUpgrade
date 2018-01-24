@@ -1,4 +1,6 @@
-﻿$Location = "C:\Git\NAVUpgrade\Customer\PP\Script"
+﻿Set-Location -Path F:
+(Get-Location).providerpath
+$Location = join-path (Get-Location).providerpath '\Git\NAVUpgrade\Customer\PP\Script'
 . (join-path $Location 'Set-UpgradeSettings.ps1')
 
 clear-host
@@ -32,6 +34,14 @@ Merge-NAVCode -WorkingFolderPath $WorkingFolder -CompareObject $CompareObject -M
 #Copy and compare the Merged objects to the Merged folder before running this script.
 Merge-NAVCode -WorkingFolderPath $WorkingFolder -CompareObject $CompareObject -Join
 
+
+#Step 1
+$StartedDateTime = Get-Date
+$BackupFileName = $UpgradeDataBaseName + "_Step1.bak"
+$BackupFilePath = join-path $BackupPath $BackupFileName 
+Backup-SqlDatabase -ServerInstance $DBServer -Database $UpgradeDataBaseName -BackupAction Database -BackupFile $BackupFilePath -CompressionOption Default
+$StoppedDateTime = Get-Date
+Write-Host 'Start at: ' + $StartedDateTime + ' . Finished at: ' + $StoppedDateTime + ' . Total time' + ($StoppedDateTime-$StartedDateTime) -ForegroundColor Yellow
   
 $StoppedDateTime = Get-Date
   
