@@ -7,7 +7,7 @@ $DBServer = 'localhost'
 $NAVServer = 'localhost'
 # Database
 $UpgradeDataBaseName = 'NAV2009R2_PP_ToUpgrade'
-$BackupPath = 'F:\Backup'
+$BackupPath = Join-Path (Get-Location).providerpath  'Backup'
 #NAV Specific data
 $NAVShortVersion = 'NAV110'
 $NavServiceInstance = "NAV110_PP"

@@ -1,8 +1,7 @@
-﻿$Location = "C:\Git\NAVUpgrade\Customer\PP\Script"
+﻿Set-Location -Path (Split-Path $psise.CurrentFile.FullPath -Qualifier)
+$Location = (Split-Path $psise.CurrentFile.FullPath)
 . (join-path $Location 'Set-UpgradeSettings.ps1')
-
 clear-host
-
 $StartedDateTime = Get-Date
 <#
 # Reset Workingfolder
@@ -59,6 +58,13 @@ Write-Host "Number of $CompareObjectFilter in $TargetFolderPath" + (Get-ChildIte
 # Remember to manually compare the Merged objects with original, modified and target objects, before running this script.
 Merge-NAVCode -WorkingFolderPath $WorkingFolder -CompareObject $CompareObject -Join
 
+#Step 1
+$StartedDateTime = Get-Date
+$BackupFileName = $UpgradeDataBaseName + "_Step1.bak"
+$BackupFilePath = join-path $BackupPath $BackupFileName 
+Backup-SqlDatabase -ServerInstance $DBServer -Database $UpgradeDataBaseName -BackupAction Database -BackupFile $BackupFilePath -CompressionOption Default
+$StoppedDateTime = Get-Date
+Write-Host 'Start at: ' + $StartedDateTime + ' . Finished at: ' + $StoppedDateTime + ' . Total time' + ($StoppedDateTime-$StartedDateTime) -ForegroundColor Yellow
   
 $StoppedDateTime = Get-Date
   
