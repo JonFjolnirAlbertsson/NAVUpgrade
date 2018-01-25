@@ -3,7 +3,7 @@ $Location = (Split-Path $psise.CurrentFile.FullPath)
 . (join-path $Location 'Set-UpgradeSettings.ps1')
 clear-host
 $StartedDateTime = Get-Date
-<#
+#<#
 # Reset Workingfolder
 if (test-path $WorkingFolder){
     if (Confirm-YesOrNo -title 'Remove WorkingFolder?' -message "Do you want to remove the WorkingFolder $WorkingFolder ?"){
@@ -65,9 +65,42 @@ $BackupFilePath = join-path $BackupPath $BackupFileName
 Backup-SqlDatabase -ServerInstance $DBServer -Database $UpgradeDataBaseName -BackupAction Database -BackupFile $BackupFilePath -CompressionOption Default
 $StoppedDateTime = Get-Date
 Write-Host 'Start at: ' + $StartedDateTime + ' . Finished at: ' + $StoppedDateTime + ' . Total time' + ($StoppedDateTime-$StartedDateTime) -ForegroundColor Yellow
-  
+#Step 2
+$StartedDateTime = Get-Date
+$BackupFileName = $UpgradeDataBaseName + "_Step2.bak"
+$BackupFilePath = join-path $BackupPath $BackupFileName 
+Backup-SqlDatabase -ServerInstance $DBServer -Database $UpgradeDataBaseName -BackupAction Database -BackupFile $BackupFilePath -CompressionOption Default
 $StoppedDateTime = Get-Date
-  
+Write-Host 'Start at: ' + $StartedDateTime + ' . Finished at: ' + $StoppedDateTime + ' . Total time' + ($StoppedDateTime-$StartedDateTime) -ForegroundColor Yellow 
+$StoppedDateTime = Get-Date
+#Step 3
+$StartedDateTime = Get-Date
+$BackupFileName = $UpgradeDataBaseName + "_Step3.bak"
+$BackupFilePath = join-path $BackupPath $BackupFileName 
+Backup-SqlDatabase -ServerInstance $DBServer -Database $UpgradeDataBaseName -BackupAction Database -BackupFile $BackupFilePath -CompressionOption Default
+$StoppedDateTime = Get-Date
+Write-Host 'Start at: ' + $StartedDateTime + ' . Finished at: ' + $StoppedDateTime + ' . Total time' + ($StoppedDateTime-$StartedDateTime) -ForegroundColor Yellow 
+$StoppedDateTime = Get-Date
+# Sync and correct errors in NAV 2015
+# Remember to load NAV 2015 modules
+Sync-NAVTenant -ServerInstance $Nav2015ServiceInstance  -Mode Sync
+#Step 4
+$StartedDateTime = Get-Date
+$BackupFileName = $UpgradeDataBaseName + "_Step4.bak"
+$BackupFilePath = join-path $BackupPath $BackupFileName 
+Backup-SqlDatabase -ServerInstance $DBServer -Database $UpgradeDataBaseName -BackupAction Database -BackupFile $BackupFilePath -CompressionOption Default
+$StoppedDateTime = Get-Date
+Write-Host 'Start at: ' + $StartedDateTime + ' . Finished at: ' + $StoppedDateTime + ' . Total time' + ($StoppedDateTime-$StartedDateTime) -ForegroundColor Yellow 
+$StoppedDateTime = Get-Date 
+#Step 5
+$StartedDateTime = Get-Date
+$BackupFileName = $UpgradeDataBaseName + "_Step5.bak"
+$BackupFilePath = join-path $BackupPath $BackupFileName 
+Backup-SqlDatabase -ServerInstance $DBServer -Database $UpgradeDataBaseName -BackupAction Database -BackupFile $BackupFilePath -CompressionOption Default
+$StoppedDateTime = Get-Date
+Write-Host 'Start at: ' + $StartedDateTime + ' . Finished at: ' + $StoppedDateTime + ' . Total time' + ($StoppedDateTime-$StartedDateTime) -ForegroundColor Yellow 
+$StoppedDateTime = Get-Date 
+
 Write-Host ''
 Write-Host ''    
 Write-Host '****************************************************' -ForegroundColor Yellow

@@ -1,5 +1,6 @@
 ﻿#Base Path
 $RootFolderPath = Join-Path (Get-Location).providerpath 'incadea'
+$CompanyName = 'PP'
 #Servers
 $DBServer = 'NO01DEVSQL01'
 $NAVServer = 'NO01DEV03'
@@ -10,7 +11,8 @@ $UpgradeDataBaseName = 'NAV2009R2_PP_ToUpgrade'
 $BackupPath = Join-Path (Get-Location).providerpath  'Backup'
 #NAV Specific data
 $NAVShortVersion = 'NAV110'
-$NavServiceInstance = "NAV110_PP"
+$NavServiceInstance = "NAV110_$CompanyName"
+$Nav2015ServiceInstance = "NAV80_$CompanyName"
 $NAVVersion = 'NAV2018'
 $NAVCU = 'CU01'
 $NAVLandCode = 'NO'
@@ -21,7 +23,6 @@ $UserName = 'si-dev\devjal'
 $InstanceUserName = 'nav_user@si-dev.local'
 $InstancePassword = '1378Nesbru'
 #Company data
-$CompanyName = 'PP'
 $CompanyFolder = join-path 'Customer' $CompanyName
 $RootFolder = join-path $RootFolderPath $CompanyFolder
 $WorkingFolder = join-path $RootFolder "\$NAVVersion\$NAVCU\Upgrade_$CompanyName"
