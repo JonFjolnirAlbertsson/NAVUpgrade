@@ -92,6 +92,18 @@ Backup-SqlDatabase -ServerInstance $DBServer -Database $UpgradeDataBaseName -Bac
 $StoppedDateTime = Get-Date
 Write-Host 'Start at: ' + $StartedDateTime + ' . Finished at: ' + $StoppedDateTime + ' . Total time' + ($StoppedDateTime-$StartedDateTime) -ForegroundColor Yellow 
 $StoppedDateTime = Get-Date 
+# Start Data upgrade NAV 2015
+Start-NAVDataUpgrade -ServerInstance $Nav2015ServiceInstance -FunctionExecutionMode Serial
+
+# Follow up the data upgrade process
+Get-NAVDataUpgrade -ServerInstance $Nav2015ServiceInstance -Progress
+Get-NAVDataUpgrade -ServerInstance $Nav2015ServiceInstance -Detailed | ogv
+#Get-NAVDataUpgrade -ServerInstance $NavServiceInstance -Detailed | Out-File 
+Get-NAVDataUpgrade -ServerInstance $Nav2015ServiceInstance -ErrorOnly | ogv
+
+Resume-NAVDataUpgrade -ServerInstance $Nav2015ServiceInstance
+
+
 #Step 5
 $StartedDateTime = Get-Date
 $BackupFileName = $UpgradeDataBaseName + "_Step5.bak"
