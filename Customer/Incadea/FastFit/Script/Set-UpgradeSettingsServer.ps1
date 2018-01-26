@@ -20,8 +20,8 @@ $RootFolder = join-path $RootFolderPath $CompanyFolder
 $WorkingFolder = join-path $RootFolder "\$NAVVersion\$NAVCU\Upgrade_$CompanyName"
 #Database backup files
 $BackupPath = join-path $DBServerRootPath 'Database Backups'
-$AppDBName = 'fastfit_083000_NO_APP'
-$AppDBNameW1 = 'fastfit_083000_W1_APP'
+$AppDBName = 'fastfit_' + $VersionFolder + '_NO_APP'
+$AppDBNameW1 = 'fastfit_' + $VersionFolder + '_W1_APP'
 $BackupfileAppDB = join-path $BackupPath ('fastfit_' + $VersionFolder + 'W1_APP.bak')
 $DEALER1DBName = 'fastfit_' + $VersionFolder + '_NO_DEALER1'
 $DEALER1DBNameW1 = 'fastfit_' + $VersionFolder + '_W1_DEALER1'
