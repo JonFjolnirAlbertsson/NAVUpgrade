@@ -21,8 +21,8 @@ $InstanceCredential = New-Object -TypeName System.Management.Automation.PSCreden
 $UserCredential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $UserName , $InstanceSecurePassword 
 #>
 # Import modules
-Import-module (Join-Path "$gitpath\Cloud.Ready.Software.PowerShell\PSModules" ''LoadModules.ps1'')  
-Import-module (Join-Path $scriptfolderpath ''LoadModules.ps1'')  
+Import-module (Join-Path "$GitPath\Cloud.Ready.Software.PowerShell\PSModules" ''LoadModules.ps1'')  
+Import-module (Join-Path "$GitPath\IncadeaNorway" ''LoadModules.ps1'')  
 
 # Restore company database, to be upgraded. Can be run locally.
 #Restore-SQLBackupFile-SID -BackupFile $BackupfileNAVDemoDB -DatabaseServer $DBServer -DatabaseName $DemoDBName
