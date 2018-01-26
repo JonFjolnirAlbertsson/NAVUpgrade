@@ -1,12 +1,13 @@
 ﻿#Base Variables
 $RootFolderPath = 'C:\incadea'
-$CompanyName = 'Fastfit'
+$CompanyName = 'fastfit'
 $DBServerRootPath = "\\NO01DEVSQL01\$CompanyName"
+$GitPath = "\Git\NAVUpgrade\Customer\incadea"
 #Servers
 $DBServer = 'NO01DEVSQL01'
 $NAVServer = 'NO01DEV03'
-$NAVLicense = "$RootFolderPath\License\incadea.fastfit_8.X (NAV2016)_development_INS-NOR_4805448_20170321.flf"
-$CertificateFile = join-path (Split-Path (Split-Path $psise.CurrentFile.FullPath -parent) -Parent) 'cert'
+$NAVLicense = "License\incadea.fastfit_8.X (NAV2016)_development_INS-NOR_4805448_20170321.flf"
+$CertificateFile = join-path ("$GitPath\Customer\$CompanyName") 'cert'
 #$UserName = 'incadea\albertssonf'
 $UserName = 'si-dev\devjal'
 $InstanceUserName = 'nav_user@si-dev.local'

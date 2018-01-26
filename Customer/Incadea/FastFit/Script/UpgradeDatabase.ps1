@@ -12,9 +12,8 @@ clear-host
 $StartedDateTime = Get-Date
 
 Set-Location 'C:\'
-$pwd.drive.Root
 $Location = join-path $pwd.drive.Root 'Git\NAVUpgrade\Customer\Incadea\FastFit\Script'
-$scriptLocationPath = join-path $Location 'Set-UpgradeSettingsClient.ps1'
+$scriptLocationPath = join-path $Location 'Set-UpgradeSettingsServer.ps1'
 . $scriptLocationPath
 <#
 $InstanceSecurePassword = ConvertTo-SecureString $InstancePassword -AsPlainText -Force
