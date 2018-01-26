@@ -1,10 +1,6 @@
 ﻿#Base Path
-<<<<<<< HEAD
 $RootFolderPath = Join-Path (Split-Path $psise.CurrentFile.FullPath -Qualifier) 'incadea'
-=======
-$RootFolderPath = Join-Path (Get-Location).providerpath 'incadea'
 $CompanyName = 'PP'
->>>>>>> 9ef08e1c78fec3c4a78c7319bb50dfefded54641
 #Servers
 $DBServer = 'NO01DEVSQL01'
 $NAVServer = 'NO01DEV03'
