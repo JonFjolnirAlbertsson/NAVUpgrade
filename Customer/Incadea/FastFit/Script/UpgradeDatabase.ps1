@@ -20,6 +20,10 @@ $InstanceSecurePassword = ConvertTo-SecureString $InstancePassword -AsPlainText 
 $InstanceCredential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $InstanceUserName, $InstanceSecurePassword 
 $UserCredential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $UserName , $InstanceSecurePassword 
 #>
+# Import modules
+Import-module (Join-Path "$gitpath\Cloud.Ready.Software.PowerShell\PSModules" ''LoadModules.ps1'')  
+Import-module (Join-Path $scriptfolderpath ''LoadModules.ps1'')  
+
 # Restore company database, to be upgraded. Can be run locally.
 #Restore-SQLBackupFile-SID -BackupFile $BackupfileNAVDemoDB -DatabaseServer $DBServer -DatabaseName $DemoDBName
 Restore-SQLBackupFile-SID -BackupFile $BackupfileAppDB -DatabaseServer $DBServer -DatabaseName $AppDBName

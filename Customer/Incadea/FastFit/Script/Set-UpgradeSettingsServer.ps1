@@ -1,13 +1,15 @@
 ﻿#Base Variables
-$RootFolderPath = 'C:\incadea'
+$RootDrive = 'C:\'
+$RootFolderPath = join-path $RootDrive 'incadea'
 $CompanyName = 'fastfit'
 $DBServerRootPath = "\\NO01DEVSQL01\$CompanyName"
-$GitPath = "\Git\NAVUpgrade\Customer\incadea"
+$GitPath = join-path $RootDrive 'Git'
+$GitPathIncadea = join-path  $GitPath "\NAVUpgrade\Customer\incadea"
 #Servers
 $DBServer = 'NO01DEVSQL01'
 $NAVServer = 'NO01DEV03'
-$NAVLicense = "License\incadea.fastfit_8.X (NAV2016)_development_INS-NOR_4805448_20170321.flf"
-$CertificateFile = join-path ("$GitPath\Customer\$CompanyName") 'cert'
+$NAVLicense = join-path $GitPath "License\incadea.fastfit_8.X (NAV2016)_development_INS-NOR_4805448_20170321.flf"
+$CertificateFile = join-path ("$GitPathIncadea\$CompanyName") 'cert'
 #$UserName = 'incadea\albertssonf'
 $UserName = 'si-dev\devjal'
 $InstanceUserName = 'nav_user@si-dev.local'
