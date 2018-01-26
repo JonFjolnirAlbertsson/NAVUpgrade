@@ -20,9 +20,15 @@ $CompanyFolder = "$CompanyName\$VersionFolder"
 $RootFolder = join-path $RootFolderPath $CompanyFolder
 $WorkingFolder = join-path $RootFolder "\$NAVVersion\$NAVCU\Upgrade_$CompanyName"
 # Database backup common
+
 $BackupPath = join-path $DBServerRootPath ($VersionFolder + '_W1\Database Backups')
 $BackupfileAppDB = join-path $BackupPath ('fastfit_' + $VersionFolder + '_W1_APP.bak')
 $BackupfileDEALER1DB = join-path $BackupPath ('fastfit_' + $VersionFolder + '_W1_DEALER1.bak')
+$BackupfileDEALER2DB = join-path $BackupPath ('fastfit_' + $VersionFolder + '_W1_DEALER2.bak')
+$BackupfileMASTERDB = join-path $BackupPath ('fastfit_' + $VersionFolder + '_W1_MASTER.bak')
+$BackupfileREPORTINGDB = join-path $BackupPath ('fastfit_' + $VersionFolder + '_W1_REPORTING.bak')
+$BackupfileSTAGINGDB = join-path $BackupPath ('fastfit_' + $VersionFolder + '_W1_STAGING.bak')
+$BackupfileTEMPLATEDB = join-path $BackupPath ('fastfit_' + $VersionFolder + '_W1_TEMPLATE.bak')
 # Database backup W1
 $AppDBNameW1 = 'fastfit_' + $VersionFolder + '_W1_APP'
 $DEALER1DBNameW1 = 'fastfit_' + $VersionFolder + '_W1_DEALER1'

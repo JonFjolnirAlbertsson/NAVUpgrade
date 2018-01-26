@@ -19,14 +19,16 @@ $scriptLocationPath = join-path $Location 'Set-UpgradeSettingsServer.ps1'
 Import-Certificate -Filepath $CertificateFile -CertStoreLocation "Cert:\LocalMachine\Root"
 ## Server Enabling WSManCredSSP to be able to do a double hop with authentication.
 Enable-WSManCredSSP -Role server -Force
-# Import modules
+# Import cloud.ready and incadea modules
 Import-module (Join-Path "$GitPath\Cloud.Ready.Software.PowerShell\PSModules" 'LoadModules.ps1') -Force 
 Import-module (Join-Path "$GitPath\IncadeaNorway" 'LoadModules.ps1') -Force 
 # Restore W1 databases
 Restore-SQLBackupFile-INC -BackupFile $BackupfileAppDB -DatabaseServer $DBServer -DatabaseName $AppDBNameW1
 Restore-SQLBackupFile-INC -BackupFile $BackupfileDEALER1DB -DatabaseServer $DBServer -DatabaseName $DEALER1DBNameW1
+Restore-SQLBackupFile-INC -BackupFile $BackupfileDEALER2DB -DatabaseServer $DBServer -DatabaseName $DEALER2DBNameW1
+Restore-SQLBackupFile-INC -BackupFile $BackupfileMASTERDB -DatabaseServer $DBServer -DatabaseName $MASTERDBNameW1
 # Restore NO databases
-Restore-SQLBackupFile-INC -BackupFile $BackupfileAppDB -DatabaseServer $DBServer -DatabaseName $AppDBName -TrustedConnection
+Restore-SQLBackupFile-INC -BackupFile $BackupfileAppDB -DatabaseServer $DBServer -DatabaseName $AppDBName
 Restore-SQLBackupFile-INC -BackupFile $BackupfileDEALER1DB -DatabaseServer $DBServer -DatabaseName $DEALER1DBName 
 #Must run in remote session, if the server instance is run on another server.
 New-NAVEnvironment  -EnablePortSharing -ServerInstance $FastFitInstanceW1 -DatabaseServer $DBServer
