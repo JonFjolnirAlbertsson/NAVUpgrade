@@ -1,5 +1,5 @@
 ﻿#Base Path
-$RootFolderPath = Join-Path (Get-Location).providerpath 'incadea'
+$RootFolderPath = Join-Path (Split-Path $psise.CurrentFile.FullPath -Qualifier) 'incadea'
 #Servers
 $DBServer = 'NO01DEVSQL01'
 $NAVServer = 'NO01DEV03'

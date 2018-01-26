@@ -1,6 +1,8 @@
-﻿$CompanyName = 'PP'
+﻿Set-Location -Path (Split-Path $psise.CurrentFile.FullPath -Qualifier)
+#$Location = 
+$CompanyName = 'PP'
 #$CompanyName = 'Incadea\FastFit'
-$Location = "C:\Git\NAVUpgrade\Customer\$CompanyName\Script"
+$Location = join-path (Split-Path $psise.CurrentFile.FullPath) "$CompanyName\Script"
 . (join-path $Location ('Set-UpgradeSettings.ps1'))
 #$WorkingFolder = "C:\incadea\Customer\$CompanyName \NAV2018\CU01"
 #$WorkingFolder = join-path 'C:\Git\NAV AddOns' 'EHF\PDF'
@@ -9,7 +11,7 @@ $Location = "C:\Git\NAVUpgrade\Customer\$CompanyName\Script"
 #Open Files with conflict. Using the Merge Folder to merge the conflict
 #$ObjectName ='COD430'
 #<#
-$ObjectName ='TAB21'
+$ObjectName ='TAB25'
 Open-File-SID -WorkingFolder $WorkingFolder -ObjectName $ObjectName -OpenInNotepadPlus -OpenOriginal -OpenModified -OpenResult #-OpenTarget -OpenMerged -OpenToBeJoined
 Open-File-SID -ObjectName $ObjectName -WorkingFolder $WorkingFolder -OpenInNotepadPlus -UseWaldoFolders
 #>
