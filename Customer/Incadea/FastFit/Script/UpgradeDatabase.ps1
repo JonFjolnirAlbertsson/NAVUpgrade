@@ -11,9 +11,10 @@ Import-Certificate -Filepath $CertificateFile -CertStoreLocation "Cert:\LocalMac
 clear-host
 $StartedDateTime = Get-Date
 
-Set-Location -Path (Split-Path $psise.CurrentFile.FullPath -Qualifier)
-$Location = (Split-Path $psise.CurrentFile.FullPath)
-$scriptLocationPath = (join-path $Location 'Set-UpgradeSettingsClient.ps1')
+Set-Location 'C:\'
+$pwd.drive.Root
+$Location = join-path $pwd.drive.Root 'Git\NAVUpgrade\Customer\Incadea\FastFit\Script'
+$scriptLocationPath = join-path $Location 'Set-UpgradeSettingsClient.ps1'
 . $scriptLocationPath
 <#
 $InstanceSecurePassword = ConvertTo-SecureString $InstancePassword -AsPlainText -Force
