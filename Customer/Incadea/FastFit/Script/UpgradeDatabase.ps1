@@ -1,4 +1,4 @@
-﻿#To start remote session on application server
+﻿# Client script to start remote session on application server
 Set-Location -Path (Split-Path $psise.CurrentFile.FullPath -Qualifier)
 $Location = (Split-Path $psise.CurrentFile.FullPath)
 $scriptLocationPath = (join-path $Location 'Set-UpgradeSettingsClient.ps1')
@@ -10,8 +10,8 @@ $UserCredential = New-Object -TypeName System.Management.Automation.PSCredential
 Enter-PSSession -ComputerName $NAVServer -UseSSL -Credential $UserCredential –Authentication CredSSP
 #Enter-PSSession -ComputerName $DBServer -UseSSL -Credential $UserCredential
 clear-host
+# Server Site script
 $StartedDateTime = Get-Date
-
 Set-Location 'C:\'
 $Location = join-path $pwd.drive.Root 'Git\NAVUpgrade\Customer\Incadea\FastFit\Script'
 $scriptLocationPath = join-path $Location 'Set-UpgradeSettingsServer.ps1'
@@ -19,14 +19,9 @@ $scriptLocationPath = join-path $Location 'Set-UpgradeSettingsServer.ps1'
 Import-Certificate -Filepath $CertificateFile -CertStoreLocation "Cert:\LocalMachine\Root"
 ## Server Enabling WSManCredSSP to be able to do a double hop with authentication.
 Enable-WSManCredSSP -Role server -Force
-<#
-$InstanceSecurePassword = ConvertTo-SecureString $InstancePassword -AsPlainText -Force
-$InstanceCredential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $InstanceUserName, $InstanceSecurePassword 
-$UserCredential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $UserName , $InstanceSecurePassword 
-#>
 # Import modules
-Import-module (Join-Path "$GitPath\Cloud.Ready.Software.PowerShell\PSModules" 'LoadModules.ps1')  
-Import-module (Join-Path "$GitPath\IncadeaNorway" 'LoadModules.ps1')  -Force 
+Import-module (Join-Path "$GitPath\Cloud.Ready.Software.PowerShell\PSModules" 'LoadModules.ps1') -Force   
+Import-module (Join-Path "$GitPath\IncadeaNorway" 'LoadModules.ps1') -Force 
 # Restore company database, to be upgraded. Can be run locally.
 Restore-SQLBackupFile-INC -BackupFile $BackupfileAppDB -DatabaseServer $DBServer -DatabaseName $AppDBName -TrustedConnection
 Restore-SQLBackupFile-INC -BackupFile $BackupfileDEALER1DB -DatabaseServer $DBServer -DatabaseName $DEALER1DBName 
