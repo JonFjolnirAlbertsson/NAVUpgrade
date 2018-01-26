@@ -6,8 +6,8 @@ $DBServerRootPath = "\\NO01DEVSQL01\$CompanyName"
 $GitPath = join-path $RootDrive 'Git'
 $GitPathIncadea = join-path  $GitPath "\NAVUpgrade\Customer\incadea"
 #Servers
-$DBServer = 'NO01DEVSQL01'
-$NAVServer = 'NO01DEV03'
+$DBServer = 'NO01DEVSQL01.si-dev.local'
+$NAVServer = 'NO01DEV03.si-dev.local'
 $NAVLicense = join-path $GitPath "License\incadea.fastfit_8.X (NAV2016)_development_INS-NOR_4805448_20170321.flf"
 $CertificateFile = join-path ("$GitPathIncadea\$CompanyName") 'cert'
 #$UserName = 'incadea\albertssonf'
@@ -21,7 +21,7 @@ $CompanyFolder = "$CompanyName\$VersionFolder"
 $RootFolder = join-path $RootFolderPath $CompanyFolder
 $WorkingFolder = join-path $RootFolder "\$NAVVersion\$NAVCU\Upgrade_$CompanyName"
 #Database backup files
-$BackupPath = join-path $DBServerRootPath 'Database Backups'
+$BackupPath = join-path $DBServerRootPath "$VersionFolder\Database Backups"
 $AppDBName = 'fastfit_' + $VersionFolder + '_NO_APP'
 $AppDBNameW1 = 'fastfit_' + $VersionFolder + '_W1_APP'
 $BackupfileAppDB = join-path $BackupPath ('fastfit_' + $VersionFolder + 'W1_APP.bak')

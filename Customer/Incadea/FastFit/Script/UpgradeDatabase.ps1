@@ -3,11 +3,12 @@ Set-Location -Path (Split-Path $psise.CurrentFile.FullPath -Qualifier)
 $Location = (Split-Path $psise.CurrentFile.FullPath)
 $scriptLocationPath = (join-path $Location 'Set-UpgradeSettingsClient.ps1')
 . $scriptLocationPath
+## Client Enabling WSManCredSSP to be able to do a double hop with authentication.
+Enable-WSManCredSSP -Role Client -DelegateComputer $NAVServer  -Force
 $InstanceSecurePassword = ConvertTo-SecureString $InstancePassword -AsPlainText -Force
 $UserCredential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $UserName , $InstanceSecurePassword 
-Enter-PSSession -ComputerName NO01DEV03 -UseSSL -Credential $UserCredential
-Import-Certificate -Filepath $CertificateFile -CertStoreLocation "Cert:\LocalMachine\Root"
-
+Enter-PSSession -ComputerName $NAVServer -UseSSL -Credential $UserCredential –Authentication CredSSP
+#Enter-PSSession -ComputerName $DBServer -UseSSL -Credential $UserCredential
 clear-host
 $StartedDateTime = Get-Date
 
@@ -15,22 +16,23 @@ Set-Location 'C:\'
 $Location = join-path $pwd.drive.Root 'Git\NAVUpgrade\Customer\Incadea\FastFit\Script'
 $scriptLocationPath = join-path $Location 'Set-UpgradeSettingsServer.ps1'
 . $scriptLocationPath
+Import-Certificate -Filepath $CertificateFile -CertStoreLocation "Cert:\LocalMachine\Root"
+## Server Enabling WSManCredSSP to be able to do a double hop with authentication.
+Enable-WSManCredSSP -Role server -Force
 <#
 $InstanceSecurePassword = ConvertTo-SecureString $InstancePassword -AsPlainText -Force
 $InstanceCredential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $InstanceUserName, $InstanceSecurePassword 
 $UserCredential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $UserName , $InstanceSecurePassword 
 #>
 # Import modules
-Import-module (Join-Path "$GitPath\Cloud.Ready.Software.PowerShell\PSModules" ''LoadModules.ps1'')  
-Import-module (Join-Path "$GitPath\IncadeaNorway" ''LoadModules.ps1'')  
-
+Import-module (Join-Path "$GitPath\Cloud.Ready.Software.PowerShell\PSModules" 'LoadModules.ps1')  
+Import-module (Join-Path "$GitPath\IncadeaNorway" 'LoadModules.ps1')  -Force 
 # Restore company database, to be upgraded. Can be run locally.
-#Restore-SQLBackupFile-SID -BackupFile $BackupfileNAVDemoDB -DatabaseServer $DBServer -DatabaseName $DemoDBName
-Restore-SQLBackupFile-SID -BackupFile $BackupfileAppDB -DatabaseServer $DBServer -DatabaseName $AppDBName
-Restore-SQLBackupFile-SID -BackupFile $BackupfileDEALER1DB -DatabaseServer $DBServer -DatabaseName $DEALER1DBName 
-Restore-SQLBackupFile-SID -BackupFile $BackupfileNAVTargetDemoDB -DatabaseServer $DBServer -DatabaseName $TargetDemoDBName
-Restore-SQLBackupFile-SID -BackupFile $BackupfileAppDB -DatabaseServer $DBServer -DatabaseName $AppDBNameW1
-Restore-SQLBackupFile-SID -BackupFile $BackupfileDEALER1DB -DatabaseServer $DBServer -DatabaseName $DEALER1DBNameW1
+Restore-SQLBackupFile-INC -BackupFile $BackupfileAppDB -DatabaseServer $DBServer -DatabaseName $AppDBName -TrustedConnection
+Restore-SQLBackupFile-INC -BackupFile $BackupfileDEALER1DB -DatabaseServer $DBServer -DatabaseName $DEALER1DBName 
+Restore-SQLBackupFile-INC -BackupFile $BackupfileNAVTargetDemoDB -DatabaseServer $DBServer -DatabaseName $TargetDemoDBName
+Restore-SQLBackupFile-INC -BackupFile $BackupfileAppDB -DatabaseServer $DBServer -DatabaseName $AppDBNameW1
+Restore-SQLBackupFile-INC -BackupFile $BackupfileDEALER1DB -DatabaseServer $DBServer -DatabaseName $DEALER1DBNameW1
 #Must run in remote session, if the server instance is run on another server.
 New-NAVEnvironment  -EnablePortSharing -ServerInstance $FastFitInstanceW1 -DatabaseServer $DBServer
 #Remove-SQLDatabase -DatabaseName $DEALER1DBName
