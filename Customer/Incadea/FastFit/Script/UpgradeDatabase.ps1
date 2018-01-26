@@ -20,9 +20,9 @@ Import-Certificate -Filepath $CertificateFile -CertStoreLocation "Cert:\LocalMac
 ## Server Enabling WSManCredSSP to be able to do a double hop with authentication.
 Enable-WSManCredSSP -Role server -Force
 # Import modules
-Import-module (Join-Path "$GitPath\Cloud.Ready.Software.PowerShell\PSModules" 'LoadModules.ps1') -Force   
+Import-module (Join-Path "$GitPath\Cloud.Ready.Software.PowerShell\PSModules" 'LoadModules.ps1') -Force 
 Import-module (Join-Path "$GitPath\IncadeaNorway" 'LoadModules.ps1') -Force 
-# Restore company database, to be upgraded. Can be run locally.
+# Restore W1 databases
 Restore-SQLBackupFile-INC -BackupFile $BackupfileAppDB -DatabaseServer $DBServer -DatabaseName $AppDBName -TrustedConnection
 Restore-SQLBackupFile-INC -BackupFile $BackupfileDEALER1DB -DatabaseServer $DBServer -DatabaseName $DEALER1DBName 
 Restore-SQLBackupFile-INC -BackupFile $BackupfileNAVTargetDemoDB -DatabaseServer $DBServer -DatabaseName $TargetDemoDBName
