@@ -98,7 +98,7 @@ Start-NAVDataUpgrade -ServerInstance $Nav2015ServiceInstance -FunctionExecutionM
 # Follow up the data upgrade process
 Get-NAVDataUpgrade -ServerInstance $Nav2015ServiceInstance -Progress
 Get-NAVDataUpgrade -ServerInstance $Nav2015ServiceInstance -Detailed | ogv
-#Get-NAVDataUpgrade -ServerInstance $NavServiceInstance -Detailed | Out-File 
+Get-NAVDataUpgrade -ServerInstance $Nav2015ServiceInstance -Detailed | Out-File 'F:\Customer\PP\NAV2015UpgradeLog.txt'
 Get-NAVDataUpgrade -ServerInstance $Nav2015ServiceInstance -ErrorOnly | ogv
 
 Resume-NAVDataUpgrade -ServerInstance $Nav2015ServiceInstance
