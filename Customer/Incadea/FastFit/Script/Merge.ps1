@@ -1,27 +1,34 @@
 ﻿#To start remote session on application server
 Set-Location -Path (Split-Path $psise.CurrentFile.FullPath -Qualifier)
 $Location = (Split-Path $psise.CurrentFile.FullPath)
-$scriptLocationPath = (join-path $Location 'Set-UpgradeSettingsClient.ps1')
+$scriptLocationPath = (join-path $Location 'Set-UpgradeSettings.ps1')
 . $scriptLocationPath
 $InstanceSecurePassword = ConvertTo-SecureString $InstancePassword -AsPlainText -Force
 $UserCredential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $UserName , $InstanceSecurePassword 
 Enter-PSSession -ComputerName NO01DEV03 -UseSSL -Credential $UserCredential
-Import-Certificate -Filepath $CertificateFile -CertStoreLocation "Cert:\LocalMachine\Root"
+
+. $scriptLocationPath
+Import-Certificate -Filepath "C:\Git\NAVUpgrade\Customer\Incadea\FastFit\cert" -CertStoreLocation "Cert:\LocalMachine\Root"
 
 clear-host
+
 $StartedDateTime = Get-Date
 
-Set-Location -Path (Split-Path $psise.CurrentFile.FullPath -Qualifier)
-$Location = (Split-Path $psise.CurrentFile.FullPath)
-$scriptLocationPath = (join-path $Location 'Set-UpgradeSettingsClient.ps1')
-. $scriptLocationPath
-<#
+# Reset Workingfolder
+if (test-path $WorkingFolder){
+    if (Confirm-YesOrNo -title 'Remove WorkingFolder?' -message "Do you want to remove the WorkingFolder $WorkingFolder ?"){
+        Remove-Item -Path $WorkingFolder -Force -Recurse
+    } else {
+        write-error '$WorkingFolder already exists.  Overwrite not allowed.'
+        break
+    }
+}
 $InstanceSecurePassword = ConvertTo-SecureString $InstancePassword -AsPlainText -Force
 $InstanceCredential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $InstanceUserName, $InstanceSecurePassword 
 $UserCredential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $UserName , $InstanceSecurePassword 
-#>
+
 # Restore company database, to be upgraded. Can be run locally.
-#Restore-SQLBackupFile-SID -BackupFile $BackupfileNAVDemoDB -DatabaseServer $DBServer -DatabaseName $DemoDBName
+Restore-SQLBackupFile-SID -BackupFile $BackupfileNAVDemoDB -DatabaseServer $DBServer -DatabaseName $DemoDBName
 Restore-SQLBackupFile-SID -BackupFile $BackupfileAppDB -DatabaseServer $DBServer -DatabaseName $AppDBName
 Restore-SQLBackupFile-SID -BackupFile $BackupfileDEALER1DB -DatabaseServer $DBServer -DatabaseName $DEALER1DBName 
 Restore-SQLBackupFile-SID -BackupFile $BackupfileNAVTargetDemoDB -DatabaseServer $DBServer -DatabaseName $TargetDemoDBName

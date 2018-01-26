@@ -1,38 +1,35 @@
-﻿#We only need to run this if we want ISO file
-#$NAVISOFile = New-NAVCumulativeUpdateISOFile -CumulativeUpdateFullPath $Download.filename -TmpLocation $TmpLocation -IsoDirectory $ISODir 
-$DefaultServerInstance = 'DynamicsNAV90'
-$License = 'C:\NAVUpgrade\License\NAV2017.flf'
-#Change the name of the Demo DB to reference the CU number
-$InstallConfig = 'C:\GitHub\NAVUpgrade\NAVSetup\FullInstallNAV2017.xml'
-
-
-#$Backupfile = $CopyFromServerInstance | Backup-NAVDatabase -ErrorAction Stop
-#$CopyFromServerInstance | Enable-NAVServerInstancePortSharing
-#$Backupfile = 'C:\Temp\NAV\NAV2013R2\CU29_NO_45254\DVD\NAV.7.1.45254.NO.DVD\SQLDemoDatabase\CommonAppData\Microsoft\Microsoft Dynamics NAV\71\Database\Demo Database NAV (7-1).bak'
+﻿$CULibrary = "\\NO01DEV03\install\$NAVVersion"
+$LocalDownloadFolder = 'C:\Temp\NAV\'
+$LocalTmpLocation = 'C:\Temp\NAV\TmpIsoCreation'
+$CountryVersions = 'NO', 'W1'
 $NAVVersion = '2016'
-#$CountryCode = 'NO'
-$CountryCode = 'W1'
 $CUNo = '17'
-$DownloadFolder = 'C:\Temp\NAV'
-$DVDDestination = "C:\Temp\NAV\NAV$NAVVersion"
-$TmpLocation ='C:\Temp\NAV\NAV\Temp'
-$ISODir = 'C:\Temp\NAV\NAV\ISO'
-#The log file must exists in the folder.
-$LogFile = 'C:\Temp\NAV\NAV\Log\Install.log'
 
-$Download = Get-NAVCumulativeUpdateFile -version $NAVVersion -CountryCode $CountryCode -CUNo $CUNo -DownloadFolder $DownloadFolder -ShowDownloadFolder #-GetInfoOnly
+foreach ($CountryVersion in $CountryVersions){
+    $LocalDownloadFile = Get-NAVCumulativeUpdateFile -version $NAVVersion -CountryCode $CountryVersion -DownloadFolder $LocalDownloadFolder -GetInfoOnly
+    $LocalDownloadFileJSON = join-path $LocalDownloadFolder "$([io.path]::GetFileNameWithoutExtension($LocalDownloadFile.filename)).json"
+    $CULibraryNAVVersion = join-path $CULibrary "NAV $($LocalDownloadFile.NAVVersion)"
+    $CULibraryNAVVersionJSON = join-path $CULibraryNAVVersion "$([io.path]::GetFileNameWithoutExtension($LocalDownloadFile.filename)).json"
+    $LocalTmpLocationCountry = Join-Path $LocalTmpLocation $CountryVersion
+    
+    if (Test-Path $CULibraryNAVVersionJSON){
+        Write-Warning "Already downloaded CU$($LocalDownloadFile.CUNo) for NAV $($LocalDownloadFile.NAVVersion).  Location: $CULibraryNAVVersion"
+    } else {
+        $LocalDownloadFile = Get-NAVCumulativeUpdateFile -version $NAVVersion -CountryCode $CountryVersion -DownloadFolder $LocalDownloadFolder -Verbose 
+    
+        $LocalIsoFile = New-NAVCumulativeUpdateISOFile -CumulativeUpdateFullPath $LocalDownloadFile.filename -TmpLocation $LocalTmpLocationCountry -IsoDirectory $LocalDownloadFolder -FileNameSuffix "CU$($LocalDownloadFile.CUNo)" -ErrorAction Stop -Force
+        
+        #Move to Final Destination
+        Move-Item -Path $LocalDownloadFileJSON -Destination $CULibraryNAVVersion -Force
+        Move-Item -Path $LocalIsoFile.FullName -Destination $CULibraryNAVVersion -Force
+    }
+   
+    #Remove Previous
+    #Remove-Item -Path $LocalDownloadFile.filename
+    #Write-Warning 'TODO: Remove Previous?'
+}
 
-$VersionInfo = Get-NAVCumulativeUpdateDownloadVersionInfo -SourcePath $Download.filename
-#$VersionInfo = Get-NAVCumulativeUpdateDownloadVersionInfo -SourcePath 'C:\Temp\NAV\NAV2017\NAV.10.0.14199.NO.DVD.zip'
-#$NAVISOFile = New-NAVCumulativeUpdateISOFile -CumulativeUpdateFullPath $Download.filename -TmpLocation $TmpLocation -IsoDirectory $ISODir 
-#$NAVISOFile = New-NAVCumulativeUpdateISOFile -CumulativeUpdateFullPath 'C:\Temp\NAV\NAV2017\NAV.10.0.14199.NO.DVD.zip' -TmpLocation $TmpLocation -IsoDirectory $ISODir 
-$ZippedDVDfile = $Download.filename
-$InstallationPath = Unzip-NAVCumulativeUpdateDownload -SourcePath $ZippedDVDfile -DestinationPath $DVDDestination
-#$InstallationPath = 'C:\Temp\NAV\NAV2017\CU3\DVD'
-$InstallationResult = Install-NAV -DVDFolder $InstallationPath -Configfile $InstallConfig -LicenseFile $License -Log $LogFile
-#$InstallationResult = Install-NAV -DVDFolder 'C:\Temp\NAV\NAV2017\CU1\DVD' -Configfile $InstallConfig -LicenseFile $License -Log $LogFile
-#MODIFIED (DEV)
-#Restore-SQLBackupFile-SID -BackupFile $Backupfile -DatabaseName 'Demo Database NAV (7-1) CU29'
-#New-NAVEnvironment -ServerInstance $NewServerInstance -BackupFile $Backupfile -ErrorAction Stop -EnablePortSharing -LicenseFile $License
-
+if ($CULibraryNAVVersion){
+    start $CULibraryNAVVersion
+}
 

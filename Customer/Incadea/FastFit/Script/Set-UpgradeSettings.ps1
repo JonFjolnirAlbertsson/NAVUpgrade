@@ -1,5 +1,5 @@
 ﻿#Base Path
-$RootFolderPath = "C:\incadea"
+$RootFolderPath = Join-Path 'F:\' 'incadea'
 #Servers
 $DBServer = 'NO01DEVSQL01'
 $NAVServer = 'NO01DEV03'
@@ -18,7 +18,8 @@ $InstancePassword = '1378Nesbru'
 $DBUser = 'NAV_Service'
 #Company data
 $CompanyName = 'Fastfit'
-$VersionFolder = '083000'
+#$VersionFolder = '083000'
+$VersionFolder = '084010'
 $CompanyFolder = "$CompanyName\$VersionFolder"
 $RootFolder = join-path $RootFolderPath $CompanyFolder
 $WorkingFolder = join-path $RootFolder "\$NAVVersion\$NAVCU\Upgrade_$CompanyName"
@@ -34,15 +35,15 @@ $BackupfileNAVTargetDemoDB = join-path $ObjectLibraryNO 'Demo Database NAV (9-0)
 $BackupfileNAVDemoDB = join-path $ObjectLibraryW1 'Demo Database NAV (9-0) CU17.bak'
 $AppDBName = 'fastfit_083000_NO_APP'
 $AppDBNameW1 = 'fastfit_083000_W1_APP'
-$BackupfileAppDB = join-path $BackupPath 'fastfit_083000_W1_APP.bak'
-$DEALER1DBName = 'fastfit_083000_NO_DEALER1'
-$DEALER1DBNameW1 = 'fastfit_083000_W1_DEALER1'
-$BackupfileDEALER1DB = join-path $BackupPath 'fastfit_083000_W1_DEALER1.bak'
+$BackupfileAppDB = join-path $BackupPath ('fastfit_' + $VersionFolder + 'W1_APP.bak')
+$DEALER1DBName = 'fastfit_' + $VersionFolder + '_NO_DEALER1'
+$DEALER1DBNameW1 = 'fastfit_' + $VersionFolder + '_W1_DEALER1'
+$BackupfileDEALER1DB = join-path $BackupPath ('fastfit_' + $VersionFolder + 'W1_DEALER1.bak')
 $Dealer1Tenant= 'dealer1'
 $Dealer1TenantW1= 'dealer1w1'
-$FastFitInstance = 'fastfit_083000_NO'
-$FastFitInstanceDev = 'fastfit_083000_NO_Dev'
-$FastFitInstanceW1 = 'fastfit_083000_W1'
+$FastFitInstance = 'fastfit_' + $VersionFolder + '_NO'
+$FastFitInstanceDev = 'fastfit_' + $VersionFolder + '_NO_Dev'
+$FastFitInstanceW1 = 'fastfit_' + $VersionFolder + '_W1'
 
 #Merging parameters
 $SourcePath = join-path $WorkingFolder 'MergeResult' 
