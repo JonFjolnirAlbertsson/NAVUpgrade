@@ -35,9 +35,9 @@ Restore-SQLBackupFile-INC -BackupFile $BackupfileTEMPLATEDB -DatabaseServer $DBS
 # Restore NO databases
 Restore-SQLBackupFile-INC -BackupFile $BackupfileAppDB -DatabaseServer $DBServer -DatabaseName $AppDBName
 Restore-SQLBackupFile-INC -BackupFile $BackupfileDEALER1DB -DatabaseServer $DBServer -DatabaseName $DEALER1DBName 
-$BackupFileName = $AppDBName + "_Without_DEU.bak"
+$BackupFileName = $UpgradeFromDevDBName + "_BeforeUpgradeTo$UpradeFromVersion.bak"
 $BackupFilePath = join-path $BackupPath $BackupFileName 
-Backup-SqlDatabase -ServerInstance $DBServer -Database $AppDBName -BackupAction Database -BackupFile $BackupFilePath -CompressionOption Default
+Backup-SqlDatabase -ServerInstance $DBServer -Database $UpgradeFromDevDBName -BackupAction Database -BackupFile $BackupFilePath -CompressionOption Default
 #Must run in remote session, if the server instance is run on another server.
 New-NAVEnvironment  -EnablePortSharing -ServerInstance $FastFitInstanceW1 -DatabaseServer $DBServer
 #Remove-SQLDatabase -DatabaseName $DEALER1DBName

@@ -15,7 +15,7 @@ $UserName = 'si-dev\devjal'
 $InstanceUserName = 'nav_user@si-dev.local'
 $InstancePassword = '1378Nesbru'
 $DBUser = 'NAV_Service'
-$UpradeFromVersion = '083000'
+$UpgradeFromVersion = '083000'
 $UpgradeToVersion = '084010'
 $CompanyFolder = "$CompanyName\$UpgradeToVersion"
 $RootFolder = join-path $RootFolderPath $CompanyFolder
@@ -49,7 +49,6 @@ $UpgradeToDevDBName = 'fastfit_' + $UpgradeToVersion + '_NO_DEV'
 $AppDBName = 'fastfit_' + $UpgradeToVersion + '_NO_APP'
 $DEALER1DBName = 'fastfit_' + $UpgradeToVersion + '_NO_DEALER1'
 $Dealer1Tenant= 'dealer1'
-$UpgradeFromBackupfileDevDB = join-path $BackupPath ('fastfit_' + $UpgradeFromVersion + '_NO_DEV.bak')
 # NAV Server Instances
 $FastFitInstance = 'fastfit_' + $UpgradeToVersion + '_NO'
 $FastFitInstanceDev = 'fastfit_' + $UpgradeToVersion + '_NO_Dev'
