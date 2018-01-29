@@ -3,6 +3,7 @@ $RootDrive = 'C:\'
 $RootFolderPath = join-path $RootDrive 'incadea'
 $CompanyName = 'fastfit'
 $DBServerRootPath = "\\NO01DEVSQL01\$CompanyName"
+$DBServerDemoPath = 'C:\MSSQL\Backup\Demo\'
 $GitPath = join-path $RootDrive 'Git'
 $GitPathIncadea = join-path  $GitPath "\NAVUpgrade\Customer\incadea"
 # Servers
@@ -20,20 +21,11 @@ $UpgradeToVersion = '084010'
 $CompanyFolder = "$CompanyName\$UpgradeToVersion"
 $RootFolder = join-path $RootFolderPath $CompanyFolder
 $WorkingFolder = join-path $RootFolder "\$NAVVersion\$NAVCU\Upgrade_$CompanyName"
-# Database backup common
-$BackupPath = join-path $DBServerRootPath ($UpgradeToVersion + '_W1\Database Backups')
-$BackupfileAppDB = join-path $BackupPath ('fastfit_' + $UpgradeToVersion + '_W1_APP.bak')
-$BackupfileDEALER1DB = join-path $BackupPath ('fastfit_' + $UpgradeToVersion + '_W1_DEALER1.bak')
-$BackupfileDEALER2DB = join-path $BackupPath ('fastfit_' + $UpgradeToVersion + '_W1_DEALER2.bak')
-$BackupfileMASTERDB = join-path $BackupPath ('fastfit_' + $UpgradeToVersion + '_W1_MASTER.bak')
-$BackupfileREPORTINGDB = join-path $BackupPath ('fastfit_' + $UpgradeToVersion + '_W1_REPORTING.bak')
-$BackupfileSTAGINGDB = join-path $BackupPath ('fastfit_' + $UpgradeToVersion + '_W1_STAGING.bak')
-$BackupfileTEMPLATEDB = join-path $BackupPath ('fastfit_' + $UpgradeToVersion + '_W1_TEMPLATE.bak')
 # Database backup W1
 $AppDBNameW1 = 'fastfit_' + $UpgradeToVersion + '_W1_APP'
 $DEALER1DBNameW1 = 'fastfit_' + $UpgradeToVersion + '_W1_DEALER1'
 $DEALER2DBNameW1 = 'fastfit_' + $UpgradeToVersion + '_W1_DEALER2'
-$MasterDBNameW1 = 'fastfit_' + $UpgradeToVersion + '_W1_MASTER'
+$MASTERDBNameW1 = 'fastfit_' + $UpgradeToVersion + '_W1_MASTER'
 $REPORTINGDBNameW1 = 'fastfit_' + $UpgradeToVersion + '_W1_REPORTING'
 $STAGINGDBNameW1 = 'fastfit_' + $UpgradeToVersion + '_W1_STAGING'
 $TEMPLATEDBNameW1 = 'fastfit_' + $UpgradeToVersion + '_W1_TEMPLATE'
@@ -43,12 +35,25 @@ $MasterTenantW1= 'masterw1'
 $ReportingTenantW1= 'reportingw1'
 $StagingTenantW1= 'stagingw1'
 $TemplateTenantW1= 'templatew1'
+$DemoDBW1 = 'Demo Database NAV (9-0) CU17 W1'
 # Database backup NO
 $UpgradeFromDevDBName = 'fastfit_' + $UpgradeFromVersion + '_NO_DEV'
 $UpgradeToDevDBName = 'fastfit_' + $UpgradeToVersion + '_NO_DEV'
 $AppDBName = 'fastfit_' + $UpgradeToVersion + '_NO_APP'
 $DEALER1DBName = 'fastfit_' + $UpgradeToVersion + '_NO_DEALER1'
 $Dealer1Tenant= 'dealer1'
+$DemoDBNO = 'Demo Database NAV (9-0) CU17 NO'
+# Database backup common
+$BackupPath = join-path $DBServerRootPath ($UpgradeToVersion + '_W1\Database Backups')
+$BackupfileAppDB = join-path $BackupPath ("$AppDBNameW1.bak")
+$BackupfileDEALER1DB = join-path $BackupPath ("$DEALER1DBNameW1.bak")
+$BackupfileDEALER2DB = join-path $BackupPath ("$DEALER2DBNameW1 .bak")
+$BackupfileMASTERDB = join-path $BackupPath ("$MASTERDBNameW1.bak")
+$BackupfileREPORTINGDB = join-path $BackupPath ("$REPORTINGDBNameW1.bak")
+$BackupfileSTAGINGDB = join-path $BackupPath ("$STAGINGDBNameW1 .bak")
+$BackupfileTEMPLATEDB = join-path $BackupPath ("$TEMPLATEDBNameW1.bak")
+$BackupfileDemoDBW1 = join-paht $DBServerDemoPath "$DemoDBW1.bak"
+$BackupfileDemoDBNO = join-paht $DBServerDemoPath "$DemoDBNO.bak"
 # NAV Server Instances
 $FastFitInstance = 'fastfit_' + $UpgradeToVersion + '_NO'
 $FastFitInstanceDev = 'fastfit_' + $UpgradeToVersion + '_NO_Dev'
