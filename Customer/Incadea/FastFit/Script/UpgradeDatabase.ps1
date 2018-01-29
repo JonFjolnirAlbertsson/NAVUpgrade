@@ -20,12 +20,10 @@ Import-Certificate -Filepath $CertificateFile -CertStoreLocation "Cert:\LocalMac
 ## Server Enabling WSManCredSSP to be able to do a double hop with authentication.
 Enable-WSManCredSSP -Role server -Force
 # Import NAV, cloud.ready and incadea modules
-Import-Module "${env:ProgramFiles(x86)}\Microsoft SQL Server\130\Tools\PowerShell\Modules\SQLPS\SQLPS.ps1" -Force -WarningAction SilentlyContinue | Out-Null
 Import-module (Join-Path "$GitPath\Cloud.Ready.Software.PowerShell\PSModules" 'LoadModules.ps1') -Force -WarningAction SilentlyContinue | Out-Null
 Import-module (Join-Path "$GitPath\IncadeaNorway" 'LoadModules.ps1') -Force -WarningAction SilentlyContinue | Out-Null
 Import-Module "${env:ProgramFiles(x86)}\Microsoft Dynamics NAV\90\RoleTailored Client\Microsoft.Dynamics.Nav.Model.Tools.psd1" -Force -WarningAction SilentlyContinue | out-null
 Import-Module "$env:ProgramFiles\Microsoft Dynamics NAV\90\Service\NavAdminTool.ps1" -Force -WarningAction SilentlyContinue | Out-Null
-
 
 # Restore W1 databases
 Restore-SQLBackupFile-INC -BackupFile $BackupfileAppDB -DatabaseServer $DBServer -DatabaseName $AppDBNameW1
@@ -35,23 +33,35 @@ Restore-SQLBackupFile-INC -BackupFile $BackupfileMASTERDB -DatabaseServer $DBSer
 Restore-SQLBackupFile-INC -BackupFile $BackupfileREPORTINGDB -DatabaseServer $DBServer -DatabaseName $REPORTINGDBNameW1
 Restore-SQLBackupFile-INC -BackupFile $BackupfileSTAGINGDB -DatabaseServer $DBServer -DatabaseName $STAGINGDBNameW1
 Restore-SQLBackupFile-INC -BackupFile $BackupfileTEMPLATEDB -DatabaseServer $DBServer -DatabaseName $TEMPLATEDBNameW1
+Restore-SQLBackupFile-INC -BackupFile $BackupfileDemoDBW1  -DatabaseServer $DBServer -DatabaseName $DemoDBW1
 # Restore NO databases
 Restore-SQLBackupFile-INC -BackupFile $BackupfileAppDB -DatabaseServer $DBServer -DatabaseName $AppDBName
 Restore-SQLBackupFile-INC -BackupFile $BackupfileDEALER1DB -DatabaseServer $DBServer -DatabaseName $DEALER1DBName 
+Restore-SQLBackupFile-INC -BackupFile $BackupfileDemoDBNO  -DatabaseServer $DBServer -DatabaseName $DemoDBNO
 # Backup the development database that will be upgraded
 $BackupFileName = $UpgradeFromDevDBName + "_BeforeUpgradeTo$UpradeFromVersion.bak"
 $BackupFilePath = join-path $BackupPath $BackupFileName 
-#Backup-SqlDatabase - $DBServer -Database $UpgradeFromDevDBName -BackupAction Database -BackupFile $BackupFilePath -CompressionOption Default
+Backup-SqlDatabase -ServerInstance $DBServer -Database $UpgradeFromDevDBName -BackupAction Database -BackupFile $BackupFilePath -CompressionOption Default
 Backup-SQLDatabaseToFile -DatabaseName $UpgradeFromDevDBName -BackupFile $BackupFilePath -DatabaseServer $DBServer -TimeOut 0
-backup-
-#Must run in remote session, if the server instance is run on another server.
+
+# Must run in remote session, if the server instance is run on another server.
 New-NAVEnvironment  -EnablePortSharing -ServerInstance $FastFitInstanceW1 -DatabaseServer $DBServer
-#Remove-SQLDatabase -DatabaseName $DEALER1DBName
+# Remove-SQLDatabase -DatabaseName $DEALER1DBName
 Write-host "Create Service Instance"
 New-NAVEnvironment  -EnablePortSharing -ServerInstance $FastFitInstance -DatabaseServer $DBServer
+$InstanceSecurePassword = ConvertTo-SecureString $InstancePassword -AsPlainText -Force
+$InstanceCredential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $InstanceUserName , $InstanceSecurePassword 
+# Set instance to Multitenant
+$CurrentServerInstanceW1 = Get-NAVServerInstance -ServerInstance $FastFitInstanceW1
+Write-host "Prepare NST for MultiTenancy"
+$CurrentServerInstanceW1 | Set-NAVServerInstance -stop
+$CurrentServerInstanceW1 | Set-NAVServerConfiguration -KeyName MultiTenant -KeyValue "true"
+$CurrentServerInstanceW1 | Set-NAVServerConfiguration -KeyName DatabaseServer -KeyValue ""
+$CurrentServerInstanceW1 | Set-NAVServerConfiguration -KeyName DatabaseName -KeyValue ""
+$CurrentServerInstanceW1 | Set-NAVServerInstance -ServiceAccountCredential $InstanceCredential -ServiceAccount User
+$CurrentServerInstanceW1 | Set-NAVServerInstance -start
 # Set instance to Multitenant
 $CurrentServerInstance = Get-NAVServerInstance -ServerInstance $FastFitInstance
-$CurrentServerInstance = Get-NAVServerInstance -ServerInstance $FastFitInstanceW1
 Write-host "Prepare NST for MultiTenancy"
 $CurrentServerInstance | Set-NAVServerInstance -stop
 $CurrentServerInstance | Set-NAVServerConfiguration -KeyName MultiTenant -KeyValue "true"
@@ -61,13 +71,15 @@ $CurrentServerInstance | Set-NAVServerInstance -ServiceAccountCredential $Instan
 $CurrentServerInstance | Set-NAVServerInstance -start
 
 Write-host "Mount app"
-$CurrentServerInstance | Mount-NAVApplication -DatabaseServer $DBServer -DatabaseName $AppDBName 
-$CurrentServerInstance | Mount-NAVApplication -DatabaseServer $DBServer -DatabaseName $AppDBNameW1  
+$CurrentServerInstance | Mount-NAVApplication -DatabaseServer $DBServer -DatabaseName $AppDBNameNO 
+$CurrentServerInstanceW1 | Mount-NAVApplication -DatabaseServer $DBServer -DatabaseName $AppDBNameW1  
 Write-host "Mount Tenants"
 #Mount-NAVTenant -ServerInstance DynamicsNAV71 -Id $MainTenant -DatabaseName $Databasename -AllowAppDatabaseWrite -OverwriteTenantIdInDatabase
-Mount-NAVTenant -ServerInstance $FastFitInstance -DatabaseName $DEALER1DBName -Id $Dealer1Tenant  -AllowAppDatabaseWrite -OverwriteTenantIdInDatabase
+Mount-NAVTenant -ServerInstance $FastFitInstance -DatabaseName $DEALER1DBNameNO -Id $Dealer1TenantNO  -AllowAppDatabaseWrite -OverwriteTenantIdInDatabase
 Mount-NAVTenant -ServerInstance $FastFitInstanceW1 -DatabaseName $DEALER1DBNameW1 -Id $Dealer1TenantW1  -AllowAppDatabaseWrite -OverwriteTenantIdInDatabase
 #Import License
+$CurrentServerInstanceW1 | Import-NAVServerLicense -LicenseFile $NAVLicense
+$CurrentServerInstanceW1 | Set-NAVServerInstance -Restart
 $CurrentServerInstance | Import-NAVServerLicense -LicenseFile $NAVLicense
 $CurrentServerInstance | Set-NAVServerInstance -Restart
 #Sync database
