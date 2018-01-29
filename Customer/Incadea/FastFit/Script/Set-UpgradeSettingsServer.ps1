@@ -9,7 +9,7 @@ $GitPathIncadea = join-path  $GitPath "\NAVUpgrade\Customer\incadea"
 # Servers
 $DBServer = 'NO01DEVSQL01.si-dev.local'
 $NAVServer = 'NO01DEV03.si-dev.local'
-$NAVLicense = join-path $GitPath "License\incadea.fastfit_8.X (NAV2016)_development_INS-NOR_4805448_20170321.flf"
+$NAVLicense = join-path $RootFolderPath "License\incadea.fastfit_8.X (NAV2016)_development_INS-NOR_4805448_20170321.flf"
 $CertificateFile = join-path ("$GitPathIncadea\$CompanyName") 'cert'
 # $UserName = 'incadea\albertssonf'
 $UserName = 'si-dev\devjal'

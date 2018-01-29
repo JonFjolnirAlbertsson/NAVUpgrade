@@ -9,8 +9,10 @@ $InstanceSecurePassword = ConvertTo-SecureString $InstancePassword -AsPlainText 
 $UserCredential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $UserName , $InstanceSecurePassword 
 Enter-PSSession -ComputerName $NAVServer -UseSSL -Credential $UserCredential –Authentication CredSSP
 #Enter-PSSession -ComputerName $DBServer -UseSSL -Credential $UserCredential
-clear-host
+#Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy Unrestricted
+
 # Server Site script
+clear-host
 $StartedDateTime = Get-Date
 Set-Location 'C:\'
 $Location = join-path $pwd.drive.Root 'Git\NAVUpgrade\Customer\Incadea\FastFit\Script'
@@ -19,12 +21,15 @@ $scriptLocationPath = join-path $Location 'Set-UpgradeSettingsServer.ps1'
 Import-Certificate -Filepath $CertificateFile -CertStoreLocation "Cert:\LocalMachine\Root"
 ## Server Enabling WSManCredSSP to be able to do a double hop with authentication.
 Enable-WSManCredSSP -Role server -Force
+
 # Import NAV, cloud.ready and incadea modules
+# Had to copy the files in folder "C:\Program Files (x86)\Microsoft SQL Server\130\Tools\PowerShell\Modules" to the folder "C:\Windows\System32\WindowsPowerShell\v1.0\Modules" 
+# To be able to import the moduel sqlps
 Import-module (Join-Path "$GitPath\Cloud.Ready.Software.PowerShell\PSModules" 'LoadModules.ps1') -Force -WarningAction SilentlyContinue | Out-Null
 Import-module (Join-Path "$GitPath\IncadeaNorway" 'LoadModules.ps1') -Force -WarningAction SilentlyContinue | Out-Null
 Import-Module "${env:ProgramFiles(x86)}\Microsoft Dynamics NAV\90\RoleTailored Client\Microsoft.Dynamics.Nav.Model.Tools.psd1" -Force -WarningAction SilentlyContinue | out-null
 Import-Module "$env:ProgramFiles\Microsoft Dynamics NAV\90\Service\NavAdminTool.ps1" -Force -WarningAction SilentlyContinue | Out-Null
-
+Import-Module SQLPS -DisableNameChecking 
 # Restore W1 databases
 Restore-SQLBackupFile-INC -BackupFile $BackupfileAppDB -DatabaseServer $DBServer -DatabaseName $AppDBNameW1
 Restore-SQLBackupFile-INC -BackupFile $BackupfileDEALER1DB -DatabaseServer $DBServer -DatabaseName $DEALER1DBNameW1
@@ -42,7 +47,6 @@ Restore-SQLBackupFile-INC -BackupFile $BackupfileDemoDBNO  -DatabaseServer $DBSe
 $BackupFileName = $UpgradeFromDevDBName + "_BeforeUpgradeTo$UpradeFromVersion.bak"
 $BackupFilePath = join-path $BackupPath $BackupFileName 
 Backup-SqlDatabase -ServerInstance $DBServer -Database $UpgradeFromDevDBName -BackupAction Database -BackupFile $BackupFilePath -CompressionOption Default
-Backup-SQLDatabaseToFile -DatabaseName $UpgradeFromDevDBName -BackupFile $BackupFilePath -DatabaseServer $DBServer -TimeOut 0
 
 # Must run in remote session, if the server instance is run on another server.
 New-NAVEnvironment  -EnablePortSharing -ServerInstance $FastFitInstanceW1 -DatabaseServer $DBServer
@@ -53,6 +57,7 @@ $InstanceSecurePassword = ConvertTo-SecureString $InstancePassword -AsPlainText 
 $InstanceCredential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $InstanceUserName , $InstanceSecurePassword 
 # Set instance to Multitenant
 $CurrentServerInstanceW1 = Get-NAVServerInstance -ServerInstance $FastFitInstanceW1
+$CurrentServerInstance = Get-NAVServerInstance -ServerInstance $FastFitInstance
 Write-host "Prepare NST for MultiTenancy"
 $CurrentServerInstanceW1 | Set-NAVServerInstance -stop
 $CurrentServerInstanceW1 | Set-NAVServerConfiguration -KeyName MultiTenant -KeyValue "true"
@@ -61,7 +66,6 @@ $CurrentServerInstanceW1 | Set-NAVServerConfiguration -KeyName DatabaseName -Key
 $CurrentServerInstanceW1 | Set-NAVServerInstance -ServiceAccountCredential $InstanceCredential -ServiceAccount User
 $CurrentServerInstanceW1 | Set-NAVServerInstance -start
 # Set instance to Multitenant
-$CurrentServerInstance = Get-NAVServerInstance -ServerInstance $FastFitInstance
 Write-host "Prepare NST for MultiTenancy"
 $CurrentServerInstance | Set-NAVServerInstance -stop
 $CurrentServerInstance | Set-NAVServerConfiguration -KeyName MultiTenant -KeyValue "true"
@@ -69,7 +73,6 @@ $CurrentServerInstance | Set-NAVServerConfiguration -KeyName DatabaseServer -Key
 $CurrentServerInstance | Set-NAVServerConfiguration -KeyName DatabaseName -KeyValue ""
 $CurrentServerInstance | Set-NAVServerInstance -ServiceAccountCredential $InstanceCredential -ServiceAccount User
 $CurrentServerInstance | Set-NAVServerInstance -start
-
 Write-host "Mount app"
 $CurrentServerInstance | Mount-NAVApplication -DatabaseServer $DBServer -DatabaseName $AppDBNameNO 
 $CurrentServerInstanceW1 | Mount-NAVApplication -DatabaseServer $DBServer -DatabaseName $AppDBNameW1  
@@ -77,21 +80,20 @@ Write-host "Mount Tenants"
 #Mount-NAVTenant -ServerInstance DynamicsNAV71 -Id $MainTenant -DatabaseName $Databasename -AllowAppDatabaseWrite -OverwriteTenantIdInDatabase
 Mount-NAVTenant -ServerInstance $FastFitInstance -DatabaseName $DEALER1DBNameNO -Id $Dealer1TenantNO  -AllowAppDatabaseWrite -OverwriteTenantIdInDatabase
 Mount-NAVTenant -ServerInstance $FastFitInstanceW1 -DatabaseName $DEALER1DBNameW1 -Id $Dealer1TenantW1  -AllowAppDatabaseWrite -OverwriteTenantIdInDatabase
-#Import License
+# Import License
 $CurrentServerInstanceW1 | Import-NAVServerLicense -LicenseFile $NAVLicense
 $CurrentServerInstanceW1 | Set-NAVServerInstance -Restart
 $CurrentServerInstance | Import-NAVServerLicense -LicenseFile $NAVLicense
 $CurrentServerInstance | Set-NAVServerInstance -Restart
-#Sync database
+# Sync database
 Sync-NAVTenant -ServerInstance $FastFitInstance -Tenant $Dealer1Tenant
 Sync-NAVTenant -ServerInstance $FastFitInstance -Tenant $Dealer1Tenant -Mode ForceSync
 Sync-NAVTenant -ServerInstance $FastFitInstanceW1 -Tenant $Dealer1TenantW1 -Mode ForceSync
+# Add user to database
 #Remove-NAVServerUser -ServerInstance $AppDBName -WindowsAccount $UserName -Tenant $Dealer1Tenant
 #Remove-NAVServerUserPermissionSet -PermissionSetId SUPER -ServerInstance $AppDBName -WindowsAccount $UserName -Tenant $Dealer1Tenant
-New-NAVServerUser -ServerInstance $FastFitInstance -WindowsAccount $UserName -Tenant $Dealer1Tenant -LicenseType Full -State Enabled
-New-NAVServerUserPermissionSet -PermissionSetId SUPER -ServerInstance $FastFitInstance -WindowsAccount $UserName -Tenant $Dealer1Tenant 
-New-NAVServerUser -ServerInstance $FastFitInstanceW1 -WindowsAccount $UserName -Tenant $Dealer1TenantW1 -LicenseType Full -State Enabled
-New-NAVServerUserPermissionSet -PermissionSetId SUPER -ServerInstance $FastFitInstanceW1 -WindowsAccount $UserName -Tenant $Dealer1TenantW1 
+CreateNAVUser -NavServiceInstance $FastFitInstanceW1 -User $UserName -Tenant $Dealer1TenantW1
+CreateNAVUser -NavServiceInstance $FastFitInstance -User $UserName -Tenant $Dealer1TenantNO
 #Get-NAVServerUser -ServerInstance $FastFitInstance -Tenant $Dealer1Tenant
 #Export all objects from Demo DB to text file.
 #Export-NAVApplicationObject2 -Path $TargetObjects -ServerInstance $NavServiceInstance -LogPath $LogPath
