@@ -3,7 +3,7 @@ Set-Location -Path (Split-Path $psise.CurrentFile.FullPath -Qualifier)
 $Location = (Split-Path $psise.CurrentFile.FullPath)
 $scriptLocationPath = (join-path $Location 'Set-UpgradeSettingsClient.ps1')
 . $scriptLocationPath
-## Client Enabling WSManCredSSP to be able to do a double hop with authentication.
+# Client Enabling WSManCredSSP to be able to do a double hop with authentication.
 Enable-WSManCredSSP -Role Client -DelegateComputer $NAVServer  -Force
 $InstanceSecurePassword = ConvertTo-SecureString $InstancePassword -AsPlainText -Force
 $UserCredential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $UserName , $InstanceSecurePassword 
@@ -19,17 +19,25 @@ $scriptLocationPath = join-path $Location 'Set-UpgradeSettingsServer.ps1'
 Import-Certificate -Filepath $CertificateFile -CertStoreLocation "Cert:\LocalMachine\Root"
 ## Server Enabling WSManCredSSP to be able to do a double hop with authentication.
 Enable-WSManCredSSP -Role server -Force
-# Import cloud.ready and incadea modules
-Import-module (Join-Path "$GitPath\Cloud.Ready.Software.PowerShell\PSModules" 'LoadModules.ps1') -Force 
-Import-module (Join-Path "$GitPath\IncadeaNorway" 'LoadModules.ps1') -Force 
+# Import NAV, cloud.ready and incadea modules
+Import-module (Join-Path "$GitPath\Cloud.Ready.Software.PowerShell\PSModules" 'LoadModules.ps1') -Force -WarningAction SilentlyContinue | Out-Null
+Import-module (Join-Path "$GitPath\IncadeaNorway" 'LoadModules.ps1') -Force -WarningAction SilentlyContinue | Out-Null
+Import-Module "${env:ProgramFiles(x86)}\Microsoft Dynamics NAV\80\RoleTailored Client\Microsoft.Dynamics.Nav.Model.Tools.psd1" -Force -WarningAction SilentlyContinue | out-null
+Import-Module "$env:ProgramFiles\Microsoft Dynamics NAV\80\Service\NavAdminTool.ps1" -Force -WarningAction SilentlyContinue | Out-Null
 # Restore W1 databases
 Restore-SQLBackupFile-INC -BackupFile $BackupfileAppDB -DatabaseServer $DBServer -DatabaseName $AppDBNameW1
 Restore-SQLBackupFile-INC -BackupFile $BackupfileDEALER1DB -DatabaseServer $DBServer -DatabaseName $DEALER1DBNameW1
 Restore-SQLBackupFile-INC -BackupFile $BackupfileDEALER2DB -DatabaseServer $DBServer -DatabaseName $DEALER2DBNameW1
 Restore-SQLBackupFile-INC -BackupFile $BackupfileMASTERDB -DatabaseServer $DBServer -DatabaseName $MASTERDBNameW1
+Restore-SQLBackupFile-INC -BackupFile $BackupfileREPORTINGDB -DatabaseServer $DBServer -DatabaseName $REPORTINGDBNameW1
+Restore-SQLBackupFile-INC -BackupFile $BackupfileSTAGINGDB -DatabaseServer $DBServer -DatabaseName $STAGINGDBNameW1
+Restore-SQLBackupFile-INC -BackupFile $BackupfileTEMPLATEDB -DatabaseServer $DBServer -DatabaseName $TEMPLATEDBNameW1
 # Restore NO databases
 Restore-SQLBackupFile-INC -BackupFile $BackupfileAppDB -DatabaseServer $DBServer -DatabaseName $AppDBName
 Restore-SQLBackupFile-INC -BackupFile $BackupfileDEALER1DB -DatabaseServer $DBServer -DatabaseName $DEALER1DBName 
+$BackupFileName = $AppDBName + "_Without_DEU.bak"
+$BackupFilePath = join-path $BackupPath $BackupFileName 
+Backup-SqlDatabase -ServerInstance $DBServer -Database $AppDBName -BackupAction Database -BackupFile $BackupFilePath -CompressionOption Default
 #Must run in remote session, if the server instance is run on another server.
 New-NAVEnvironment  -EnablePortSharing -ServerInstance $FastFitInstanceW1 -DatabaseServer $DBServer
 #Remove-SQLDatabase -DatabaseName $DEALER1DBName
