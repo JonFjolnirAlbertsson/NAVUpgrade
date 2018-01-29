@@ -40,9 +40,11 @@ Restore-SQLBackupFile-INC -BackupFile $BackupfileSTAGINGDB -DatabaseServer $DBSe
 Restore-SQLBackupFile-INC -BackupFile $BackupfileTEMPLATEDB -DatabaseServer $DBServer -DatabaseName $TEMPLATEDBNameW1
 Restore-SQLBackupFile-INC -BackupFile $BackupfileDemoDBW1  -DatabaseServer $DBServer -DatabaseName $DemoDBW1
 # Restore NO databases
-Restore-SQLBackupFile-INC -BackupFile $BackupfileAppDB -DatabaseServer $DBServer -DatabaseName $AppDBName
-Restore-SQLBackupFile-INC -BackupFile $BackupfileDEALER1DB -DatabaseServer $DBServer -DatabaseName $DEALER1DBName 
+Restore-SQLBackupFile-INC -BackupFile $BackupfileAppDB -DatabaseServer $DBServer -DatabaseName $AppDBNameNO
+Restore-SQLBackupFile-INC -BackupFile $BackupfileDEALER1DB -DatabaseServer $DBServer -DatabaseName $DEALER1DBNameNO 
 Restore-SQLBackupFile-INC -BackupFile $BackupfileDemoDBNO  -DatabaseServer $DBServer -DatabaseName $DemoDBNO
+Restore-SQLBackupFile-INC -BackupFile $BackupfileAppDB -DatabaseServer $DBServer -DatabaseName $AppDBNameNODev
+Restore-SQLBackupFile-INC -BackupFile $BackupfileDEALER1DB -DatabaseServer $DBServer -DatabaseName $DEALER1DBNameNODev 
 # Backup the development database that will be upgraded
 $BackupFileName = $UpgradeFromDevDBName + "_BeforeUpgradeTo$UpradeFromVersion.bak"
 $BackupFilePath = join-path $BackupPath $BackupFileName 
@@ -86,14 +88,14 @@ $CurrentServerInstanceW1 | Set-NAVServerInstance -Restart
 $CurrentServerInstance | Import-NAVServerLicense -LicenseFile $NAVLicense
 $CurrentServerInstance | Set-NAVServerInstance -Restart
 # Sync database
-Sync-NAVTenant -ServerInstance $FastFitInstance -Tenant $Dealer1Tenant
-Sync-NAVTenant -ServerInstance $FastFitInstance -Tenant $Dealer1Tenant -Mode ForceSync
+Sync-NAVTenant -ServerInstance $FastFitInstance -Tenant $Dealer1TenantNO
+#Sync-NAVTenant -ServerInstance $FastFitInstance -Tenant $Dealer1TenantNO -Mode ForceSync
 Sync-NAVTenant -ServerInstance $FastFitInstanceW1 -Tenant $Dealer1TenantW1 -Mode ForceSync
 # Add user to database
 #Remove-NAVServerUser -ServerInstance $AppDBName -WindowsAccount $UserName -Tenant $Dealer1Tenant
 #Remove-NAVServerUserPermissionSet -PermissionSetId SUPER -ServerInstance $AppDBName -WindowsAccount $UserName -Tenant $Dealer1Tenant
-CreateNAVUser -NavServiceInstance $FastFitInstanceW1 -User $UserName -Tenant $Dealer1TenantW1
-CreateNAVUser -NavServiceInstance $FastFitInstance -User $UserName -Tenant $Dealer1TenantNO
+New-NAVUser-INC -NavServiceInstance $FastFitInstanceW1 -User $UserName -Tenant $Dealer1TenantW1
+New-NAVUser-INC -NavServiceInstance $FastFitInstance -User $UserName -Tenant $Dealer1TenantNO
 #Get-NAVServerUser -ServerInstance $FastFitInstance -Tenant $Dealer1Tenant
 #Export all objects from Demo DB to text file.
 #Export-NAVApplicationObject2 -Path $TargetObjects -ServerInstance $NavServiceInstance -LogPath $LogPath
