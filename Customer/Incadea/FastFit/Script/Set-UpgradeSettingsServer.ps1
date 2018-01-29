@@ -66,6 +66,6 @@ $BackupfileTEMPLATEDB = join-path $BackupPath ("$TEMPLATEDBNameW1.bak")
 $BackupfileDemoDBW1 = join-path $DBServerDemoPath "$DemoDBW1.bak"
 $BackupfileDemoDBNO = join-path $DBServerDemoPath "$DemoDBNO.bak"
 # NAV Server Instances
-$FastFitInstance = 'fastfit_' + $UpgradeToVersion + '_NO'
-$FastFitInstanceDev = 'fastfit_' + $UpgradeToVersion + '_NO_Dev'
+$FastFitInstanceNO = 'fastfit_' + $UpgradeToVersion + '_NO'
+$FastFitInstanceNODev = 'fastfit_' + $UpgradeToVersion + '_NO_Dev'
 $FastFitInstanceW1 = 'fastfit_' + $UpgradeToVersion + '_W1'
