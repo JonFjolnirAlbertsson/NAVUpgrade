@@ -77,8 +77,8 @@ $FastFitInstanceW1 = 'fastfit_' + $UpgradeToVersion + '_W1'
 $FastFitInstanceUpgradeFromVersionW1 = 'fastfit_' + $UpgradeFromVersion + '_W1'
 #$FastFitInstanceUpgradeFromVersionNO = 'fastfit_' + $UpgradeFromVersion + '_NO_Dev'
 # Merge files
-$OriginalObjects = 'fastfit_' + $UpgradeFromVersion + '_W1'$FastFitObjects = 'fastfit_' + $UpgradeFromVersion + '_NO'
-$TargetObjects = 'fastfit_' + $UpgradeToVersion + '_W1'
+$OriginalObjects = 'fastfit_' + $UpgradeFromVersion + '_W1.txt'$FastFitObjects = 'fastfit_' + $UpgradeFromVersion + '_NO.txt'
+$TargetObjects = 'fastfit_' + $UpgradeToVersion + '_W1.txt'
 $OriginalObjectsPath = (join-path $WorkingFolder $OriginalObjects)
 $FastFitObjectsPath = (join-path $WorkingFolder $FastFitObjects)
 $TargetObjectsPath = (join-path $WorkingFolder $TargetObjects)
