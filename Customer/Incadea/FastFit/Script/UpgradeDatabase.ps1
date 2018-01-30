@@ -120,6 +120,7 @@ Sync-NAVTenant -ServerInstance $FastFitInstanceNODev -Tenant $Dealer1TenantNO -M
 New-NAVUser-INC -NavServiceInstance $FastFitInstanceW1 -User $UserName -Tenant $Dealer1TenantW1
 New-NAVUser-INC -NavServiceInstance $FastFitInstanceNO -User $UserName -Tenant $Dealer1TenantNO
 New-NAVUser-INC -NavServiceInstance $FastFitInstanceNODev -User $UserName -Tenant $Dealer1TenantNO
+New-NAVUser-INC -NavServiceInstance $FastFitInstanceUpgradeFromVersionW1 -User $UserName -Tenant $Dealer1TenantW1
 
 # Make the development environment a single tenant
 Write-Host "Starting merging $AppDBNameNODev and $DEALER1DBNameNODev to single tenant." -foregroundcolor cyan 
