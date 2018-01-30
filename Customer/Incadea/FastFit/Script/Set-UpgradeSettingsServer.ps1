@@ -42,7 +42,7 @@ $TemplateTenantW1= 'templatew1'
 $DemoDBW1 = 'Demo Database NAV (9-0) CU17 W1'
 # Database backup NO
 $UpgradeFromDevDBName = 'fastfit_' + $UpgradeFromVersion + '_NO_DEV'
-$UpgradeFromW1DBName = 'fastfit_' + $UpgradeFromVersion + '_W1'
+$UpgradeFromW1DBName = 'fastfit_' + $UpgradeFromVersion + '_W1_APP'
 $AppDBNameNODev = 'fastfit_' + $UpgradeToVersion + '_NO_APP_DEV'
 $DEALER1DBNameNODev = 'fastfit_' + $UpgradeToVersion + '_NO_DEV'
 $AppDBNameNO = 'fastfit_' + $UpgradeToVersion + '_NO_APP'

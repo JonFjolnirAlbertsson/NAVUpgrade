@@ -149,8 +149,7 @@ $CurrentServerInstanceNODev | Set-NAVServerInstance -Restart
 Write-Host "Finished merging databases to single tenant. The single tenant database name is $DEALER1DBNameNODev." -foregroundcolor cyan 
 
 #Export all objects to text files.
-Set-NAVServerInstance -ServerInstance $FastFitInstanceUpgradeFromVersionW1 -Start
-Set-NAVServerInstance -ServerInstance $FastFitInstanceUpgradeFromVersionNO -Start
+New-SQLUser-INC -DatabaseServer $DBServer -DatabaseName $UpgradeFromW1DBName -DatabaseUser $UserName 
 Export-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $UpgradeFromW1DBName -Path $OriginalObjectsPath -LogPath $LogPath -ExportTxtSkipUnlicensed
 Export-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $UpgradeFromDevDBName -Path $FastFitObjectsPath -LogPath $LogPath -ExportTxtSkipUnlicensed
 Export-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $AppDBNameNODev -Path $TargetObjectsPath -LogPath $LogPath -ExportTxtSkipUnlicensed
