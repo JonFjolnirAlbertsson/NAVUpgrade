@@ -11,8 +11,8 @@ $Location = join-path (Split-Path $psise.CurrentFile.FullPath) "$CompanyName\Scr
 #Open Files with conflict. Using the Merge Folder to merge the conflict
 #$ObjectName ='COD430'
 #<#
-$ObjectName ='TAB25'
-Open-File-SID -WorkingFolder $WorkingFolder -ObjectName $ObjectName -OpenInNotepadPlus -OpenOriginal -OpenModified -OpenResult #-OpenTarget -OpenMerged -OpenToBeJoined
+$ObjectName ='TAB81'
+Open-File-SID -WorkingFolder $WorkingFolder -ObjectName $ObjectName -OpenInNotepadPlus -OpenMerged #-OpenTarget -OpenMerged -OpenToBeJoined
 Open-File-SID -ObjectName $ObjectName -WorkingFolder $WorkingFolder -OpenInNotepadPlus -UseWaldoFolders
 #>
 

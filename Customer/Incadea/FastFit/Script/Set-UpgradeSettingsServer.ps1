@@ -82,3 +82,5 @@ $TargetObjects = 'fastfit_' + $UpgradeToVersion + '_W1.txt'
 $OriginalObjectsPath = (join-path $WorkingFolder $OriginalObjects)
 $FastFitObjectsPath = (join-path $WorkingFolder $FastFitObjects)
 $TargetObjectsPath = (join-path $WorkingFolder $TargetObjects)
+$SourcePath = join-path $WorkingFolder 'MergeResult' 
+$ConflictTarget = join-path $SourcePath  'ConflictTarget' 
