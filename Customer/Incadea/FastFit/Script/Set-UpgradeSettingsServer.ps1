@@ -84,3 +84,4 @@ $FastFitObjectsPath = (join-path $WorkingFolder $FastFitObjects)
 $TargetObjectsPath = (join-path $WorkingFolder $TargetObjects)
 $SourcePath = join-path $WorkingFolder 'MergeResult' 
 $ConflictTarget = join-path $SourcePath  'ConflictTarget' 
+$NAVEnvZupFilePath = 'C:\Incadea\Fastfit\zup'
