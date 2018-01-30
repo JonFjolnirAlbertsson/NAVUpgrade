@@ -24,6 +24,7 @@ $NAVCU = 'CU17'
 $CompanyFolder = "$CompanyName\$UpgradeToVersion"
 $RootFolder = join-path $RootFolderPath $CompanyFolder
 $WorkingFolder = join-path $RootFolder "\$NAVVersion\$NAVCU\Upgrade_$CompanyName"
+$LogPath = join-path $WorkingFolder 'Log'
 # Database backup W1
 $AppDBNameW1 = 'fastfit_' + $UpgradeToVersion + '_W1_APP'
 $DEALER1DBNameW1 = 'fastfit_' + $UpgradeToVersion + '_W1_DEALER1'
@@ -72,6 +73,8 @@ $BackupfileDemoDBNO = join-path $DBServerDemoPath "$DemoDBNO.bak"
 $FastFitInstanceNO = 'fastfit_' + $UpgradeToVersion + '_NO'
 $FastFitInstanceNODev = 'fastfit_' + $UpgradeToVersion + '_NO_Dev'
 $FastFitInstanceW1 = 'fastfit_' + $UpgradeToVersion + '_W1'
+$FastFitInstanceUpgradeFromVersionW1 = 'fastfit_' + $UpgradeFromVersion + '_W1'
+$FastFitInstanceUpgradeFromVersionNO = 'fastfit_' + $UpgradeFromVersion + '_NO_Dev'
 # Merge files
 $OriginalObjects = 'fastfit_' + $UpgradeFromVersion + '_W1'$FastFitObjects = 'fastfit_' + $UpgradeFromVersion + '_NO'
 $TargetObjects = 'fastfit_' + $UpgradeToVersion + '_W1'

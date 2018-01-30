@@ -144,8 +144,10 @@ New-NAVUser-INC -NavServiceInstance $FastFitInstanceNODev -User $DBNAVServiceUse
 New-NAVUser-INC -NavServiceInstance $FastFitInstanceNODev -User $UserName
 Write-Host "Finished merging databases to single tenant. The single tenant database name is $DEALER1DBNameNODev." -foregroundcolor cyan 
 
-#Export all objects from Demo DB to text file.
-#Export-NAVApplicationObject2 -Path $TargetObjects -ServerInstance $NavServiceInstance -LogPath $LogPath
+#Export all objects to text files.
+Export-NAVApplicationObject2 -Path $TargetObjects -ServerInstance $FastFitInstanceUpgradeFromVersionW1 -LogPath $LogPath
+Export-NAVApplicationObject2 -Path $FastFitObjects -ServerInstance $FastFitInstanceUpgradeFromVersionNO -LogPath $LogPath
+Export-NAVApplicationObject2 -Path $TargetObjects -ServerInstance $FastFitInstanceW1 -LogPath $LogPath
 
 # Merge Customer database objects and NAV 2016 objects.
 $MergeResult = Merge-NAVUpgradeObjects `
