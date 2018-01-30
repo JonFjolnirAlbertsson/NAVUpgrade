@@ -142,10 +142,8 @@ Remove-SQLDatabase -DatabaseServer $DBServer -DatabaseName $AppDBNameNODev
 # Adding user to the database
 New-NAVUser-INC -NavServiceInstance $FastFitInstanceNODev -User $DBNAVServiceUserName 
 New-NAVUser-INC -NavServiceInstance $FastFitInstanceNODev -User $UserName
-
 Write-Host "Finished merging databases to single tenant. The single tenant database name is $DEALER1DBNameNODev." -foregroundcolor cyan 
 
-#Get-NAVServerUser -ServerInstance $FastFitInstance -Tenant $Dealer1Tenant
 #Export all objects from Demo DB to text file.
 #Export-NAVApplicationObject2 -Path $TargetObjects -ServerInstance $NavServiceInstance -LogPath $LogPath
 

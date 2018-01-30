@@ -19,6 +19,8 @@ $InstancePassword = '1378Nesbru'
 $DBUser = 'NAV_Service'
 $UpgradeFromVersion = '083000'
 $UpgradeToVersion = '084010'
+$NAVVersion = 'NAV2016'
+$NAVCU = 'CU17'
 $CompanyFolder = "$CompanyName\$UpgradeToVersion"
 $RootFolder = join-path $RootFolderPath $CompanyFolder
 $WorkingFolder = join-path $RootFolder "\$NAVVersion\$NAVCU\Upgrade_$CompanyName"
@@ -70,3 +72,6 @@ $BackupfileDemoDBNO = join-path $DBServerDemoPath "$DemoDBNO.bak"
 $FastFitInstanceNO = 'fastfit_' + $UpgradeToVersion + '_NO'
 $FastFitInstanceNODev = 'fastfit_' + $UpgradeToVersion + '_NO_Dev'
 $FastFitInstanceW1 = 'fastfit_' + $UpgradeToVersion + '_W1'
+# Merge files
+$OriginalObjects = 'fastfit_' + $UpgradeFromVersion + '_W1'$FastFitObjects = 'fastfit_' + $UpgradeFromVersion + '_NO'
+$TargetObjects = 'fastfit_' + $UpgradeToVersion + '_W1'
