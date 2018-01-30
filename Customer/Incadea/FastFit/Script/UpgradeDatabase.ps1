@@ -148,9 +148,11 @@ $CurrentServerInstanceNODev | Import-NAVServerLicense -LicenseFile $NAVLicense
 $CurrentServerInstanceNODev | Set-NAVServerInstance -Restart
 Write-Host "Finished merging databases to single tenant. The single tenant database name is $DEALER1DBNameNODev." -foregroundcolor cyan 
 #Export all objects to text files. Remember that the objects will be created on the $NAVServer 
+Copy-Item -Path (join-path (join-path $NAVEnvZupFilePath $UpgradeFromW1DBName) 'fin.zup') -Destination $NAVZupFilePath -Force
 Export-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $UpgradeFromW1DBName -Path $OriginalObjectsPath -LogPath $LogPath -ExportTxtSkipUnlicensed
-Copy-Item -Path (join-path (join-path $ZupFilePath $UpgradeFromDevDBName) 'fin.zup') -Destination 'C:\Users\DevJAL\AppData\Roaming\fin.zup' -Force
+Copy-Item -Path (join-path (join-path $NAVEnvZupFilePath $UpgradeFromDevDBName) 'fin.zup') -Destination $NAVZupFilePath -Force
 Export-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $UpgradeFromDevDBName -Path $FastFitObjectsPath -LogPath $LogPath -ExportTxtSkipUnlicensed
+Copy-Item -Path (join-path (join-path $NAVEnvZupFilePath $AppDBNameNODev) 'fin.zup') -Destination $NAVZupFilePath -Force
 Export-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $AppDBNameNODev -Path $TargetObjectsPath -LogPath $LogPath -ExportTxtSkipUnlicensed
 
 # Merge Customer database objects and NAV 2016 objects.

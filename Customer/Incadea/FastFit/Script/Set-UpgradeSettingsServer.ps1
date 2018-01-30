@@ -85,3 +85,4 @@ $TargetObjectsPath = (join-path $WorkingFolder $TargetObjects)
 $SourcePath = join-path $WorkingFolder 'MergeResult' 
 $ConflictTarget = join-path $SourcePath  'ConflictTarget' 
 $NAVEnvZupFilePath = 'C:\Incadea\Fastfit\zup'
+$NAVZupFilePath = 'C:\Users\DevJAL\AppData\Roaming\fin.zup' 
