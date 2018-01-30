@@ -25,11 +25,11 @@ Enable-WSManCredSSP -Role server -Force
 # Import NAV, cloud.ready and incadea modules
 # To be able to import the moduel sqlps
 # files had to be copied from folder "C:\Program Files (x86)\Microsoft SQL Server\130\Tools\PowerShell\Modules" to the folder "C:\Windows\System32\WindowsPowerShell\v1.0\Modules" 
-Import-module (Join-Path "$GitPath\Cloud.Ready.Software.PowerShell\PSModules" 'LoadModules.ps1') -Force -WarningAction SilentlyContinue | Out-Null
-Import-module (Join-Path "$GitPath\IncadeaNorway" 'LoadModules.ps1') -Force -WarningAction SilentlyContinue | Out-Null
 Import-Module "${env:ProgramFiles(x86)}\Microsoft Dynamics NAV\90\RoleTailored Client\Microsoft.Dynamics.Nav.Model.Tools.psd1" -Force -WarningAction SilentlyContinue | out-null
 Import-Module "$env:ProgramFiles\Microsoft Dynamics NAV\90\Service\NavAdminTool.ps1" -Force -WarningAction SilentlyContinue | Out-Null
 Import-Module SQLPS -DisableNameChecking 
+Import-module (Join-Path "$GitPath\Cloud.Ready.Software.PowerShell\PSModules" 'LoadModules.ps1') -Force -WarningAction SilentlyContinue | Out-Null
+Import-module (Join-Path "$GitPath\IncadeaNorway" 'LoadModules.ps1') -Force -WarningAction SilentlyContinue | Out-Null
 # Restore W1 databases
 Restore-SQLBackupFile-INC -BackupFile $BackupfileAppDB -DatabaseServer $DBServer -DatabaseName $AppDBNameW1
 Restore-SQLBackupFile-INC -BackupFile $BackupfileDEALER1DB -DatabaseServer $DBServer -DatabaseName $DEALER1DBNameW1
@@ -50,6 +50,17 @@ $BackupFileName = $UpgradeFromDevDBName + "_BeforeUpgradeTo$UpradeFromVersion.ba
 $BackupFilePath = join-path $BackupPath $BackupFileName 
 Backup-SqlDatabase -ServerInstance $DBServer -Database $UpgradeFromDevDBName -BackupAction Database -BackupFile $BackupFilePath -CompressionOption Default
 # Remember to manually add the NAV Instance user as DBOwner for all databases
+New-SQLUser-INC -DatabaseServer $DBServer -DatabaseName $AppDBNameW1 -DatabaseUser $DBNAVServiceUserName 
+New-SQLUser-INC -DatabaseServer $DBServer -DatabaseName $DEALER1DBNameW1 -DatabaseUser $DBNAVServiceUserName 
+New-SQLUser-INC -DatabaseServer $DBServer -DatabaseName $DEALER2DBNameW1 -DatabaseUser $DBNAVServiceUserName 
+New-SQLUser-INC -DatabaseServer $DBServer -DatabaseName $MASTERDBNameW1 -DatabaseUser $DBNAVServiceUserName 
+New-SQLUser-INC -DatabaseServer $DBServer -DatabaseName $REPORTINGDBNameW1 -DatabaseUser $DBNAVServiceUserName 
+New-SQLUser-INC -DatabaseServer $DBServer -DatabaseName $STAGINGDBNameW1 -DatabaseUser $DBNAVServiceUserName 
+New-SQLUser-INC -DatabaseServer $DBServer -DatabaseName $TEMPLATEDBNameW1 -DatabaseUser $DBNAVServiceUserName 
+New-SQLUser-INC -DatabaseServer $DBServer -DatabaseName $DemoDBW1 -DatabaseUser $DBNAVServiceUserName 
+New-SQLUser-INC -DatabaseServer $DBServer -DatabaseName $AppDBNameNO -DatabaseUser $DBNAVServiceUserName 
+New-SQLUser-INC -DatabaseServer $DBServer -DatabaseName $DEALER1DBNameNO -DatabaseUser $DBNAVServiceUserName 
+New-SQLUser-INC -DatabaseServer $DBServer -DatabaseName $DemoDBNO -DatabaseUser $DBNAVServiceUserName 
 New-SQLUser-INC -DatabaseServer $DBServer -DatabaseName $AppDBNameNODev -DatabaseUser $DBNAVServiceUserName 
 New-SQLUser-INC -DatabaseServer $DBServer -DatabaseName $DEALER1DBNameNODev -DatabaseUser $DBNAVServiceUserName 
  
@@ -124,10 +135,15 @@ Set-NAVServerConfiguration -ServerInstance $FastFitInstanceNODev -KeyName Databa
 Set-NAVServerConfiguration -ServerInstance $FastFitInstanceNODev -KeyName Multitenant -KeyValue false -WarningAction Ignore
 # Start the server instance.
 Set-NAVServerInstance -ServerInstance $FastFitInstanceNODev -Start
+# Delete the App database
+Remove-SQLDatabase -DatabaseServer $DBServer -DatabaseName $AppDBNameNODev
 # Dismount all tenants that are not using the current tenant database.
-Get-NAVTenant -ServerInstance $FastFitInstanceNODev | where {$_.Database -ne $DEALER1DBNameNODev} | foreach { Dismount-NAVTenant -ServerInstance $FastFitInstanceNODev -Tenant $_.Id }
-Write-Host "Operation complete." -foregroundcolor cyan 
+# Get-NAVTenant -ServerInstance $FastFitInstanceNODev | where {$_.Database -ne $DEALER1DBNameNODev} | foreach { Dismount-NAVTenant -ServerInstance $FastFitInstanceNODev -Tenant $_.Id }
+# Adding user to the database
+New-NAVUser-INC -NavServiceInstance $FastFitInstanceNODev -User $DBNAVServiceUserName 
+New-NAVUser-INC -NavServiceInstance $FastFitInstanceNODev -User $UserName
 
+Write-Host "Finished merging databases to single tenant. The single tenant database name is $DEALER1DBNameNODev." -foregroundcolor cyan 
 
 #Get-NAVServerUser -ServerInstance $FastFitInstance -Tenant $Dealer1Tenant
 #Export all objects from Demo DB to text file.
