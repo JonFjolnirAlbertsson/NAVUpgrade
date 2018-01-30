@@ -142,12 +142,17 @@ Remove-SQLDatabase -DatabaseServer $DBServer -DatabaseName $AppDBNameNODev
 # Adding user to the database
 New-NAVUser-INC -NavServiceInstance $FastFitInstanceNODev -User $DBNAVServiceUserName 
 New-NAVUser-INC -NavServiceInstance $FastFitInstanceNODev -User $UserName
+$CurrentServerInstanceNODev = Get-NAVServerInstance -ServerInstance $FastFitInstanceNODev
+$CurrentServerInstanceNODev | Import-NAVServerLicense -LicenseFile $NAVLicense
+$CurrentServerInstanceNODev | Set-NAVServerInstance -Restart
 Write-Host "Finished merging databases to single tenant. The single tenant database name is $DEALER1DBNameNODev." -foregroundcolor cyan 
 
 #Export all objects to text files.
-Export-NAVApplicationObject2 -Path $TargetObjects -ServerInstance $FastFitInstanceUpgradeFromVersionW1 -LogPath $LogPath
-Export-NAVApplicationObject2 -Path $FastFitObjects -ServerInstance $FastFitInstanceUpgradeFromVersionNO -LogPath $LogPath
-Export-NAVApplicationObject2 -Path $TargetObjects -ServerInstance $FastFitInstanceW1 -LogPath $LogPath
+Set-NAVServerInstance -ServerInstance $FastFitInstanceUpgradeFromVersionW1 -Start
+Set-NAVServerInstance -ServerInstance $FastFitInstanceUpgradeFromVersionNO -Start
+Export-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $UpgradeFromW1DBName -Path $OriginalObjectsPath -LogPath $LogPath -ExportTxtSkipUnlicensed
+Export-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $UpgradeFromDevDBName -Path $FastFitObjectsPath -LogPath $LogPath -ExportTxtSkipUnlicensed
+Export-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $AppDBNameNODev -Path $TargetObjectsPath -LogPath $LogPath -ExportTxtSkipUnlicensed
 
 # Merge Customer database objects and NAV 2016 objects.
 $MergeResult = Merge-NAVUpgradeObjects `

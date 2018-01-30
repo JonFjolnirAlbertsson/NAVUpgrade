@@ -42,6 +42,7 @@ $TemplateTenantW1= 'templatew1'
 $DemoDBW1 = 'Demo Database NAV (9-0) CU17 W1'
 # Database backup NO
 $UpgradeFromDevDBName = 'fastfit_' + $UpgradeFromVersion + '_NO_DEV'
+$UpgradeFromW1DBName = 'fastfit_' + $UpgradeFromVersion + '_W1'
 $AppDBNameNODev = 'fastfit_' + $UpgradeToVersion + '_NO_APP_DEV'
 $DEALER1DBNameNODev = 'fastfit_' + $UpgradeToVersion + '_NO_DEV'
 $AppDBNameNO = 'fastfit_' + $UpgradeToVersion + '_NO_APP'
@@ -73,8 +74,11 @@ $BackupfileDemoDBNO = join-path $DBServerDemoPath "$DemoDBNO.bak"
 $FastFitInstanceNO = 'fastfit_' + $UpgradeToVersion + '_NO'
 $FastFitInstanceNODev = 'fastfit_' + $UpgradeToVersion + '_NO_Dev'
 $FastFitInstanceW1 = 'fastfit_' + $UpgradeToVersion + '_W1'
-$FastFitInstanceUpgradeFromVersionW1 = 'fastfit_' + $UpgradeFromVersion + '_W1'
-$FastFitInstanceUpgradeFromVersionNO = 'fastfit_' + $UpgradeFromVersion + '_NO_Dev'
+#$FastFitInstanceUpgradeFromVersionW1 = 'fastfit_' + $UpgradeFromVersion + '_W1'
+#$FastFitInstanceUpgradeFromVersionNO = 'fastfit_' + $UpgradeFromVersion + '_NO_Dev'
 # Merge files
 $OriginalObjects = 'fastfit_' + $UpgradeFromVersion + '_W1'$FastFitObjects = 'fastfit_' + $UpgradeFromVersion + '_NO'
 $TargetObjects = 'fastfit_' + $UpgradeToVersion + '_W1'
+$OriginalObjectsPath = (join-path $WorkingFolder $OriginalObjects)
+$FastFitObjectsPath = (join-path $WorkingFolder $FastFitObjects)
+$TargetObjectsPath = (join-path $WorkingFolder $TargetObjects)
