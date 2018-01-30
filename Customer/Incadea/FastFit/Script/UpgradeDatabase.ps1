@@ -147,13 +147,14 @@ $CurrentServerInstanceNODev = Get-NAVServerInstance -ServerInstance $FastFitInst
 $CurrentServerInstanceNODev | Import-NAVServerLicense -LicenseFile $NAVLicense
 $CurrentServerInstanceNODev | Set-NAVServerInstance -Restart
 Write-Host "Finished merging databases to single tenant. The single tenant database name is $DEALER1DBNameNODev." -foregroundcolor cyan 
-#Export all objects to text files. Remember that the objects will be created on the $NAVServer 
+# Export all objects to text files. Remember that the objects will be created on the $NAVServer.
+# To be able to export the object file, a correct zup file for finsql.exe has to be copied. It points to DB, Server Instance and tenant.
 Copy-Item -Path (join-path (join-path $NAVEnvZupFilePath $UpgradeFromW1DBName) 'fin.zup') -Destination $NAVZupFilePath -Force
 Export-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $UpgradeFromW1DBName -Path $OriginalObjectsPath -LogPath $LogPath -ExportTxtSkipUnlicensed
 Copy-Item -Path (join-path (join-path $NAVEnvZupFilePath $UpgradeFromDevDBName) 'fin.zup') -Destination $NAVZupFilePath -Force
 Export-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $UpgradeFromDevDBName -Path $FastFitObjectsPath -LogPath $LogPath -ExportTxtSkipUnlicensed
-Copy-Item -Path (join-path (join-path $NAVEnvZupFilePath $AppDBNameNODev) 'fin.zup') -Destination $NAVZupFilePath -Force
-Export-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $AppDBNameNODev -Path $TargetObjectsPath -LogPath $LogPath -ExportTxtSkipUnlicensed
+Copy-Item -Path (join-path (join-path $NAVEnvZupFilePath $DEALER1DBNameNODev) 'fin.zup') -Destination $NAVZupFilePath -Force
+Export-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $DEALER1DBNameNODev -Path $TargetObjectsPath -LogPath $LogPath -ExportTxtSkipUnlicensed
 
 # Merge Customer database objects and NAV 2016 objects.
 $MergeResult = Merge-NAVUpgradeObjects `
@@ -162,8 +163,7 @@ $MergeResult = Merge-NAVUpgradeObjects `
     -WorkingFolder $WorkingFolder `
     -VersionListPrefixes $VersionListPrefixes `
     -Force
-#Merge-NAVCode -WorkingFolderPath $WorkingFolder -OriginalFileName $OriginalObjects -ModifiedFileName $ModifiedObjects -TargetFileName $TargetObjects -CompareObject $CompareObject -Split
-
+# Copy 
 $fileNames = Get-ChildItem -Path $ConflictTarget -Recurse -Include *.txt
 foreach($filename in $fileNames)
 {

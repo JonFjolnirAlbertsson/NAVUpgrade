@@ -82,7 +82,11 @@ $TargetObjects = 'fastfit_' + $UpgradeToVersion + '_W1.txt'
 $OriginalObjectsPath = (join-path $WorkingFolder $OriginalObjects)
 $FastFitObjectsPath = (join-path $WorkingFolder $FastFitObjects)
 $TargetObjectsPath = (join-path $WorkingFolder $TargetObjects)
+$NAVEnvZupFilePath = 'C:\Incadea\Fastfit\zup'
+$NAVZupFilePath = 'C:\Users\DevJAL\AppData\Roaming\fin.zup'
+#Merging parameters
 $SourcePath = join-path $WorkingFolder 'MergeResult' 
 $ConflictTarget = join-path $SourcePath  'ConflictTarget' 
-$NAVEnvZupFilePath = 'C:\Incadea\Fastfit\zup'
-$NAVZupFilePath = 'C:\Users\DevJAL\AppData\Roaming\fin.zup' 
+$MergedPath = join-path $WorkingFolder 'Merged' 
+$JoinPath = Join-Path $WorkingFolder 'Merged\ToBeJoined'
+$JoinFile = join-path $WorkingFolder 'all-merged-objects.txt' 
