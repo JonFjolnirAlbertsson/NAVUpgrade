@@ -50,8 +50,8 @@ $BackupFileName = $UpgradeFromDevDBName + "_BeforeUpgradeTo$UpradeFromVersion.ba
 $BackupFilePath = join-path $BackupPath $BackupFileName 
 Backup-SqlDatabase -ServerInstance $DBServer -Database $UpgradeFromDevDBName -BackupAction Database -BackupFile $BackupFilePath -CompressionOption Default
 # Remember to manually add the NAV Instance user as DBOwner for all databases
+New-SQLUser-INC -DatabaseServer $DBServer -DatabaseName $AppDBNameNODev -DatabaseUser $DBNAVServiceUserName 
 New-SQLUser-INC -DatabaseServer $DBServer -DatabaseName $DEALER1DBNameNODev -DatabaseUser $DBNAVServiceUserName 
-
  
 # Creating Credential for the NAV Server Instance user
 $InstanceSecurePassword = ConvertTo-SecureString $InstancePassword -AsPlainText -Force
