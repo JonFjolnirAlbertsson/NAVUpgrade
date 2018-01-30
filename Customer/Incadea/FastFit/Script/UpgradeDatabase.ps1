@@ -49,6 +49,8 @@ Restore-SQLBackupFile-INC -BackupFile $BackupfileDEALER1DB -DatabaseServer $DBSe
 $BackupFileName = $UpgradeFromDevDBName + "_BeforeUpgradeTo$UpradeFromVersion.bak"
 $BackupFilePath = join-path $BackupPath $BackupFileName 
 Backup-SqlDatabase -ServerInstance $DBServer -Database $UpgradeFromDevDBName -BackupAction Database -BackupFile $BackupFilePath -CompressionOption Default
+# Remember to manually add the NAV Instance user as DBOwner for all databases
+
 # Creating NAV Server Instances
 Write-host "Create Service Instance"
 New-NAVEnvironment  -EnablePortSharing -ServerInstance $FastFitInstanceW1 -DatabaseServer $DBServer
@@ -101,11 +103,28 @@ Sync-NAVTenant -ServerInstance $FastFitInstanceW1 -Tenant $Dealer1TenantW1 -Mode
 Sync-NAVTenant -ServerInstance $FastFitInstanceNO -Tenant $Dealer1TenantNO -Mode ForceSync
 Sync-NAVTenant -ServerInstance $FastFitInstanceNODev -Tenant $Dealer1TenantNO -Mode ForceSync
 # Add user to database
-#Remove-NAVServerUser -ServerInstance $AppDBName -WindowsAccount $UserName -Tenant $Dealer1Tenant
-#Remove-NAVServerUserPermissionSet -PermissionSetId SUPER -ServerInstance $AppDBName -WindowsAccount $UserName -Tenant $Dealer1Tenant
 New-NAVUser-INC -NavServiceInstance $FastFitInstanceW1 -User $UserName -Tenant $Dealer1TenantW1
 New-NAVUser-INC -NavServiceInstance $FastFitInstanceNO -User $UserName -Tenant $Dealer1TenantNO
-New-NAVUser-INC -NavServiceInstance $CurrentServerInstanceNODev -User $UserName -Tenant $Dealer1TenantNO
+New-NAVUser-INC -NavServiceInstance $FastFitInstanceNODev -User $UserName -Tenant $Dealer1TenantNO
+
+# Make the development environment a single tenant
+Write-Host "Starting merging $AppDBNameNODev and $DEALER1DBNameNODev to single tenant." -foregroundcolor cyan 
+# Stop the server instance if it is running.
+Set-NAVServerInstance -ServerInstance $FastFitInstanceNODev -Stop
+# Remove any application tables from the tenant database if these have not already been removed
+# and Copy the application tables from the application database to the tenant database.
+Export-NAVApplication -DatabaseServer $DBServer -DatabaseName $AppDBNameNODev -DestinationDatabaseName $DEALER1DBNameNODev -Force | Remove-NAVApplication -Force
+# Reconfigure the CustomSettings.config to use the tenant database.
+Set-NAVServerConfiguration -ServerInstance $FastFitInstanceNODev -KeyName DatabaseName -KeyValue $DEALER1DBNameNODev -WarningAction Ignore
+# Reconfigure the CustomSettings.config to use single-tenant mode
+Set-NAVServerConfiguration -ServerInstance $FastFitInstanceNODev -KeyName Multitenant -KeyValue false -WarningAction Ignore
+# Start the server instance.
+Set-NAVServerInstance -ServerInstance $FastFitInstanceNODev -Start
+# Dismount all tenants that are not using the current tenant database.
+Get-NAVTenant -ServerInstance $FastFitInstanceNODev | where {$_.Database -ne $DEALER1DBNameNODev} | foreach { Dismount-NAVTenant -ServerInstance $FastFitInstanceNODev -Tenant $_.Id }
+Write-Host "Operation complete." -foregroundcolor cyan 
+
+
 #Get-NAVServerUser -ServerInstance $FastFitInstance -Tenant $Dealer1Tenant
 #Export all objects from Demo DB to text file.
 #Export-NAVApplicationObject2 -Path $TargetObjects -ServerInstance $NavServiceInstance -LogPath $LogPath
