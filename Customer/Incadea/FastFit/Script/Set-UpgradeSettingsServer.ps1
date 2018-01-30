@@ -13,6 +13,7 @@ $NAVLicense = join-path $RootFolderPath "License\incadea.fastfit_8.X (NAV2016)_d
 $CertificateFile = join-path ("$GitPathIncadea\$CompanyName") 'cert'
 # $UserName = 'incadea\albertssonf'
 $UserName = 'si-dev\devjal'
+$DBNAVServiceUserName = 'si-dev\nav_user'
 $InstanceUserName = 'nav_user@si-dev.local'
 $InstancePassword = '1378Nesbru'
 $DBUser = 'NAV_Service'
