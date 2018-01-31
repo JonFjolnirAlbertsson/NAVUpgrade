@@ -164,6 +164,7 @@ $MergeResult = Merge-NAVUpgradeObjects `
     -WorkingFolder $WorkingFolder `
     -VersionListPrefixes $VersionListPrefixes `
     -Force
+Merge-NAVCode -WorkingFolderPath $WorkingFolder -OriginalFileName $OriginalObjectsPath -ModifiedFileName $FastFitObjectsPath -TargetFileName $TargetObjectsPath -CompareObject $CompareObject -Split
 # Check if folders exists. If not create them.
 if(!(Test-Path -Path $MergedPath )){
     New-Item -ItemType directory -Path $MergedPath
@@ -177,12 +178,16 @@ foreach($filename in $fileNames)
     Copy-Item $Source -Destination $Destination
     Write-Host $Source + ' file copied to ' + $Destination
 }
+$StartDateTime = "{0:D}" -f (get-date)
+"$StartDateTime : Started copying conflict files from $SourcePath to $MergedPath" | Out-File $CopyResultFile -Append
+$fileNames | Out-File $CopyResultFile -Append
 # Check if folders exists. If not create them.
 if(!(Test-Path -Path $JoinPath )){
     New-Item -ItemType directory -Path $JoinPath
 }
-#Copy merged result items to the join folder
-$fileNames = Get-ChildItem -Path $SourcePath -Recurse -Include *.txt
+#Copy merged result items to the Merged/ToBeJoined folder. Subfolders are not included in the search.
+$fileNames = Get-ChildItem -Path "$SourcePath\*" -Recurse -Include '*.TXT' -File
+#Remove-Item -Path "$JoinPath\*.*"
 foreach($filename in $fileNames)
 {
     $Source = join-path $SourcePath  $filename.Name
@@ -190,6 +195,9 @@ foreach($filename in $fileNames)
     Copy-Item $Source -Destination $Destination
     Write-Host $Source + ' file copied to ' + $Destination
 }
+$StartDateTime = "{0:D}" -f (get-date)
+"$StartDateTime : Started copying merged files from $SourcePath to $JoinPath" | Out-File $CopyResultFile -Append
+$fileNames | Out-File $CopyResultFile -Append
 #$NOObjects = join-path $WorkingFolder 'NO_Objects.txt'
 #Export-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $TargetDemoDBName -Username $DBUser -Password $InstancePassword -Path $NOObjects -Filter 'Id=10600..10699|15000000..15000999' -LogPath $LogPath
 

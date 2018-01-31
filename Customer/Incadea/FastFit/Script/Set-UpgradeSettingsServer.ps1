@@ -85,8 +85,10 @@ $TargetObjectsPath = (join-path $WorkingFolder $TargetObjects)
 $NAVEnvZupFilePath = 'C:\Incadea\Fastfit\zup'
 $NAVZupFilePath = 'C:\Users\DevJAL\AppData\Roaming\fin.zup'
 #Merging parameters
+$CompareObject = '*.TXT'
 $SourcePath = join-path $WorkingFolder 'MergeResult' 
 $ConflictTarget = join-path $SourcePath  'ConflictTarget' 
 $MergedPath = join-path $WorkingFolder 'Merged' 
 $JoinPath = Join-Path $MergedPath 'ToBeJoined'
 $JoinFile = join-path $WorkingFolder 'all-merged-objects.txt' 
+$CopyResultFile =  join-path $WorkingFolder 'Copy Results.txt' 
