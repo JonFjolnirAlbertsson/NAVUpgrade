@@ -164,8 +164,15 @@ $MergeResult = Merge-NAVUpgradeObjects `
     -WorkingFolder $WorkingFolder `
     -VersionListPrefixes $VersionListPrefixes `
     -Force
+# Splitting Original, Modified and Target files to individua files.
 Merge-NAVCode -WorkingFolderPath $WorkingFolder -OriginalFileName $OriginalObjectsPath -ModifiedFileName $FastFitObjectsPath -TargetFileName $TargetObjectsPath -CompareObject $CompareObject -Split
-# Check if folders exists. If not create them.
+# Coping merged files to the Merged and ToBeJoined folders.
+Compare-Folders -WorkingFolderPath $WorkingFolder -CompareFolder1Path $MergeResultPath -CompareFolder2Path $TargetObjectsPath -CompareObjectFilter $CompareObjectFilter -CopyMergeResult2ToBeJoined -MoveConflictItemsFromToBeJoined2Merged -CompareContent -DropObjectProperty 
+# Remove Original standard objects that have been removed or that we do not have license to import to DB as text files
+Remove-OriginalFilesNotInTarget -WorkingFolderPath $WorkingFolder -WriteResultToFile
+# Join ToBeJoined folder
+Join-NAVApplicationObjectFile -Source $ToBeJoinedFolderPath  -Destination $ToBeJoinedDestinationFile -Force   
+<# Check if folders exists. If not create them.
 if(!(Test-Path -Path $MergedPath )){
     New-Item -ItemType directory -Path $MergedPath
 }
@@ -173,31 +180,33 @@ if(!(Test-Path -Path $MergedPath )){
 $fileNames = Get-ChildItem -Path $ConflictTarget -Recurse -Include *.txt
 foreach($filename in $fileNames)
 {
-    $Source = join-path $SourcePath  $filename.Name
+    $Source = join-path $MergeResultPath  $filename.Name
     $Destination = join-path $MergedPath  $filename.Name
     Copy-Item $Source -Destination $Destination
     Write-Host $Source + ' file copied to ' + $Destination
 }
 $StartDateTime = "{0:D}" -f (get-date)
-"$StartDateTime : Started copying conflict files from $SourcePath to $MergedPath" | Out-File $CopyResultFile -Append
+"$StartDateTime : Started copying conflict files from $MergeResultPath to $MergedPath" | Out-File $CopyResultFile -Append
 $fileNames | Out-File $CopyResultFile -Append
 # Check if folders exists. If not create them.
-if(!(Test-Path -Path $JoinPath )){
-    New-Item -ItemType directory -Path $JoinPath
+if(!(Test-Path -Path $ToBeJoinedPath )){
+    New-Item -ItemType directory -Path $ToBeJoinedPath
 }
 #Copy merged result items to the Merged/ToBeJoined folder. Subfolders are not included in the search.
-$fileNames = Get-ChildItem -Path "$SourcePath\*" -Recurse -Include '*.TXT' -File
+$fileNames = Get-ChildItem -Path "$MergeResultPath\*" -Recurse -Include '*.TXT' -File
 #Remove-Item -Path "$JoinPath\*.*"
 foreach($filename in $fileNames)
 {
-    $Source = join-path $SourcePath  $filename.Name
-    $Destination = join-path $JoinPath  $filename.Name
+    $Source = join-path $MergeResultPath  $filename.Name
+    $Destination = join-path $ToBeJoinedPath  $filename.Name
     Copy-Item $Source -Destination $Destination
     Write-Host $Source + ' file copied to ' + $Destination
 }
 $StartDateTime = "{0:D}" -f (get-date)
-"$StartDateTime : Started copying merged files from $SourcePath to $JoinPath" | Out-File $CopyResultFile -Append
+"$StartDateTime : Started copying merged files from $MergeResultPath to $ToBeJoinedPath" | Out-File $CopyResultFile -Append
 $fileNames | Out-File $CopyResultFile -Append
+#>
+
 #$NOObjects = join-path $WorkingFolder 'NO_Objects.txt'
 #Export-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $TargetDemoDBName -Username $DBUser -Password $InstancePassword -Path $NOObjects -Filter 'Id=10600..10699|15000000..15000999' -LogPath $LogPath
 
