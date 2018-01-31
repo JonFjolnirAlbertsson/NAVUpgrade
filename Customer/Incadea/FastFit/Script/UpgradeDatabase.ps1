@@ -1,7 +1,7 @@
 ﻿# Client script to start remote session on application server
 Set-Location -Path (Split-Path $psise.CurrentFile.FullPath -Qualifier)
 $Location = (Split-Path $psise.CurrentFile.FullPath)
-$scriptLocationPath = (join-path $Location 'Set-UpgradeSettingsClient.ps1')
+$scriptLocationPath = (join-path $Location 'Set-UpgradeSettings.ps1')
 . $scriptLocationPath
 # Client Enabling WSManCredSSP to be able to do a double hop with authentication.
 Enable-WSManCredSSP -Role Client -DelegateComputer $NAVServer  -Force
@@ -16,7 +16,7 @@ clear-host
 $StartedDateTime = Get-Date
 Set-Location 'C:\'
 $Location = join-path $pwd.drive.Root 'Git\NAVUpgrade\Customer\Incadea\FastFit\Script'
-$scriptLocationPath = join-path $Location 'Set-UpgradeSettingsServer.ps1'
+$scriptLocationPath = join-path $Location 'Set-UpgradeSettings.ps1'
 . $scriptLocationPath
 Import-Certificate -Filepath $CertificateFile -CertStoreLocation "Cert:\LocalMachine\Root"
 ## Server Enabling WSManCredSSP to be able to do a double hop with authentication.
@@ -166,12 +166,17 @@ $MergeResult = Merge-NAVUpgradeObjects `
     -Force
 # Splitting Original, Modified and Target files to individua files.
 Merge-NAVCode -WorkingFolderPath $WorkingFolder -OriginalFileName $OriginalObjectsPath -ModifiedFileName $FastFitObjectsPath -TargetFileName $TargetObjectsPath -CompareObject $CompareObject -Split
-# Coping merged files to the Merged and ToBeJoined folders.
-Compare-Folders -WorkingFolderPath $WorkingFolder -CompareFolder1Path $MergeResultPath -CompareFolder2Path $TargetObjectsPath -CompareObjectFilter $CompareObjectFilter -CopyMergeResult2ToBeJoined -MoveConflictItemsFromToBeJoined2Merged -CompareContent -DropObjectProperty 
+# Copy object files with conflict to the Merged folder
+#Copy merged result items to the Merged/ToBeJoined folder. Subfolders are not included in the search.
+Compare-Folders -WorkingFolderPath $WorkingFolder -CompareFolder1Path $MergeResultPath -CompareFolder2Path $TargetPath -CompareObjectFilter $CompareObjectFilter `
+                -CopyMergeResult2ToBeJoined -MoveConflictItemsFromToBeJoined2Merged -CompareContent -DropObjectProperty 
 # Remove Original standard objects that have been removed or that we do not have license to import to DB as text files
 Remove-OriginalFilesNotInTarget -WorkingFolderPath $WorkingFolder -WriteResultToFile
 # Join ToBeJoined folder
-Join-NAVApplicationObjectFile -Source $ToBeJoinedFolderPath  -Destination $ToBeJoinedDestinationFile -Force   
+Join-NAVApplicationObjectFile -Source $ToBeJoinedPath  -Destination $ToBeJoinedDestinationFile -Force  
+# Compare the $ToBeJoinedDestinationFile file to the $TargetObjects in the "NAV Object Compare" application from Rune Sigurdsen
+$NAVObjectCompareWinClient = join-path 'C:\Users\DevJAL\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\NAVObjectCompareWinClient' 'NAVObjectCompareWinClient.appref-ms'
+& $NAVObjectCompareWinClient  
 <# Check if folders exists. If not create them.
 if(!(Test-Path -Path $MergedPath )){
     New-Item -ItemType directory -Path $MergedPath
