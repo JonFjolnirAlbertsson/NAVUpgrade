@@ -157,13 +157,18 @@ Copy-Item -Path (join-path (join-path $NAVEnvZupFilePath $DEALER1DBNameNODev) 'f
 Export-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $DEALER1DBNameNODev -Path $TargetObjectsPath -LogPath $LogPath -ExportTxtSkipUnlicensed
 
 # Merge Customer database objects and NAV 2016 objects.
+# I got out of memory error on the $NAVServer, so I copied the files and run the merge code from NO01DEVTS02.si-dev.local server.
 $MergeResult = Merge-NAVUpgradeObjects `
     -OriginalObjects $OriginalObjectsPath `    -ModifiedObjects $FastFitObjectsPath `
     -TargetObjects $TargetObjectsPath `
     -WorkingFolder $WorkingFolder `
     -VersionListPrefixes $VersionListPrefixes `
     -Force
-# Copy 
+# Check if folders exists. If not create them.
+if(!(Test-Path -Path $MergedPath )){
+    New-Item -ItemType directory -Path $MergedPath
+}
+# Copy object files with conflict to the Merged folder
 $fileNames = Get-ChildItem -Path $ConflictTarget -Recurse -Include *.txt
 foreach($filename in $fileNames)
 {
@@ -171,6 +176,10 @@ foreach($filename in $fileNames)
     $Destination = join-path $MergedPath  $filename.Name
     Copy-Item $Source -Destination $Destination
     Write-Host $Source + ' file copied to ' + $Destination
+}
+# Check if folders exists. If not create them.
+if(!(Test-Path -Path $JoinPath )){
+    New-Item -ItemType directory -Path $JoinPath
 }
 #Copy merged result items to the join folder
 $fileNames = Get-ChildItem -Path $SourcePath -Recurse -Include *.txt
