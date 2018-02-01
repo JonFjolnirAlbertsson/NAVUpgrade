@@ -84,6 +84,7 @@ $DemoObjectsNO = $NAVVersion +'_' + $NAVCU + '_NO.txt'
 $OriginalObjectsPath = (join-path $WorkingFolder $OriginalObjects)
 $FastFitObjectsPath = (join-path $WorkingFolder $FastFitObjects)
 $TargetObjectsPath = (join-path $WorkingFolder $TargetObjects)
+$DemoObjectsNOPath = (join-path $WorkingFolder $DemoObjectsNO)
 $NAVEnvZupFilePath = 'C:\Incadea\Fastfit\zup'
 $NAVZupFilePath = 'C:\Users\DevJAL\AppData\Roaming\fin.zup'
 # Merging parameters
