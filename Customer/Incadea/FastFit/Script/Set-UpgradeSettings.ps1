@@ -76,7 +76,7 @@ $FastFitInstanceNODev = 'fastfit_' + $UpgradeToVersion + '_NO_Dev'
 $FastFitInstanceW1 = 'fastfit_' + $UpgradeToVersion + '_W1'
 $FastFitInstanceUpgradeFromVersionW1 = 'fastfit_' + $UpgradeFromVersion + '_W1'
 #$FastFitInstanceUpgradeFromVersionNO = 'fastfit_' + $UpgradeFromVersion + '_NO_Dev'
-# Merge files
+# Merge files parameters
 $OriginalObjects = 'fastfit_' + $UpgradeFromVersion + '_W1.txt'$FastFitObjects = 'fastfit_' + $UpgradeFromVersion + '_NO.txt'
 $TargetObjects = 'fastfit_' + $UpgradeToVersion + '_W1.txt'
 $OriginalObjectsPath = (join-path $WorkingFolder $OriginalObjects)
@@ -85,12 +85,22 @@ $TargetObjectsPath = (join-path $WorkingFolder $TargetObjects)
 $NAVEnvZupFilePath = 'C:\Incadea\Fastfit\zup'
 $NAVZupFilePath = 'C:\Users\DevJAL\AppData\Roaming\fin.zup'
 #Merging parameters
+$VersionListPrefixes = 'NAVW1', 'NAVNO', 'IFFW' #Needs full prefix definition Check in NAV DEV with (<>*IFFW*&<>*NAVW*&<>*NAVNO*)
 $CompareObjectFilter = '*.TXT'
 $MergeResultPath = join-path $WorkingFolder 'MergeResult' 
 $ConflictTarget = join-path $MergeResultPath  'ConflictTarget' 
 $MergedPath = join-path $WorkingFolder 'Merged' 
+$ModifiedPath = join-path $WorkingFolder 'Modified' 
 $TargetPath = join-path $WorkingFolder 'Target' 
 $ToBeJoinedPath = Join-Path $MergedPath 'ToBeJoined'
 $JoinFile = join-path $WorkingFolder 'all-merged-objects.txt' 
 $CopyResultFile =  join-path $WorkingFolder 'Copy Results.txt' 
 $ToBeJoinedDestinationFile = join-path $WorkingFolder 'ToBeJoined_Objects.TXT'
+# Language parameters
+$LangFileDEU = (join-path $WorkingFolder 'languages-DEU.txt')
+$LangFileNOR = (join-path $WorkingFolder 'languages-NOR.txt')
+$LangFileENU = (join-path $WorkingFolder 'languages-ENU.txt')
+$FastFitObjectsENUNORDEU = 'fastfit_' + $UpgradeFromVersion + '_NO_ENU_NOR_DEU.txt'
+$FastFitObjectsWithENUNORDEUPath = (join-path $WorkingFolder $FastFitObjectsENUNORDEU)
+$FastFitObjectsDEUOnly = 'fastfit_' + $UpgradeFromVersion + '_NO_DEU.txt'
+$FastFitObjectsWithDEUPath = (join-path $WorkingFolder $FastFitObjectsDEUOnly)

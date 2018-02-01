@@ -158,8 +158,21 @@ Export-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $DEALER1DBNa
 
 # Merge Customer database objects and NAV 2016 objects.
 # I got out of memory error on the $NAVServer, so I copied the files and run the merge code from NO01DEVTS02.si-dev.local server.
+Remove-Item -Path "$MergeResultPath\*.*"
+Remove-Item -Path "$MergedPath\*.*"
+Remove-Item -Path "$ToBeJoinedPath\*.*"
+# Export DEU Language from Target file
+Export-NAVApplicationObjectLanguage -Source $TargetObjectsPath -LanguageId "DEU" -Destination $LangFileDEU
+# Export "NOR" and "ENU"  Language from Modified file
+Export-NAVApplicationObjectLanguage -Source $FastFitObjectsPath -LanguageId "NOR" -Destination $LangFileNOR
+Export-NAVApplicationObjectLanguage -Source $FastFitObjectsPath -LanguageId "ENU" -Destination $LangFileENU
+# Importing DEU to modifed file
+Import-NAVApplicationObjectLanguage -Source $FastFitObjectsPath -LanguageId "DEU" -LanguagePath $LangFileDEU -Destination $FastFitObjectsWithENUNORDEUPath
+# Removing "NOR" and "ENU"  Language from Modified file
+Remove-NAVApplicationObjectLanguage -Source $FastFitObjectsWithENUNORDEUPath -LanguageId "NOR","ENU" -Destination $FastFitObjectsWithDEUPath
+
 $MergeResult = Merge-NAVUpgradeObjects `
-    -OriginalObjects $OriginalObjectsPath `    -ModifiedObjects $FastFitObjectsPath `
+    -OriginalObjects $OriginalObjectsPath `    -ModifiedObjects $FastFitObjectsWithDEUPath `
     -TargetObjects $TargetObjectsPath `
     -WorkingFolder $WorkingFolder `
     -VersionListPrefixes $VersionListPrefixes `
@@ -167,7 +180,7 @@ $MergeResult = Merge-NAVUpgradeObjects `
 # Splitting Original, Modified and Target files to individua files.
 Merge-NAVCode -WorkingFolderPath $WorkingFolder -OriginalFileName $OriginalObjectsPath -ModifiedFileName $FastFitObjectsPath -TargetFileName $TargetObjectsPath -CompareObject $CompareObject -Split
 # Copy object files with conflict to the Merged folder
-#Copy merged result items to the Merged/ToBeJoined folder. Subfolders are not included in the search.
+# Copy merged result items to the Merged/ToBeJoined folder. Subfolders are not included in the search.
 Compare-Folders -WorkingFolderPath $WorkingFolder -CompareFolder1Path $MergeResultPath -CompareFolder2Path $TargetPath -CompareObjectFilter $CompareObjectFilter `
                 -CopyMergeResult2ToBeJoined -MoveConflictItemsFromToBeJoined2Merged -CompareContent -DropObjectProperty 
 # Remove Original standard objects that have been removed or that we do not have license to import to DB as text files
