@@ -9,6 +9,7 @@ $GitPathIncadea = join-path  $GitPath "\NAVUpgrade\Customer\incadea"
 # Servers
 $DBServer = 'NO01DEVSQL01.si-dev.local'
 $NAVServer = 'NO01DEV03.si-dev.local'
+$NAVServerRSName = 'NO01DEV03'
 $NAVLicense = join-path $RootFolderPath "License\incadea.fastfit_8.X (NAV2016)_development_INS-NOR_4805448_20170321.flf"
 $CertificateFile = join-path ("$GitPathIncadea\$CompanyName") 'cert'
 # $UserName = 'incadea\albertssonf'
@@ -75,16 +76,17 @@ $FastFitInstanceNO = 'fastfit_' + $UpgradeToVersion + '_NO'
 $FastFitInstanceNODev = 'fastfit_' + $UpgradeToVersion + '_NO_Dev'
 $FastFitInstanceW1 = 'fastfit_' + $UpgradeToVersion + '_W1'
 $FastFitInstanceUpgradeFromVersionW1 = 'fastfit_' + $UpgradeFromVersion + '_W1'
-#$FastFitInstanceUpgradeFromVersionNO = 'fastfit_' + $UpgradeFromVersion + '_NO_Dev'
+# $FastFitInstanceUpgradeFromVersionNO = 'fastfit_' + $UpgradeFromVersion + '_NO_Dev'
 # Merge files parameters
 $OriginalObjects = 'fastfit_' + $UpgradeFromVersion + '_W1.txt'$FastFitObjects = 'fastfit_' + $UpgradeFromVersion + '_NO.txt'
 $TargetObjects = 'fastfit_' + $UpgradeToVersion + '_W1.txt'
+$DemoObjectsNO = $NAVVersion +'_' + $NAVCU + '_NO.txt'
 $OriginalObjectsPath = (join-path $WorkingFolder $OriginalObjects)
 $FastFitObjectsPath = (join-path $WorkingFolder $FastFitObjects)
 $TargetObjectsPath = (join-path $WorkingFolder $TargetObjects)
 $NAVEnvZupFilePath = 'C:\Incadea\Fastfit\zup'
 $NAVZupFilePath = 'C:\Users\DevJAL\AppData\Roaming\fin.zup'
-#Merging parameters
+# Merging parameters
 $VersionListPrefixes = 'NAVW1', 'NAVNO', 'IFFW' #Needs full prefix definition Check in NAV DEV with (<>*IFFW*&<>*NAVW*&<>*NAVNO*)
 $CompareObjectFilter = '*.TXT'
 $MergeResultPath = join-path $WorkingFolder 'MergeResult' 

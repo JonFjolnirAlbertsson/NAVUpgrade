@@ -7,7 +7,7 @@ $scriptLocationPath = (join-path $Location 'Set-UpgradeSettings.ps1')
 Enable-WSManCredSSP -Role Client -DelegateComputer $NAVServer  -Force
 $InstanceSecurePassword = ConvertTo-SecureString $InstancePassword -AsPlainText -Force
 $UserCredential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $UserName , $InstanceSecurePassword 
-Enter-PSSession -ComputerName $NAVServer -UseSSL -Credential $UserCredential –Authentication CredSSP
+$NAVServerRS  = Enter-PSSession -ComputerName $NAVServerRSName -UseSSL -Credential $UserCredential –Authentication CredSSP
 #Enter-PSSession -ComputerName $DBServer -UseSSL -Credential $UserCredential
 #Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy Unrestricted
 
@@ -155,7 +155,8 @@ Copy-Item -Path (join-path (join-path $NAVEnvZupFilePath $UpgradeFromDevDBName) 
 Export-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $UpgradeFromDevDBName -Path $FastFitObjectsPath -LogPath $LogPath -ExportTxtSkipUnlicensed
 Copy-Item -Path (join-path (join-path $NAVEnvZupFilePath $DEALER1DBNameNODev) 'fin.zup') -Destination $NAVZupFilePath -Force
 Export-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $DEALER1DBNameNODev -Path $TargetObjectsPath -LogPath $LogPath -ExportTxtSkipUnlicensed
-
+Copy-Item -Path (join-path (join-path $NAVEnvZupFilePath $DemoDBNO) 'fin.zup') -Destination $NAVZupFilePath -Force
+Export-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $DemoDBNO -Path $DemoObjectsNO -LogPath $LogPath -ExportTxtSkipUnlicensed
 # Merge Customer database objects and NAV 2016 objects.
 # I got out of memory error on the $NAVServer, so I copied the files and run the merge code from NO01DEVTS02.si-dev.local server.
 Remove-Item -Path "$MergeResultPath\*.*"
