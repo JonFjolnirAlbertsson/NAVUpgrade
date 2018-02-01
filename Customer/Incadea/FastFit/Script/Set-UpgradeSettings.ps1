@@ -1,7 +1,7 @@
 ﻿# Base Variables
 $RootDrive = 'C:\'
-$RootFolder = 'incadea'
-$RootFolderPath = join-path $RootDrive $RootFolder
+$RootFolderName = 'incadea'
+$RootFolderPath = join-path $RootDrive $RootFolderName
 $CompanyName = 'fastfit'
 $DBServerRootPath = "\\NO01DEVSQL01\$CompanyName"
 $DBServerDemoPath = 'C:\MSSQL\Backup\Demo\'
@@ -27,7 +27,7 @@ $NAVCU = 'CU17'
 $CompanyFolder = "$CompanyName\$UpgradeToVersion"
 $RootFolder = join-path $RootFolderPath $CompanyFolder
 $WorkingFolder = join-path $RootFolder "\$NAVVersion\$NAVCU\Upgrade_$CompanyName"
-$ClientWorkingFolder = "\\$NAVServerClientName \c$\$RootFolder\$CompanyName\$NAVVersion\$NAVCU\Upgrade_$CompanyName"
+$ClientWorkingFolder = "\\$NAVServerClientName\c$\$RootFolderName\$CompanyFolder\$NAVVersion\$NAVCU\Upgrade_$CompanyName"
 $LogPath = join-path $WorkingFolder 'Log'
 # Database backup W1
 $AppDBNameW1 = 'fastfit_' + $UpgradeToVersion + '_W1_APP'

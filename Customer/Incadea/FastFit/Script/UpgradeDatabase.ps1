@@ -7,7 +7,7 @@ $scriptLocationPath = (join-path $Location 'Set-UpgradeSettings.ps1')
 Enable-WSManCredSSP -Role Client -DelegateComputer $NAVServer  -Force
 $InstanceSecurePassword = ConvertTo-SecureString $InstancePassword -AsPlainText -Force
 $UserCredential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $UserName , $InstanceSecurePassword 
-$NAVServerRS  = Enter-PSSession -ComputerName $NAVServerRSName -UseSSL -Credential $UserCredential –Authentication CredSSP
+Enter-PSSession -ComputerName $NAVServerRSName -UseSSL -Credential $UserCredential –Authentication CredSSP
 #Enter-PSSession -ComputerName $DBServer -UseSSL -Credential $UserCredential
 #Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy Unrestricted
 
@@ -158,9 +158,9 @@ Export-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $DEALER1DBNa
 Copy-Item -Path (join-path (join-path $NAVEnvZupFilePath $DemoDBNO) 'fin.zup') -Destination $NAVZupFilePath -Force
 Export-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $DemoDBNO -Path $DemoObjectsNOPath -LogPath $LogPath -ExportTxtSkipUnlicensed
 # Copy from remote server
-Copy-Item -Path $DemoObjectsNOPath -Destination (Join-Path $ClientWorkingFolder $OriginalObjects) -Force
-Copy-Item -Path $DemoObjectsNOPath -Destination (Join-Path $ClientWorkingFolder $FastFitObjects) -Force
-Copy-Item -Path $DemoObjectsNOPath -Destination (Join-Path $ClientWorkingFolder $TargetObjects) -Force
+Copy-Item -Path $OriginalObjectsPath -Destination (Join-Path $ClientWorkingFolder $OriginalObjects) -Force
+Copy-Item -Path $FastFitObjectsPath -Destination (Join-Path $ClientWorkingFolder $FastFitObjects) -Force
+Copy-Item -Path $TargetObjectsPath -Destination (Join-Path $ClientWorkingFolder $TargetObjects) -Force
 Copy-Item -Path $DemoObjectsNOPath -Destination (Join-Path $ClientWorkingFolder $DemoObjectsNO) -Force
 # Merge Customer database objects and NAV 2016 objects.
 # I got out of memory error on the $NAVServer, so I copied the files and run the merge code from NO01DEVTS02.si-dev.local server.
