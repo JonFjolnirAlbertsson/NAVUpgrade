@@ -110,3 +110,7 @@ $FastFitObjectsENUNORDEU = 'fastfit_' + $UpgradeFromVersion + '_NO_ENU_NOR_DEU.t
 $FastFitObjectsWithENUNORDEUPath = (join-path $WorkingFolder $FastFitObjectsENUNORDEU)
 $FastFitObjectsDEUOnly = 'fastfit_' + $UpgradeFromVersion + '_NO_DEU.txt'
 $FastFitObjectsWithDEUPath = (join-path $WorkingFolder $FastFitObjectsDEUOnly)
+$DemoObjectsENUNORDEU = $NAVVersion +'_' + $NAVCU + '_NO_ENU_NOR_DEU.txt'
+$DemoObjectsWithENUNORDEUPath = (join-path $WorkingFolder $DemoObjectsENUNORDEU)
+$DemoObjectsDEUOnly = $NAVVersion +'_' + $NAVCU + '_NO_DEU.txt'
+$DemoObjectsDEUOnlyPath = (join-path $WorkingFolder $DemoObjectsDEUOnly)

@@ -174,8 +174,10 @@ Export-NAVApplicationObjectLanguage -Source $FastFitObjectsPath -LanguageId "NOR
 Export-NAVApplicationObjectLanguage -Source $FastFitObjectsPath -LanguageId "ENU" -Destination $LangFileENU
 # Importing DEU to modifed file
 Import-NAVApplicationObjectLanguage -Source $FastFitObjectsPath -LanguageId "DEU" -LanguagePath $LangFileDEU -Destination $FastFitObjectsWithENUNORDEUPath
+Import-NAVApplicationObjectLanguage -Source $DemoObjectsNOPath -LanguageId "DEU" -LanguagePath $LangFileDEU -Destination $DemoObjectsWithENUNORDEUPath
 # Removing "NOR" and "ENU"  Language from Modified file
 Remove-NAVApplicationObjectLanguage -Source $FastFitObjectsWithENUNORDEUPath -LanguageId "NOR","ENU" -Destination $FastFitObjectsWithDEUPath
+Remove-NAVApplicationObjectLanguage -Source $DemoObjectsWithENUNORDEUPath -LanguageId "NOR","ENU" -Destination $DemoObjectsDEUOnlyPath
 
 $MergeResult = Merge-NAVUpgradeObjects `
     -OriginalObjects $OriginalObjectsPath `    -ModifiedObjects $FastFitObjectsWithDEUPath `
