@@ -198,46 +198,11 @@ Join-NAVApplicationObjectFile -Source $ToBeJoinedPath  -Destination $ToBeJoinedD
 # Compare the $ToBeJoinedDestinationFile file to the $TargetObjects in the "NAV Object Compare" application from Rune Sigurdsen
 $NAVObjectCompareWinClient = join-path 'C:\Users\DevJAL\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\NAVObjectCompareWinClient' 'NAVObjectCompareWinClient.appref-ms'
 & $NAVObjectCompareWinClient  
-<# Check if folders exists. If not create them.
-if(!(Test-Path -Path $MergedPath )){
-    New-Item -ItemType directory -Path $MergedPath
-}
-# Copy object files with conflict to the Merged folder
-$fileNames = Get-ChildItem -Path $ConflictTarget -Recurse -Include *.txt
-foreach($filename in $fileNames)
-{
-    $Source = join-path $MergeResultPath  $filename.Name
-    $Destination = join-path $MergedPath  $filename.Name
-    Copy-Item $Source -Destination $Destination
-    Write-Host $Source + ' file copied to ' + $Destination
-}
-$StartDateTime = "{0:D}" -f (get-date)
-"$StartDateTime : Started copying conflict files from $MergeResultPath to $MergedPath" | Out-File $CopyResultFile -Append
-$fileNames | Out-File $CopyResultFile -Append
-# Check if folders exists. If not create them.
-if(!(Test-Path -Path $ToBeJoinedPath )){
-    New-Item -ItemType directory -Path $ToBeJoinedPath
-}
-#Copy merged result items to the Merged/ToBeJoined folder. Subfolders are not included in the search.
-$fileNames = Get-ChildItem -Path "$MergeResultPath\*" -Recurse -Include '*.TXT' -File
-#Remove-Item -Path "$JoinPath\*.*"
-foreach($filename in $fileNames)
-{
-    $Source = join-path $MergeResultPath  $filename.Name
-    $Destination = join-path $ToBeJoinedPath  $filename.Name
-    Copy-Item $Source -Destination $Destination
-    Write-Host $Source + ' file copied to ' + $Destination
-}
-$StartDateTime = "{0:D}" -f (get-date)
-"$StartDateTime : Started copying merged files from $MergeResultPath to $ToBeJoinedPath" | Out-File $CopyResultFile -Append
-$fileNames | Out-File $CopyResultFile -Append
-#>
 
-#$NOObjects = join-path $WorkingFolder 'NO_Objects.txt'
-#Export-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $TargetDemoDBName -Username $DBUser -Password $InstancePassword -Path $NOObjects -Filter 'Id=10600..10699|15000000..15000999' -LogPath $LogPath
+#Import-NAVApplicationObject -DatabaseName $DEALER1DBNameNODev -Path $JoinFile -DatabaseServer $DBServer -ImportAction Overwrite -LogPath $LogPath -NavServerInstance $FastFitInstanceNODev -NavServerName $NAVServer -SynchronizeSchemaChanges Yes
+Copy-Item -Path (join-path $ClientWorkingFolder $JoinFileName ) -Destination $JoinFile -Force
+Import-NAVApplicationObject2 -Path $JoinFile -ServerInstance $FastFitInstanceNODev -ImportAction Overwrite -LogPath $LogPath -NavServerName $NAVServer -SynchronizeSchemaChanges Force
 
-#Join-NAVApplicationObjectFile -Destination $JoinFile -Source $Destination
-Merge-NAVCode -WorkingFolderPath $WorkingFolder -Join
 #Create Web client instance
 New-NAVWebServerInstance -WebServerInstance $FastFitInstanceNO  -Server $NAVServer -ServerInstance $FastFitInstanceNO 
 New-NAVWebServerInstance -WebServerInstance $FastFitInstanceNODev  -Server $NAVServer -ServerInstance $FastFitInstanceNODev 
