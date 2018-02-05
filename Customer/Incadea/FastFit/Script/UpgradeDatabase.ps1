@@ -4,7 +4,7 @@ $Location = (Split-Path $psise.CurrentFile.FullPath)
 $scriptLocationPath = (join-path $Location 'Set-UpgradeSettings.ps1')
 . $scriptLocationPath
 # Client Enabling WSManCredSSP to be able to do a double hop with authentication.
-Enable-WSManCredSSP -Role Client -DelegateComputer $NAVServer  -Force
+Enable-WSManCredSSP -Role Client -DelegateComputer $NAVServerRSName  -Force
 $InstanceSecurePassword = ConvertTo-SecureString $InstancePassword -AsPlainText -Force
 $UserCredential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $UserName , $InstanceSecurePassword 
 Enter-PSSession -ComputerName $NAVServerRSName -UseSSL -Credential $UserCredential –Authentication CredSSP
@@ -198,9 +198,20 @@ Join-NAVApplicationObjectFile -Source $ToBeJoinedPath  -Destination $ToBeJoinedD
 # Compare the $ToBeJoinedDestinationFile file to the $TargetObjects in the "NAV Object Compare" application from Rune Sigurdsen
 $NAVObjectCompareWinClient = join-path 'C:\Users\DevJAL\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\NAVObjectCompareWinClient' 'NAVObjectCompareWinClient.appref-ms'
 & $NAVObjectCompareWinClient  
+#
 
-#Import-NAVApplicationObject -DatabaseName $DEALER1DBNameNODev -Path $JoinFile -DatabaseServer $DBServer -ImportAction Overwrite -LogPath $LogPath -NavServerInstance $FastFitInstanceNODev -NavServerName $NAVServer -SynchronizeSchemaChanges Yes
+Export-NAVApplicationObjectLanguage -Source $TargetObjectsPath -LanguageId "DEU" -Destination $LangFileDEU
+# Export "NOR" and "ENU"  Language from Modified file
+Export-NAVApplicationObjectLanguage -Source $FastFitObjectsPath -LanguageId "NOR" -Destination $LangFileNOR
+Export-NAVApplicationObjectLanguage -Source $FastFitObjectsPath -LanguageId "ENU" -Destination $LangFileENU
+# Importing DEU to modifed file
+Import-NAVApplicationObjectLanguage -Source $LangFileDEU -LanguageId "DEU" -LanguagePath $LangFileDEU -Destination $JoinFile
+Import-NAVApplicationObjectLanguage -Source $LangFileNOR -LanguageId "NOR" -LanguagePath $LangFileNOR -Destination $JoinFile
+Import-NAVApplicationObjectLanguage -Source $LangFileENU -LanguageId "ENU" -LanguagePath $LangFileENU -Destination $JoinFile
+
+# Copy file with merged objects to NAV Server
 Copy-Item -Path (join-path $ClientWorkingFolder $JoinFileName ) -Destination $JoinFile -Force
+# Import the objects to the development database
 Import-NAVApplicationObject2 -Path $JoinFile -ServerInstance $FastFitInstanceNODev -ImportAction Overwrite -LogPath $LogPath -NavServerName $NAVServer -SynchronizeSchemaChanges Force
 
 #Create Web client instance
