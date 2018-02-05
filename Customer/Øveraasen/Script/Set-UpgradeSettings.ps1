@@ -1,87 +1,115 @@
-﻿#Base Path
-#Azure
-#$RootFolderPath = "F:\NavUpgrade"
-#SQLNAVUpgrade
-$RootFolderPath = "C:\Incadea"
-#Servers
-$DBServer = 'localhost'
-$NAVServer = 'NO01DEV03'
-#NAV Specific data
-$NAVShortVersion = '100'
-$DBServer = "localhost"
-$NavServiceInstance = "NAV100_Overaasen"
-$NavServiceInstanceServer = "localhost"
-$NAVVersion = '2017'
-$NAVCU = 'CU3'
-$VersionListPrefixes = 'NAVW1', 'NAVNO', 'I'
-$NAVLicense = "$RootFolderPath\License\NAV2017.flf"
-$NAVLicenseOAS = "$RootFolderPath\License\Øveraasen NAV 2017 5111316.flf"
-#Company data
+﻿# Base Variables
+$RootDrive = 'C:\'
+$RootFolderName = 'incadea'
+$RootFolderPath = join-path $RootDrive $RootFolderName
 $CompanyName = 'Øveraasen'
-$UpgradeName = 'NAV' + $NAVShortVersion  + $NAVCU + $CompanyName
-$UpgradeDataBaseName = $UpgradeName
-$UpgradeObjectsName = 'NAV' + $NAVShortVersion  + $NAVCU + $CompanyName + 'Objects'
-$CompanyFolder = "$CompanyName\NAV$NAVVersion\$NAVCU"
-$ModifiedFolder = "$RootFolderPath\Customer\$CompanyName\CustomerDBs"
-$ModifiedObjectFile = 'NAV2009R2_' + $CompanyName + '.txt'
-$WorkingFolder = "$RootFolderPath\Customer\$CompanyFolder\Upgrade_$UpgradeName"
-$WorkingFolderNAV2009 = "$RootFolderPath\Customer\$CompanyFolder\NAV2009"
-$WorkingFolderNAV2015 = "$RootFolderPath\Customer\$CompanyFolder\NAV2015"
-#Original DB objects
-$ObjectLibrary = "$RootFolderPath\DB Original"
-#Database backup files
-$BackupPath = $ModifiedFolder
-$BackupfileCaompanyDB = join-path $ModifiedFolder 'NAV2009R2ToBeUpgraded.bak'
-$BackupfileTargetDB = "$RootFolderPath\NAV\NAV2016\NAV2016NO5_45243\DVD\NAV.9.0.45243.NO.DVD\SQLDemoDatabase\CommonAppData\Microsoft\Microsoft Dynamics NAV\90\Database\Demo Database NAV (9-0).bak"
-$NAV2009BackupFile = "$RootFolderPath\NAV\NAV2009\DVD\SQLDemoDatabase\CommonAppData\Microsoft\Microsoft Dynamics NAV\60\Database\Demo Database NAV (6-0).bak"
-$NAV2015BackupFile = "$RootFolderPath\NAV\NAV2015\CU24\DVD\SQLDemoDatabase\CommonAppData\Microsoft\Microsoft Dynamics NAV\80\Database\Demo Database NAV (8-0).bak"
-#Previous NAv versions naming
-$NAV2009DBName = 'NAV60' + $CompanyName 
-$NAV2015CU = 'CU24'
-$NAV2009ObjectFile = 'NAV2009_R2_35179_NO.txt'
-$NAV2015DBName = 'NAV80' + $NAV2015CU + $CompanyName
-$NAV2015ObjectFile = 'NAV2015_' +$NAV2015CU  + '_NO.txt'
-$NAV2015ModifiedObjectFile = 'Elas_NAV2009_WithMerged_Tables.txt'
-#Upgrade objects 
-$NAV2015APPObjects2Import = join-path $WorkingFolderNAV2015 ($CompanyName +'_NAV2015' +$NAV2015CU  + 'NO.fob')
-$NAV2015UpgradeObjects2Import= join-path $WorkingFolderNAV2015 'Upgrade601800.NO.fob'
-$NAV2017APPObjects2Import = join-path $WorkingFolder ($CompanyName +'_NAV' + $NAVVersion + '_' + $NAVCU + '_' + 'NO.fob')
-$NAV2017UpgradeObjects2Import= join-path $WorkingFolder 'Upgrade8001000.NO.fob'
-#Putting the paths toghether
-$RootFolder = $RootFolderPath + $CompanyFolderName
-$LogPath = "$RootFolder\Logs\"
-$CompileLog = $LogPath + "compile"
-$ImportLog = $LogPath + "import"
-$ConversionLog = $LogPath + "Conversion"
-$TmpLocation = "$NAVRootFolder\Temp\"
-$ISODir = "$NAVRootFolder\ISO"
-$NAVRootFolder = "$RootFolderPath\NAV\NAV$NAVVersion"
-$InstallLogFolder = "$NAVRootFolder\Log"
-$InstallLog = "$InstallLogFolder\install.log"
-
-#Original Version
-$OriginalVersion = '2009R2NO_6_00_32012_AllObjects'
-$OriginalObjects = join-path $ObjectLibrary "$($OriginalVersion).txt"
-$OriginalFolder = join-path $WorkingFolder 'Original'
-
-#Modified Version
-$ModifiedServerInstance = $UpgradeName
-$ModifiedObjects = join-path $ModifiedFolder $ModifiedObjectFile
-$ModifiedDatabaseBackupLocation = join-path $ModifiedFolder "$($ModifiedServerInstance).bak"
-$ModifiedFolder = join-path $WorkingFolder 'Modified'
-$ModifiedNAV2015Objects = join-path $WorkingFolderNAV2009 $NAV2015ModifiedObjectFile
-
-#Target Version
-$TargetVersion = 'NAV' + $NAVVersion + '_' + $NAVCU + '_NO' 
-$TargetServerInstance = $TargetVersion + '_' + $CompanyName
-$TargetObjects = join-path $ObjectLibrary "$($TargetVersion).txt"
-$TargetFolder = join-path $WorkingFolder 'Target'
-$TargetNAV2009Objects = join-path $ObjectLibrary $NAV2009ObjectFile
-$TargetNAV2015Objects = join-path $ObjectLibrary $NAV2015ObjectFile
-
-#Result Version
-$ResultObjectFile = Join-Path $WorkingFolder 'Result.fob'
-
-#Join
-$JoinFolder = join-path $WorkingFolder 'Merged\ToBeJoined'
-$DestinationFile = join-path $WorkingFolder "$ModifiedServerInstance.txt"
+$DBServerRootPath = "\\NO01DEVSQL01\$CompanyName"
+$DBServerDemoPath = 'C:\MSSQL\Backup\Demo\'
+$GitPath = join-path $RootDrive 'Git'
+$GitPathIncadea = join-path  $GitPath "\NAVUpgrade\Customer"
+# Servers
+$DBServer = 'NO01DEVSQL01.si-dev.local'
+$NAVServer = 'NO01DEV03.si-dev.local'
+$NAVServerRSName = 'NO01DEV03'
+$NAVServerClientName = 'No01devts02'
+$NAVLicense = join-path $RootFolderPath "License\NAV2018.flf"
+$CertificateFile = join-path ("$GitPathIncadea\$CompanyName") 'cert'
+# $UserName = 'incadea\albertssonf'
+$UserName = 'si-dev\devjal'
+$DBNAVServiceUserName = 'si-dev\nav_user'
+$InstanceUserName = 'nav_user@si-dev.local'
+$InstancePassword = '1378Nesbru'
+$DBUser = 'NAV_Service'
+$NAVVersion = 'NAV2018'
+$NAVCU = 'CU01'
+$CompanyFolder = "Customer\$CompanyName"
+$RootFolder = join-path $RootFolderPath $CompanyFolder
+$WorkingFolder = join-path $RootFolder "\$NAVVersion\$NAVCU\Upgrade_$CompanyName"
+$ClientWorkingFolder = "\\$NAVServerClientName\c$\$RootFolderName\$CompanyFolder\$NAVVersion\$NAVCU\Upgrade_$CompanyName"
+$LogPath = join-path $WorkingFolder 'Log'
+# Database backup W1
+$AppDBNameW1 = 'fastfit_' + $UpgradeToVersion + '_W1_APP'
+$DEALER1DBNameW1 = 'fastfit_' + $UpgradeToVersion + '_W1_DEALER1'
+$DEALER2DBNameW1 = 'fastfit_' + $UpgradeToVersion + '_W1_DEALER2'
+$MASTERDBNameW1 = 'fastfit_' + $UpgradeToVersion + '_W1_MASTER'
+$REPORTINGDBNameW1 = 'fastfit_' + $UpgradeToVersion + '_W1_REPORTING'
+$STAGINGDBNameW1 = 'fastfit_' + $UpgradeToVersion + '_W1_STAGING'
+$TEMPLATEDBNameW1 = 'fastfit_' + $UpgradeToVersion + '_W1_TEMPLATE'
+$Dealer1TenantW1= 'dealer1w1'
+$Dealer2TenantW1= 'dealer2w1'
+$MasterTenantW1= 'masterw1'
+$ReportingTenantW1= 'reportingw1'
+$StagingTenantW1= 'stagingw1'
+$TemplateTenantW1= 'templatew1'
+$DemoDBW1 = 'Demo Database NAV (9-0) CU17 W1'
+# Database backup NO
+$UpgradeFromDevDBName = 'fastfit_' + $UpgradeFromVersion + '_NO_DEV'
+$UpgradeFromW1DBName = 'fastfit_' + $UpgradeFromVersion + '_W1_APP'
+$AppDBNameNODev = 'fastfit_' + $UpgradeToVersion + '_NO_APP_DEV'
+$DEALER1DBNameNODev = 'fastfit_' + $UpgradeToVersion + '_NO_DEV'
+$AppDBNameNO = 'fastfit_' + $UpgradeToVersion + '_NO_APP'
+$DEALER1DBNameNO = 'fastfit_' + $UpgradeToVersion + '_NO_DEALER1'
+$DEALER2DBNameNO = 'fastfit_' + $UpgradeToVersion + '_NO_DEALER2'
+$MASTERDBNameNO = 'fastfit_' + $UpgradeToVersion + '_NO_MASTER'
+$REPORTINGDBNameNO = 'fastfit_' + $UpgradeToVersion + '_NO_REPORTING'
+$STAGINGDBNameNO = 'fastfit_' + $UpgradeToVersion + '_NO_STAGING'
+$TEMPLATEDBNameNO = 'fastfit_' + $UpgradeToVersion + '_NO_TEMPLATE'
+$Dealer1TenantNO= 'dealer1no'
+$Dealer2TenantNO= 'dealer2no'
+$MasterTenantNO= 'masterno'
+$ReportingTenantNO= 'reportingno'
+$StagingTenantNO= 'stagingno'
+$TemplateTenantNO= 'templateno'
+$DemoDBNO = 'Demo Database NAV (9-0) CU17 NO'
+# Database backup common
+$BackupPath = join-path $DBServerRootPath ($UpgradeToVersion + '_W1\Database Backups')
+$BackupfileAppDB = join-path $BackupPath ("$AppDBNameW1.bak")
+$BackupfileDEALER1DB = join-path $BackupPath ("$DEALER1DBNameW1.bak")
+$BackupfileDEALER2DB = join-path $BackupPath ("$DEALER2DBNameW1 .bak")
+$BackupfileMASTERDB = join-path $BackupPath ("$MASTERDBNameW1.bak")
+$BackupfileREPORTINGDB = join-path $BackupPath ("$REPORTINGDBNameW1.bak")
+$BackupfileSTAGINGDB = join-path $BackupPath ("$STAGINGDBNameW1 .bak")
+$BackupfileTEMPLATEDB = join-path $BackupPath ("$TEMPLATEDBNameW1.bak")
+$BackupfileDemoDBW1 = join-path $DBServerDemoPath "$DemoDBW1.bak"
+$BackupfileDemoDBNO = join-path $DBServerDemoPath "$DemoDBNO.bak"
+# NAV Server Instances
+$FastFitInstanceNO = 'fastfit_' + $UpgradeToVersion + '_NO'
+$FastFitInstanceNODev = 'fastfit_' + $UpgradeToVersion + '_NO_Dev'
+$FastFitInstanceW1 = 'fastfit_' + $UpgradeToVersion + '_W1'
+$FastFitInstanceUpgradeFromVersionW1 = 'fastfit_' + $UpgradeFromVersion + '_W1'
+# $FastFitInstanceUpgradeFromVersionNO = 'fastfit_' + $UpgradeFromVersion + '_NO_Dev'
+# Merge files parameters
+$OriginalObjects = 'fastfit_' + $UpgradeFromVersion + '_W1.txt'$FastFitObjects = 'fastfit_' + $UpgradeFromVersion + '_NO.txt'
+$TargetObjects = 'fastfit_' + $UpgradeToVersion + '_W1.txt'
+$DemoObjectsNO = $NAVVersion +'_' + $NAVCU + '_NO.txt'
+$OriginalObjectsPath = (join-path $WorkingFolder $OriginalObjects)
+$FastFitObjectsPath = (join-path $WorkingFolder $FastFitObjects)
+$TargetObjectsPath = (join-path $WorkingFolder $TargetObjects)
+$DemoObjectsNOPath = (join-path $WorkingFolder $DemoObjectsNO)
+$NAVEnvZupFilePath = 'C:\Incadea\Fastfit\zup'
+$NAVZupFilePath = 'C:\Users\DevJAL\AppData\Roaming\fin.zup'
+# Merging parameters
+$VersionListPrefixes = 'NAVW1', 'NAVNO', 'IFFW' #Needs full prefix definition Check in NAV DEV with (<>*IFFW*&<>*NAVW*&<>*NAVNO*)
+$CompareObjectFilter = '*.TXT'
+$MergeResultPath = join-path $WorkingFolder 'MergeResult' 
+$ConflictTarget = join-path $MergeResultPath  'ConflictTarget' 
+$MergedPath = join-path $WorkingFolder 'Merged' 
+$ModifiedPath = join-path $WorkingFolder 'Modified' 
+$TargetPath = join-path $WorkingFolder 'Target' 
+$ToBeJoinedPath = Join-Path $MergedPath 'ToBeJoined'
+$JoinFileName = 'all-merged-objects.txt'
+$JoinFile = join-path $WorkingFolder $JoinFileName
+$CopyResultFile =  join-path $WorkingFolder 'Copy Results.txt' 
+$ToBeJoinedDestinationFile = join-path $WorkingFolder 'ToBeJoined_Objects.TXT'
+# Language parameters
+$LangFileDEU = (join-path $WorkingFolder 'languages-DEU.txt')
+$LangFileNOR = (join-path $WorkingFolder 'languages-NOR.txt')
+$LangFileENU = (join-path $WorkingFolder 'languages-ENU.txt')
+$FastFitObjectsENUNORDEU = 'fastfit_' + $UpgradeFromVersion + '_NO_ENU_NOR_DEU.txt'
+$FastFitObjectsWithENUNORDEUPath = (join-path $WorkingFolder $FastFitObjectsENUNORDEU)
+$FastFitObjectsDEUOnly = 'fastfit_' + $UpgradeFromVersion + '_NO_DEU.txt'
+$FastFitObjectsWithDEUPath = (join-path $WorkingFolder $FastFitObjectsDEUOnly)
+$DemoObjectsENUNORDEU = $NAVVersion +'_' + $NAVCU + '_NO_ENU_NOR_DEU.txt'
+$DemoObjectsWithENUNORDEUPath = (join-path $WorkingFolder $DemoObjectsENUNORDEU)
+$DemoObjectsDEUOnly = $NAVVersion +'_' + $NAVCU + '_NO_DEU.txt'
+$DemoObjectsDEUOnlyPath = (join-path $WorkingFolder $DemoObjectsDEUOnly)
