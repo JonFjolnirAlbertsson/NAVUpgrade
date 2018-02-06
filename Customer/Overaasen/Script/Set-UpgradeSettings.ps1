@@ -21,7 +21,7 @@ $InstancePassword = '1378Nesbru'
 $DBUser = 'NAV_Service'
 $NAVVersion = 'NAV2018'
 $NAVShortVersion = 'NAV110'
-$NAVCU = 'CU01'
+$NAVCU = 'CU02'
 # Company data
 $CompanyFolder = "Customer\$CompanyName"
 $RootFolder = join-path $RootFolderPath $CompanyFolder
@@ -35,7 +35,7 @@ $UpgradeObjectsName = $NAVVersion  + $NAVCU + $CompanyName + 'Objects'
 $LogPath = join-path $WorkingFolder 'Log'
 # Database backup NO
 $DemoOriginalDBNO = 'Demo Database NAV (10-0) NO CU03'
-$DemoDBNO = 'Demo Database NAV (11-0) NO CU01'
+$DemoDBNO = "Demo Database NAV (11-0) NO $NAVCU"
 # Database backup common
 $BackupPath = $DBServerRootPath
 $BackupfileDemoDBNO = join-path $DBServerDemoPath ("$DemoDBNO.bak")
@@ -51,7 +51,7 @@ $ModifiedObjectsPath = (join-path $WorkingFolder $ModifiedObjects)
 $TargetObjectsPath = (join-path $WorkingFolder $TargetObjects)
 #$DemoObjectsNOPath = (join-path $WorkingFolder $DemoObjectsNO)
 # Merging parameters
-$VersionListPrefixes = 'NAVW1', 'NAVNO' #Needs full prefix definition Check in NAV DEV with (<>*IFFW*&<>*NAVW*&<>*NAVNO*)
+$VersionListPrefixes = 'NAVW1','NAVNO','INC','SER','OPC' #Needs full prefix definition Check in NAV DEV with (<>*IFFW*&<>*NAVW*&<>*NAVNO*)
 $CompareObjectFilter = '*.TXT'
 $MergeResultPath = join-path $WorkingFolder 'MergeResult' 
 $ConflictTarget = join-path $MergeResultPath  'ConflictTarget' 

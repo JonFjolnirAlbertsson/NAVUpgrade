@@ -41,18 +41,14 @@ Backup-SqlDatabase -ServerInstance $DBServer -Database $UpgradeFromDataBaseName 
 # Add the NAV Instance user as DBOwner for all databases
 New-SQLUser-INC -DatabaseServer $DBServer -DatabaseName $UpgradeDataBaseName -DatabaseUser $DBNAVServiceUserName 
 New-SQLUser-INC -DatabaseServer $DBServer -DatabaseName $DemoOriginalDBNO -DatabaseUser $DBNAVServiceUserName 
- 
 # Creating Credential for the NAV Server Instance user
 $InstanceSecurePassword = ConvertTo-SecureString $InstancePassword -AsPlainText -Force
 $InstanceCredential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $InstanceUserName , $InstanceSecurePassword 
 # Creating NAV Server Instances
 Write-host "Create Service Instance"
 New-NAVEnvironment  -EnablePortSharing -ServerInstance $UpgradeName  -DatabaseServer $DBServer
-New-NAVEnvironment  -EnablePortSharing -ServerInstance $UpgradeFromOriginalName  -DatabaseServer $DBServer
 # Set instance to Multitenant
 $CurrentServerInstance = Get-NAVServerInstance -ServerInstance $UpgradeName
-$ServerInstanceOriginal = Get-NAVServerInstance -ServerInstance $UpgradeFromOriginalName
-
 Write-host "Set instance parameters"
 # Set instance parameters
 $CurrentServerInstance | Set-NAVServerInstance -stop
@@ -61,32 +57,29 @@ $CurrentServerInstance | Set-NAVServerConfiguration -KeyName DatabaseServer -Key
 $CurrentServerInstance | Set-NAVServerConfiguration -KeyName DatabaseName -KeyValue $UpgradeName
 $CurrentServerInstance | Set-NAVServerInstance -ServiceAccountCredential $InstanceCredential -ServiceAccount User
 $CurrentServerInstance | Set-NAVServerInstance -start
-
+# Import License
+$CurrentServerInstance | Import-NAVServerLicense -LicenseFile $NAVLicense
+$CurrentServerInstance | Set-NAVServerInstance -Restart
+# Sync database
+$CurrentServerInstance | Sync-NAVTenant -Mode Sync
+# Add user to database
+New-NAVUser-INC -NavServiceInstance $UpgradeName -User $UserName 
+# Export all objects to text files. Remember that the objects will be created on the $NAVServer.
+# Import Module for original DB
+Import-Module "$env:ProgramFiles\Microsoft Dynamics NAV\100\Service CU03\NavAdminTool.ps1" -Force -WarningAction SilentlyContinue | Out-Null
+Import-Module "${env:ProgramFiles(x86)}\Microsoft Dynamics NAV\100\RTC CU03\Microsoft.Dynamics.Nav.Model.Tools.psd1" -Force -WarningAction SilentlyContinue | out-null
+New-NAVEnvironment  -EnablePortSharing -ServerInstance $UpgradeFromOriginalName  -DatabaseServer $DBServer
+New-NAVUser-INC -NavServiceInstance $UpgradeFromOriginalName -User $DBNAVServiceUserName 
+$ServerInstanceOriginal = Get-NAVServerInstance -ServerInstance $UpgradeFromOriginalName
 $ServerInstanceOriginal | Set-NAVServerInstance -stop
 $ServerInstanceOriginal | Set-NAVServerConfiguration -KeyName MultiTenant -KeyValue "false"
 $ServerInstanceOriginal | Set-NAVServerConfiguration -KeyName DatabaseServer -KeyValue $DBServer
 $ServerInstanceOriginal | Set-NAVServerConfiguration -KeyName DatabaseName -KeyValue $UpgradeName
 $ServerInstanceOriginal | Set-NAVServerInstance -ServiceAccountCredential $InstanceCredential -ServiceAccount User
 $ServerInstanceOriginal | Set-NAVServerInstance -start
-
-# Import License
-$CurrentServerInstance | Import-NAVServerLicense -LicenseFile $NAVLicense
-$CurrentServerInstance | Set-NAVServerInstance -Restart
 $ServerInstanceOriginal | Import-NAVServerLicense -LicenseFile $NAVLicense
 $ServerInstanceOriginal | Set-NAVServerInstance -Restart
-
-# Sync database
-$CurrentServerInstance | Sync-NAVTenant -Mode Sync
 $ServerInstanceOriginal | Sync-NAVTenant -Mode Sync
-#Sync-NAVTenant -ServerInstance $UpgradeName -Tenant $Dealer1TenantNO -Mode ForceSync
-
-# Add user to database
-New-NAVUser-INC -NavServiceInstance $UpgradeName -User $UserName 
-New-NAVUser-INC -NavServiceInstance $UpgradeFromOriginalName -User $DBNAVServiceUserName 
-# Export all objects to text files. Remember that the objects will be created on the $NAVServer.
-# Import Module for original DB
-Import-Module "$env:ProgramFiles\Microsoft Dynamics NAV\100\Service CU03\NavAdminTool.ps1" -Force -WarningAction SilentlyContinue | Out-Null
-Import-Module "${env:ProgramFiles(x86)}\Microsoft Dynamics NAV\100\RTC CU03\Microsoft.Dynamics.Nav.Model.Tools.psd1" -Force -WarningAction SilentlyContinue | out-null
 Export-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $DemoOriginalDBNO -Path $OriginalObjectsPath -LogPath $LogPath -ExportTxtSkipUnlicensed
 # Import Module for Modified DB
 Import-Module "${env:ProgramFiles(x86)}\Microsoft Dynamics NAV\100\RoleTailored Client\Microsoft.Dynamics.Nav.Model.Tools.psd1" -Force -WarningAction SilentlyContinue | out-null
@@ -96,17 +89,21 @@ Export-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $UpgradeFrom
 Import-Module "${env:ProgramFiles(x86)}\Microsoft Dynamics NAV\110\RoleTailored Client\Microsoft.Dynamics.Nav.Model.Tools.psd1" -Force -WarningAction SilentlyContinue | out-null
 Import-Module "$env:ProgramFiles\Microsoft Dynamics NAV\110\Service\NavAdminTool.ps1" -Force -WarningAction SilentlyContinue | Out-Null
 Export-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $DemoDBNO -Path $TargetObjectsPath -LogPath $LogPath -ExportTxtSkipUnlicensed
-
 # Copy from remote server
+if(!(Test-Path -Path $ClientWorkingFolder )){
+    New-Item -ItemType directory -Path $ClientWorkingFolder
+}
 Copy-Item -Path $OriginalObjectsPath -Destination (Join-Path $ClientWorkingFolder $OriginalObjects) -Force
 Copy-Item -Path $ModifiedObjectsPath -Destination (Join-Path $ClientWorkingFolder $ModifiedObjects) -Force
 Copy-Item -Path $TargetObjectsPath -Destination (Join-Path $ClientWorkingFolder $TargetObjects) -Force
 # Merge Customer database objects and NAV 2018 objects.
-# I got out of memory error on the $NAVServer, so I copied the files and run the merge code from NO01DEVTS02.si-dev.local server.
 Remove-Item -Path "$MergeResultPath\*.*"
 Remove-Item -Path "$MergedPath\*.*"
 Remove-Item -Path "$ToBeJoinedPath\*.*"
-
+# I got out of memory error on the $NAVServer, so I copied the files and run the merge code from NO01DEVTS02.si-dev.local server.
+#winrm get winrm/config/winrs # Get memory size
+#Set-Item WSMan:\localhost\Shell\MaxMemoryPerShellMB 2048 # Change memory size
+#winrm set winrm/config/winrs `@`{MaxMemoryPerShellMB=`"2048`"`}
 $MergeResult = Merge-NAVUpgradeObjects `
     -OriginalObjects $OriginalObjectsPath `    -ModifiedObjects $ModifiedObjectsPath `
     -TargetObjects $TargetObjectsPath `
