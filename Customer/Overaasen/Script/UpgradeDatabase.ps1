@@ -23,11 +23,12 @@ Enable-WSManCredSSP -Role server -Force
 # Import NAV, cloud.ready and incadea modules
 # To be able to import the moduel sqlps
 # files had to be copied from folder "C:\Program Files (x86)\Microsoft SQL Server\130\Tools\PowerShell\Modules" to the folder "C:\Windows\System32\WindowsPowerShell\v1.0\Modules" 
-Import-Module "${env:ProgramFiles(x86)}\Microsoft Dynamics NAV\110\RoleTailored Client\Microsoft.Dynamics.Nav.Model.Tools.psd1" -Force -WarningAction SilentlyContinue | out-null
-Import-Module "$env:ProgramFiles\Microsoft Dynamics NAV\110\Service\NavAdminTool.ps1" -Force -WarningAction SilentlyContinue | Out-Null
+#Import-Module "${env:ProgramFiles(x86)}\Microsoft Dynamics NAV\110\RoleTailored Client\Microsoft.Dynamics.Nav.Model.Tools.psd1" -Force -WarningAction SilentlyContinue | out-null
+#Import-Module "$env:ProgramFiles\Microsoft Dynamics NAV\110\Service\NavAdminTool.ps1" -Force -WarningAction SilentlyContinue | Out-Null
 Import-Module SQLPS -DisableNameChecking 
 Import-module (Join-Path "$GitPath\Cloud.Ready.Software.PowerShell\PSModules" 'LoadModules.ps1') -Force -WarningAction SilentlyContinue | Out-Null
 Import-module (Join-Path "$GitPath\IncadeaNorway" 'LoadModules.ps1') -Force -WarningAction SilentlyContinue | Out-Null
+Import-NAVModule-INC -ShortVersion '110' -ImportRTCModule
 # Create Customer Upgrade NAV NO database
 Restore-SQLBackupFile-INC -BackupFile $BackupfileDemoDBNO  -DatabaseServer $DBServer -DatabaseName $DemoDBNO
 Restore-SQLBackupFile-INC -BackupFile $BackupfileDemoDBNO  -DatabaseServer $DBServer -DatabaseName $UpgradeDataBaseName
@@ -40,6 +41,7 @@ $BackupFileName = $UpgradeFromDataBaseName + "_BeforeUpgradeTo$UpgradeDataBaseNa
 $BackupFilePath = join-path $BackupPath $BackupFileName 
 Backup-SqlDatabase -ServerInstance $DBServer -Database $UpgradeFromDataBaseName -BackupAction Database -BackupFile $BackupFilePath -CompressionOption Default
 # Add the NAV Instance user as DBOwner for all databases
+New-SQLUser-INC -DatabaseServer $DBServer -DatabaseName $DemoDBNO -DatabaseUser $DBNAVServiceUserName
 New-SQLUser-INC -DatabaseServer $DBServer -DatabaseName $UpgradeDataBaseName -DatabaseUser $DBNAVServiceUserName 
 New-SQLUser-INC -DatabaseServer $DBServer -DatabaseName $DemoOriginalDBNO -DatabaseUser $DBNAVServiceUserName 
 # Creating Credential for the NAV Server Instance user
@@ -67,10 +69,12 @@ $CurrentServerInstance | Sync-NAVTenant -Mode Sync
 New-NAVUser-INC -NavServiceInstance $UpgradeName -User $UserName 
 # Export all objects to text files. Remember that the objects will be created on the $NAVServer.
 # Import Module for original DB
-Import-Module "$env:ProgramFiles\Microsoft Dynamics NAV\100\Service CU03\NavAdminTool.ps1" -Force -WarningAction SilentlyContinue | Out-Null
-Import-Module "${env:ProgramFiles(x86)}\Microsoft Dynamics NAV\100\RTC CU03\Microsoft.Dynamics.Nav.Model.Tools.psd1" -Force -WarningAction SilentlyContinue | out-null
+#Import-Module "$env:ProgramFiles\Microsoft Dynamics NAV\100\Service CU03\NavAdminTool.ps1" -Force -WarningAction SilentlyContinue | Out-Null
+#Import-Module "${env:ProgramFiles(x86)}\Microsoft Dynamics NAV\100\RTC CU03\Microsoft.Dynamics.Nav.Model.Tools.psd1" -Force -WarningAction SilentlyContinue | out-null
+Import-NAVModule-INC -ShortVersion '100' -ServiceFolder 'Service CU03' -RTCFolder 'RTC CU03' -ImportRTCModule
 New-NAVEnvironment  -EnablePortSharing -ServerInstance $UpgradeFromOriginalName  -DatabaseServer $DBServer
 New-NAVUser-INC -NavServiceInstance $UpgradeFromOriginalName -User $DBNAVServiceUserName 
+#$ServerInstanceOriginal = Get-NAVServerInstance -ServerInstance 'nav100_overaasen'
 $ServerInstanceOriginal = Get-NAVServerInstance -ServerInstance $UpgradeFromOriginalName
 $ServerInstanceOriginal | Set-NAVServerInstance -stop
 $ServerInstanceOriginal | Set-NAVServerConfiguration -KeyName MultiTenant -KeyValue "false"
@@ -81,14 +85,17 @@ $ServerInstanceOriginal | Set-NAVServerInstance -start
 $ServerInstanceOriginal | Import-NAVServerLicense -LicenseFile $NAVLicense
 $ServerInstanceOriginal | Set-NAVServerInstance -Restart
 $ServerInstanceOriginal | Sync-NAVTenant -Mode Sync
-Export-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $DemoOriginalDBNO -Path $OriginalObjectsPath -LogPath $LogPath -ExportTxtSkipUnlicensed
+#$ServerInstanceOriginal | Sync-NAVTenant -Mode ForceSync
+Export-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $DemoOriginalDBNO -Path $OriginalObjectsPath -Filter $ExportObjectFilter -LogPath $LogPath -ExportTxtSkipUnlicensed
 # Import Module for Modified DB
-Import-Module "${env:ProgramFiles(x86)}\Microsoft Dynamics NAV\100\RoleTailored Client\Microsoft.Dynamics.Nav.Model.Tools.psd1" -Force -WarningAction SilentlyContinue | out-null
-Import-Module "$env:ProgramFiles\Microsoft Dynamics NAV\100\Service\NavAdminTool.ps1" -Force -WarningAction SilentlyContinue | Out-Null
+#Import-Module "${env:ProgramFiles(x86)}\Microsoft Dynamics NAV\100\RoleTailored Client\Microsoft.Dynamics.Nav.Model.Tools.psd1" -Force -WarningAction SilentlyContinue | out-null
+#Import-Module "$env:ProgramFiles\Microsoft Dynamics NAV\100\Service\NavAdminTool.ps1" -Force -WarningAction SilentlyContinue | Out-Null
+Import-NAVModule-INC -ShortVersion '100' -ImportRTCModule
 Export-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $UpgradeFromDataBaseName -Path $ModifiedObjectsPath -LogPath $LogPath -ExportTxtSkipUnlicensed
 # Import Module for Target DB
-Import-Module "${env:ProgramFiles(x86)}\Microsoft Dynamics NAV\110\RoleTailored Client\Microsoft.Dynamics.Nav.Model.Tools.psd1" -Force -WarningAction SilentlyContinue | out-null
-Import-Module "$env:ProgramFiles\Microsoft Dynamics NAV\110\Service\NavAdminTool.ps1" -Force -WarningAction SilentlyContinue | Out-Null
+#Import-Module "${env:ProgramFiles(x86)}\Microsoft Dynamics NAV\110\RoleTailored Client\Microsoft.Dynamics.Nav.Model.Tools.psd1" -Force -WarningAction SilentlyContinue | out-null
+#Import-Module "$env:ProgramFiles\Microsoft Dynamics NAV\110\Service\NavAdminTool.ps1" -Force -WarningAction SilentlyContinue | Out-Null
+Import-NAVModule-INC -ShortVersion '110' -ImportRTCModule
 Export-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $DemoDBNO -Path $TargetObjectsPath -LogPath $LogPath -ExportTxtSkipUnlicensed
 # Copy from remote server
 if(!(Test-Path -Path $ClientWorkingFolder )){

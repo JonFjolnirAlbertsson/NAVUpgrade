@@ -52,6 +52,7 @@ $TargetObjectsPath = (join-path $WorkingFolder $TargetObjects)
 #$DemoObjectsNOPath = (join-path $WorkingFolder $DemoObjectsNO)
 # Merging parameters
 $VersionListPrefixes = 'NAVW1','NAVNO','INC','SER','OPC' #Needs full prefix definition Check in NAV DEV with (<>*IFFW*&<>*NAVW*&<>*NAVNO*)
+$ExportObjectFilter = "Version List=<>*OMA*&<>*Test*"
 $CompareObjectFilter = '*.TXT'
 $MergeResultPath = join-path $WorkingFolder 'MergeResult' 
 $ConflictTarget = join-path $MergeResultPath  'ConflictTarget' 
