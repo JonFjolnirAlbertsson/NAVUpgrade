@@ -13,7 +13,7 @@ Enter-PSSession -ComputerName $NAVServerRSName -UseSSL -Credential $UserCredenti
 clear-host
 $StartedDateTime = Get-Date
 Set-Location 'C:\'
-$Location = join-path $pwd.drive.Root 'Git\NAVUpgrade\Customer\Incadea\FastFit\Script'
+$Location = join-path $pwd.drive.Root 'Git\NAVUpgrade\Customer\Overaasen\Script'
 $scriptLocationPath = join-path $Location 'Set-UpgradeSettings.ps1'
 . $scriptLocationPath
 Import-Certificate -Filepath $CertificateFile -CertStoreLocation "Cert:\LocalMachine\Root"

@@ -258,3 +258,5 @@ New-NAVWebServerInstance -WebServerInstance $FastFitInstanceNODev  -Server $NAVS
 $BackupFileName = $DEALER1DBNameNODev + "_AfterMergeAndLanguageImport.bak"
 $BackupFilePath = join-path $BackupPath $BackupFileName 
 Backup-SqlDatabase -ServerInstance $DBServer -Database $DEALER1DBNameNODev -BackupAction Database -BackupFile $BackupFilePath -CompressionOption Default
+# Export NAV Objects fra Dev
+Export-nav
