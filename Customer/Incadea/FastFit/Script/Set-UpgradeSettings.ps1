@@ -103,6 +103,7 @@ $JoinFileName = 'all-merged-objects.txt'
 $JoinFile = join-path $WorkingFolder $JoinFileName
 $CopyResultFile =  join-path $WorkingFolder 'Copy Results.txt' 
 $ToBeJoinedDestinationFile = join-path $WorkingFolder 'ToBeJoined_Objects.TXT'
+$FastfitMergedFobFileName = join-path $WorkingFolder ($NAVVersion +'_' + $NAVCU + '_' +$FastFitInstanceNODev + '.fob')
 # Language parameters
 $LangFileDEU = (join-path $WorkingFolder 'languages-DEU.txt')
 $LangFileNOR = (join-path $WorkingFolder 'languages-NOR.txt')

@@ -141,9 +141,16 @@ $CurrentServerInstanceNODev | Set-NAVServerInstance -Restart
 Sync-NAVTenant -ServerInstance $FastFitInstanceW1 -Tenant $Dealer1TenantW1 -Mode ForceSync
 Sync-NAVTenant -ServerInstance $FastFitInstanceNO -Tenant $Dealer1TenantNO -Mode ForceSync
 Sync-NAVTenant -ServerInstance $FastFitInstanceNODev -Tenant $Dealer1TenantNO -Mode ForceSync
-# Add user to database
+# Add user to W1 database
 New-NAVUser-INC -NavServiceInstance $FastFitInstanceW1 -User $UserName -Tenant $Dealer1TenantW1
+# Add user to NO database
 New-NAVUser-INC -NavServiceInstance $FastFitInstanceNO -User $UserName -Tenant $Dealer1TenantNO
+New-NAVUser-INC -NavServiceInstance $FastFitInstanceNO -User $UserName -Tenant $Dealer2TenantNO
+New-NAVUser-INC -NavServiceInstance $FastFitInstanceNO -User $UserName -Tenant $MASTERTenantNO
+New-NAVUser-INC -NavServiceInstance $FastFitInstanceNO -User $UserName -Tenant $REPORTINGTenantNO
+New-NAVUser-INC -NavServiceInstance $FastFitInstanceNO -User $UserName -Tenant $STAGINGTenantNO
+New-NAVUser-INC -NavServiceInstance $FastFitInstanceNO -User $UserName -Tenant $TEMPLATETenantNO
+# Add user to Dev database
 New-NAVUser-INC -NavServiceInstance $FastFitInstanceNODev -User $UserName -Tenant $Dealer1TenantNO
 New-NAVUser-INC -NavServiceInstance $FastFitInstanceUpgradeFromVersionW1 -User $UserName -Tenant $Dealer1TenantW1
 
