@@ -29,24 +29,27 @@ $WorkingFolder = join-path $RootFolder "\$NAVVersion\$NAVCU\Upgrade_$CompanyName
 $ClientWorkingFolder = "\\$NAVServerClientName\c$\$RootFolderName\$CompanyFolder\$NAVVersion\$NAVCU\Upgrade_$CompanyName"
 $UpgradeName = $NAVShortVersion  + $NAVCU + '_' + $CompanyName
 $UpgradeDataBaseName = $UpgradeName
-$UpgradeFromDataBaseName = "NAV100CU3_$CompanyName"
+$UpgradeFromOriginalName = 'NAV100CU3NO'
+$UpgradeFromDataBaseName = $UpgradeFromOriginalName +'_' + $CompanyName
 $UpgradeObjectsName = $NAVVersion  + $NAVCU + $CompanyName + 'Objects'																 
 $LogPath = join-path $WorkingFolder 'Log'
 # Database backup NO
+$DemoOriginalDBNO = 'Demo Database NAV (10-0) NO CU03'
 $DemoDBNO = 'Demo Database NAV (11-0) NO CU01'
 # Database backup common
 $BackupPath = $DBServerRootPath
 $BackupfileDemoDBNO = join-path $DBServerDemoPath ("$DemoDBNO.bak")
+$BackupfileDemoOriginalDBNO = join-path $DBServerDemoPath ("$DemoOriginalDBNO.bak")
 # NAV Server Instances
 
 # Merge files parameters
-$OriginalObjects = $UpgradeFromDataBaseName + '_AllObjects'$ModifiedObjects = $UpgradeFromDataBaseName + '_AllObjects'
+$OriginalObjects = $UpgradeFromOriginalName  + '_AllObjects'$ModifiedObjects = $UpgradeFromDataBaseName + '_AllObjects'
 $TargetObjects = $NAVVersion +'_' + $NAVCU + '_NO.txt'
-$DemoObjectsNO = $NAVVersion +'_' + $NAVCU + '_NO.txt'
+#$DemoObjectsNO = $NAVVersion +'_' + $NAVCU + '_NO.txt'
 $OriginalObjectsPath = (join-path $WorkingFolder $OriginalObjects)
 $ModifiedObjectsPath = (join-path $WorkingFolder $ModifiedObjects)
 $TargetObjectsPath = (join-path $WorkingFolder $TargetObjects)
-$DemoObjectsNOPath = (join-path $WorkingFolder $DemoObjectsNO)
+#$DemoObjectsNOPath = (join-path $WorkingFolder $DemoObjectsNO)
 # Merging parameters
 $VersionListPrefixes = 'NAVW1', 'NAVNO' #Needs full prefix definition Check in NAV DEV with (<>*IFFW*&<>*NAVW*&<>*NAVNO*)
 $CompareObjectFilter = '*.TXT'

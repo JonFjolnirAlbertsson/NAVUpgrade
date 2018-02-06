@@ -30,6 +30,7 @@ Import-module (Join-Path "$GitPath\Cloud.Ready.Software.PowerShell\PSModules" 'L
 Import-module (Join-Path "$GitPath\IncadeaNorway" 'LoadModules.ps1') -Force -WarningAction SilentlyContinue | Out-Null
 # Create Customer Upgrade NAV NO database
 Restore-SQLBackupFile-INC -BackupFile $BackupfileDemoDBNO  -DatabaseServer $DBServer -DatabaseName $UpgradeDataBaseName
+Restore-SQLBackupFile-INC -BackupFile $BackupfileDemoOriginalDBNO  -DatabaseServer $DBServer -DatabaseName $DemoOriginalDBNO
 # Backup the development database that will be upgraded
 if(!(Test-Path -Path $BackupPath )){
     New-Item -ItemType directory -Path $BackupPath
@@ -71,14 +72,13 @@ New-NAVUser-INC -NavServiceInstance $UpgradeName -User $UserName
 New-NAVUser-INC -NavServiceInstance $UpgradeName -User $DBNAVServiceUserName 
 # Export all objects to text files. Remember that the objects will be created on the $NAVServer.
 # To be able to export the object file, a correct zup file for finsql.exe has to be copied. It points to DB, Server Instance and tenant.
-Copy-Item -Path (join-path (join-path $NAVEnvZupFilePath $UpgradeFromW1DBName) 'fin.zup') -Destination $NAVZupFilePath -Force
-Export-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $UpgradeFromW1DBName -Path $OriginalObjectsPath -LogPath $LogPath -ExportTxtSkipUnlicensed
-Copy-Item -Path (join-path (join-path $NAVEnvZupFilePath $UpgradeFromDevDBName) 'fin.zup') -Destination $NAVZupFilePath -Force
-Export-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $UpgradeFromDevDBName -Path $FastFitObjectsPath -LogPath $LogPath -ExportTxtSkipUnlicensed
-Copy-Item -Path (join-path (join-path $NAVEnvZupFilePath $DEALER1DBNameNODev) 'fin.zup') -Destination $NAVZupFilePath -Force
-Export-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $DEALER1DBNameNODev -Path $TargetObjectsPath -LogPath $LogPath -ExportTxtSkipUnlicensed
-Copy-Item -Path (join-path (join-path $NAVEnvZupFilePath $DemoDBNO) 'fin.zup') -Destination $NAVZupFilePath -Force
-Export-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $DemoDBNO -Path $DemoObjectsNOPath -LogPath $LogPath -ExportTxtSkipUnlicensed
+#Copy-Item -Path (join-path (join-path $NAVEnvZupFilePath $UpgradeFromW1DBName) 'fin.zup') -Destination $NAVZupFilePath -Force
+Export-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $DemoOriginalDBNO -Path $OriginalObjectsPath -LogPath $LogPath -ExportTxtSkipUnlicensed
+#Copy-Item -Path (join-path (join-path $NAVEnvZupFilePath $UpgradeFromDataBaseName) 'fin.zup') -Destination $NAVZupFilePath -Force
+Export-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $UpgradeFromDataBaseName -Path $ModifiedObjectsPath -LogPath $LogPath -ExportTxtSkipUnlicensed
+#Copy-Item -Path (join-path (join-path $NAVEnvZupFilePath $DEALER1DBNameNODev) 'fin.zup') -Destination $NAVZupFilePath -Force
+Export-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $DemoDBNO -Path $TargetObjectsPath -LogPath $LogPath -ExportTxtSkipUnlicensed
+
 # Copy from remote server
 Copy-Item -Path $OriginalObjectsPath -Destination (Join-Path $ClientWorkingFolder $OriginalObjects) -Force
 Copy-Item -Path $FastFitObjectsPath -Destination (Join-Path $ClientWorkingFolder $FastFitObjects) -Force
