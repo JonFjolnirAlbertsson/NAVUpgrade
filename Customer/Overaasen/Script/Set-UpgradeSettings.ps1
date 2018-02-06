@@ -6,14 +6,13 @@ $CompanyName = 'Overaasen'
 $DBServerRootPath = "\\NO01DEVSQL01\$CompanyName"
 $DBServerDemoPath = 'C:\MSSQL\Backup\Demo\'
 $GitPath = join-path $RootDrive 'Git'
-$GitPathIncadea = join-path  $GitPath "\NAVUpgrade\Customer"
 # Servers
 $DBServer = 'NO01DEVSQL01.si-dev.local'
 $NAVServer = 'NO01DEV03.si-dev.local'
 $NAVServerRSName = 'NO01DEV03'
 $NAVServerClientName = 'No01devts02'
 $NAVLicense = join-path $RootFolderPath "License\NAV2018.flf"
-$CertificateFile = join-path ("$GitPathIncadea\$CompanyName") 'cert'
+$CertificateFile = join-path ("$GitPath\Certificate") 'cert'
 # $UserName = 'incadea\albertssonf'
 $UserName = 'si-dev\devjal'
 $DBNAVServiceUserName = 'si-dev\nav_user'
