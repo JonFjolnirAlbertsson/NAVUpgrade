@@ -42,6 +42,12 @@ Restore-SQLBackupFile-INC -BackupFile $BackupfileDemoDBW1  -DatabaseServer $DBSe
 # Restore NO databases
 Restore-SQLBackupFile-INC -BackupFile $BackupfileAppDB -DatabaseServer $DBServer -DatabaseName $AppDBNameNO
 Restore-SQLBackupFile-INC -BackupFile $BackupfileDEALER1DB -DatabaseServer $DBServer -DatabaseName $DEALER1DBNameNO 
+Restore-SQLBackupFile-INC -BackupFile $BackupfileDEALER2DB -DatabaseServer $DBServer -DatabaseName $DEALER2DBNameNO
+Restore-SQLBackupFile-INC -BackupFile $BackupfileMASTERDB -DatabaseServer $DBServer -DatabaseName $MASTERDBNameNO
+Restore-SQLBackupFile-INC -BackupFile $BackupfileREPORTINGDB -DatabaseServer $DBServer -DatabaseName $REPORTINGDBNameNO
+Restore-SQLBackupFile-INC -BackupFile $BackupfileSTAGINGDB -DatabaseServer $DBServer -DatabaseName $STAGINGDBNameNO
+Restore-SQLBackupFile-INC -BackupFile $BackupfileTEMPLATEDB -DatabaseServer $DBServer -DatabaseName $TEMPLATEDBNameNO
+# Restore DEV and Demo databases
 Restore-SQLBackupFile-INC -BackupFile $BackupfileDemoDBNO  -DatabaseServer $DBServer -DatabaseName $DemoDBNO
 Restore-SQLBackupFile-INC -BackupFile $BackupfileAppDB -DatabaseServer $DBServer -DatabaseName $AppDBNameNODev
 Restore-SQLBackupFile-INC -BackupFile $BackupfileDEALER1DB -DatabaseServer $DBServer -DatabaseName $DEALER1DBNameNODev 
@@ -58,8 +64,15 @@ New-SQLUser-INC -DatabaseServer $DBServer -DatabaseName $REPORTINGDBNameW1 -Data
 New-SQLUser-INC -DatabaseServer $DBServer -DatabaseName $STAGINGDBNameW1 -DatabaseUser $DBNAVServiceUserName 
 New-SQLUser-INC -DatabaseServer $DBServer -DatabaseName $TEMPLATEDBNameW1 -DatabaseUser $DBNAVServiceUserName 
 New-SQLUser-INC -DatabaseServer $DBServer -DatabaseName $DemoDBW1 -DatabaseUser $DBNAVServiceUserName 
+# NO
 New-SQLUser-INC -DatabaseServer $DBServer -DatabaseName $AppDBNameNO -DatabaseUser $DBNAVServiceUserName 
 New-SQLUser-INC -DatabaseServer $DBServer -DatabaseName $DEALER1DBNameNO -DatabaseUser $DBNAVServiceUserName 
+New-SQLUser-INC -DatabaseServer $DBServer -DatabaseName $DEALER2DBNameNO -DatabaseUser $DBNAVServiceUserName 
+New-SQLUser-INC -DatabaseServer $DBServer -DatabaseName $MASTERDBNameNO -DatabaseUser $DBNAVServiceUserName 
+New-SQLUser-INC -DatabaseServer $DBServer -DatabaseName $REPORTINGDBNameNO -DatabaseUser $DBNAVServiceUserName 
+New-SQLUser-INC -DatabaseServer $DBServer -DatabaseName $STAGINGDBNameNO -DatabaseUser $DBNAVServiceUserName 
+New-SQLUser-INC -DatabaseServer $DBServer -DatabaseName $TEMPLATEDBNameNO -DatabaseUser $DBNAVServiceUserName 
+# Dev
 New-SQLUser-INC -DatabaseServer $DBServer -DatabaseName $DemoDBNO -DatabaseUser $DBNAVServiceUserName 
 New-SQLUser-INC -DatabaseServer $DBServer -DatabaseName $AppDBNameNODev -DatabaseUser $DBNAVServiceUserName 
 New-SQLUser-INC -DatabaseServer $DBServer -DatabaseName $DEALER1DBNameNODev -DatabaseUser $DBNAVServiceUserName 
@@ -101,9 +114,21 @@ Write-host "Mount app"
 $CurrentServerInstanceNO | Mount-NAVApplication -DatabaseServer $DBServer -DatabaseName $AppDBNameNO 
 $CurrentServerInstanceW1 | Mount-NAVApplication -DatabaseServer $DBServer -DatabaseName $AppDBNameW1
 $CurrentServerInstanceNODev | Mount-NAVApplication -DatabaseServer $DBServer -DatabaseName $AppDBNameNODev   
-Write-host "Mount Tenants"
+Write-host "Mount Tenants W1"
 Mount-NAVTenant -ServerInstance $FastFitInstanceW1 -DatabaseName $DEALER1DBNameW1 -Id $Dealer1TenantW1 -AllowAppDatabaseWrite -OverwriteTenantIdInDatabase
+Mount-NAVTenant -ServerInstance $FastFitInstanceW1 -DatabaseName $DEALER2DBNameW1 -Id $Dealer2TenantW1 -AllowAppDatabaseWrite -OverwriteTenantIdInDatabase
+Mount-NAVTenant -ServerInstance $FastFitInstanceW1 -DatabaseName $MASTERDBNameW1 -Id $MASTERTenantW1 -AllowAppDatabaseWrite -OverwriteTenantIdInDatabase
+Mount-NAVTenant -ServerInstance $FastFitInstanceW1 -DatabaseName $REPORTINGDBNameW1 -Id $REPORTINGTenantW1 -AllowAppDatabaseWrite -OverwriteTenantIdInDatabase
+Mount-NAVTenant -ServerInstance $FastFitInstanceW1 -DatabaseName $STAGINGDBNameW1 -Id $STAGINGTenantW1 -AllowAppDatabaseWrite -OverwriteTenantIdInDatabase
+Mount-NAVTenant -ServerInstance $FastFitInstanceW1 -DatabaseName $TEMPLATEDBNameW1 -Id $TEMPLATETenantW1 -AllowAppDatabaseWrite -OverwriteTenantIdInDatabase
+Write-host "Mount Tenants NO"
 Mount-NAVTenant -ServerInstance $FastFitInstanceNO -DatabaseName $DEALER1DBNameNO -Id $Dealer1TenantNO -AllowAppDatabaseWrite -OverwriteTenantIdInDatabase
+Mount-NAVTenant -ServerInstance $FastFitInstanceNO -DatabaseName $DEALER2DBNameNO -Id $Dealer2TenantNO -AllowAppDatabaseWrite -OverwriteTenantIdInDatabase
+Mount-NAVTenant -ServerInstance $FastFitInstanceNO -DatabaseName $MASTERDBNameNO -Id $MASTERTenantNO -AllowAppDatabaseWrite -OverwriteTenantIdInDatabase
+Mount-NAVTenant -ServerInstance $FastFitInstanceNO -DatabaseName $REPORTINGDBNameNO -Id $REPORTINGTenantNO -AllowAppDatabaseWrite -OverwriteTenantIdInDatabase
+Mount-NAVTenant -ServerInstance $FastFitInstanceNO -DatabaseName $STAGINGDBNameNO -Id $STAGINGTenantNO -AllowAppDatabaseWrite -OverwriteTenantIdInDatabase
+Mount-NAVTenant -ServerInstance $FastFitInstanceNO -DatabaseName $TEMPLATEDBNameNO -Id $TEMPLATETenantNO -AllowAppDatabaseWrite -OverwriteTenantIdInDatabase
+Write-host "Mount Tenants Dev"
 Mount-NAVTenant -ServerInstance $FastFitInstanceNODev -DatabaseName $DEALER1DBNameNODev -Id $Dealer1TenantNO -AllowAppDatabaseWrite -OverwriteTenantIdInDatabase
 # Import License
 $CurrentServerInstanceW1 | Import-NAVServerLicense -LicenseFile $NAVLicense
@@ -198,29 +223,31 @@ Join-NAVApplicationObjectFile -Source $ToBeJoinedPath  -Destination $ToBeJoinedD
 # Compare the $ToBeJoinedDestinationFile file to the $TargetObjects in the "NAV Object Compare" application from Rune Sigurdsen
 $NAVObjectCompareWinClient = join-path 'C:\Users\DevJAL\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\NAVObjectCompareWinClient' 'NAVObjectCompareWinClient.appref-ms'
 & $NAVObjectCompareWinClient  
-#
-
-Export-NAVApplicationObjectLanguage -Source $TargetObjectsPath -LanguageId "DEU" -Destination $LangFileDEU
-# Export "NOR" and "ENU"  Language from Modified file
-Export-NAVApplicationObjectLanguage -Source $FastFitObjectsPath -LanguageId "NOR" -Destination $LangFileNOR
-Export-NAVApplicationObjectLanguage -Source $FastFitObjectsPath -LanguageId "ENU" -Destination $LangFileENU
-# Importing DEU to modifed file
-Import-NAVApplicationObjectLanguage -Source $LangFileDEU -LanguageId "DEU" -LanguagePath $LangFileDEU -Destination $JoinFile
-Import-NAVApplicationObjectLanguage -Source $LangFileNOR -LanguageId "NOR" -LanguagePath $LangFileNOR -Destination $JoinFile
-Import-NAVApplicationObjectLanguage -Source $LangFileENU -LanguageId "ENU" -LanguagePath $LangFileENU -Destination $JoinFile
 
 # Copy file with merged objects to NAV Server
 Copy-Item -Path (join-path $ClientWorkingFolder $JoinFileName ) -Destination $JoinFile -Force
 # Import the objects to the development database
 Import-NAVApplicationObject2 -Path $JoinFile -ServerInstance $FastFitInstanceNODev -ImportAction Overwrite -LogPath $LogPath -NavServerName $NAVServer -SynchronizeSchemaChanges Force
-
+# Compile objects and fix all errors
+Compile-NAVApplicationObject2 -ServerInstance $FastFitInstanceNODev -LogPath $LogPath -SynchronizeSchemaChanges Yes
+# Export new object file with merged objects
+Copy-Item -Path (join-path (join-path $NAVEnvZupFilePath $DEALER1DBNameNODev) 'fin.zup') -Destination $NAVZupFilePath -Force
+Export-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $DEALER1DBNameNODev -Path $JoinFile -LogPath $LogPath -ExportTxtSkipUnlicensed
+# Importing DEU,NOR and ENU to merged objects file
+Import-NAVApplicationObjectLanguage -Source $JoinFile -LanguageId "DEU" -LanguagePath $LangFileDEU -Destination $FastFitDevObjectsWithENUNORDEUPath
+Import-NAVApplicationObjectLanguage -Source $FastFitDevObjectsWithENUNORDEUPath -LanguageId "NOR" -LanguagePath $LangFileNOR -Destination $FastFitDevObjectsWithENUNORDEUPath
+Import-NAVApplicationObjectLanguage -Source $FastFitDevObjectsWithENUNORDEUPath -LanguageId "ENU" -LanguagePath $LangFileENU -Destination $FastFitDevObjectsWithENUNORDEUPath
+# Import the objects with ENU and NOR language to the development database
+Import-NAVApplicationObject2 -Path $FastFitDevObjectsWithENUNORDEUPath -ServerInstance $FastFitInstanceNODev -ImportAction Overwrite -LogPath $LogPath -NavServerName $NAVServer -SynchronizeSchemaChanges Yes
+# Copy file with merged objects and languages from NAV Server
+Copy-Item -Path $FastFitDevObjectsWithENUNORDEUPath -Destination (join-path $ClientWorkingFolder $FastFitDevObjectsENUNORDEU) -Force
+Copy-Item -Path (join-path $ClientWorkingFolder $FastFitDevObjectsENUNORDEU) -Destination $FastFitDevObjectsWithENUNORDEUPath -Force
+# Compile objects and fix all errors
+Compile-NAVApplicationObject2 -ServerInstance $FastFitInstanceNODev -LogPath $LogPath -SynchronizeSchemaChanges Yes
 #Create Web client instance
 New-NAVWebServerInstance -WebServerInstance $FastFitInstanceNO  -Server $NAVServer -ServerInstance $FastFitInstanceNO 
 New-NAVWebServerInstance -WebServerInstance $FastFitInstanceNODev  -Server $NAVServer -ServerInstance $FastFitInstanceNODev 
 # Backup
-$BackupFileName = $AppDBNameNO + "_Without_DEU.bak"
+$BackupFileName = $DEALER1DBNameNODev + "_AfterMergeAndLanguageImport.bak"
 $BackupFilePath = join-path $BackupPath $BackupFileName 
-Backup-SqlDatabase -ServerInstance $DBServer -Database $AppDBNameNO -BackupAction Database -BackupFile $BackupFilePath -CompressionOption Default
-$BackupFileName = $DEALER1DBNameNO + "_Without_DEU.bak"
-$BackupFilePath = join-path $BackupPath $BackupFileName 
-Backup-SqlDatabase -ServerInstance $DBServer -Database $DEALER1DBNameNO -BackupAction Database -BackupFile $BackupFilePath -CompressionOption Default
+Backup-SqlDatabase -ServerInstance $DBServer -Database $DEALER1DBNameNODev -BackupAction Database -BackupFile $BackupFilePath -CompressionOption Default
