@@ -88,6 +88,9 @@ New-NAVUser-INC -NavServiceInstance $UpgradeFromOriginalName -User $DBNAVService
 Import-Module "$env:ProgramFiles\Microsoft Dynamics NAV\100\Service CU03\NavAdminTool.ps1" -Force -WarningAction SilentlyContinue | Out-Null
 Import-Module "${env:ProgramFiles(x86)}\Microsoft Dynamics NAV\100\RTC CU03\Microsoft.Dynamics.Nav.Model.Tools.psd1" -Force -WarningAction SilentlyContinue | out-null
 Export-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $DemoOriginalDBNO -Path $OriginalObjectsPath -LogPath $LogPath -ExportTxtSkipUnlicensed
+# Import Module for Modified DB
+Import-Module "${env:ProgramFiles(x86)}\Microsoft Dynamics NAV\100\RoleTailored Client\Microsoft.Dynamics.Nav.Model.Tools.psd1" -Force -WarningAction SilentlyContinue | out-null
+Import-Module "$env:ProgramFiles\Microsoft Dynamics NAV\100\Service\NavAdminTool.ps1" -Force -WarningAction SilentlyContinue | Out-Null
 Export-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $UpgradeFromDataBaseName -Path $ModifiedObjectsPath -LogPath $LogPath -ExportTxtSkipUnlicensed
 # Import Module for Target DB
 Import-Module "${env:ProgramFiles(x86)}\Microsoft Dynamics NAV\110\RoleTailored Client\Microsoft.Dynamics.Nav.Model.Tools.psd1" -Force -WarningAction SilentlyContinue | out-null
@@ -96,34 +99,22 @@ Export-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $DemoDBNO -P
 
 # Copy from remote server
 Copy-Item -Path $OriginalObjectsPath -Destination (Join-Path $ClientWorkingFolder $OriginalObjects) -Force
-Copy-Item -Path $FastFitObjectsPath -Destination (Join-Path $ClientWorkingFolder $FastFitObjects) -Force
+Copy-Item -Path $ModifiedObjectsPath -Destination (Join-Path $ClientWorkingFolder $ModifiedObjects) -Force
 Copy-Item -Path $TargetObjectsPath -Destination (Join-Path $ClientWorkingFolder $TargetObjects) -Force
-Copy-Item -Path $DemoObjectsNOPath -Destination (Join-Path $ClientWorkingFolder $DemoObjectsNO) -Force
-# Merge Customer database objects and NAV 2016 objects.
+# Merge Customer database objects and NAV 2018 objects.
 # I got out of memory error on the $NAVServer, so I copied the files and run the merge code from NO01DEVTS02.si-dev.local server.
 Remove-Item -Path "$MergeResultPath\*.*"
 Remove-Item -Path "$MergedPath\*.*"
 Remove-Item -Path "$ToBeJoinedPath\*.*"
-# Export DEU Language from Target file
-Export-NAVApplicationObjectLanguage -Source $TargetObjectsPath -LanguageId "DEU" -Destination $LangFileDEU
-# Export "NOR" and "ENU"  Language from Modified file
-Export-NAVApplicationObjectLanguage -Source $FastFitObjectsPath -LanguageId "NOR" -Destination $LangFileNOR
-Export-NAVApplicationObjectLanguage -Source $FastFitObjectsPath -LanguageId "ENU" -Destination $LangFileENU
-# Importing DEU to modifed file
-Import-NAVApplicationObjectLanguage -Source $FastFitObjectsPath -LanguageId "DEU" -LanguagePath $LangFileDEU -Destination $FastFitObjectsWithENUNORDEUPath
-Import-NAVApplicationObjectLanguage -Source $DemoObjectsNOPath -LanguageId "DEU" -LanguagePath $LangFileDEU -Destination $DemoObjectsWithENUNORDEUPath
-# Removing "NOR" and "ENU"  Language from Modified file
-Remove-NAVApplicationObjectLanguage -Source $FastFitObjectsWithENUNORDEUPath -LanguageId "NOR","ENU" -Destination $FastFitObjectsWithDEUPath
-Remove-NAVApplicationObjectLanguage -Source $DemoObjectsWithENUNORDEUPath -LanguageId "NOR","ENU" -Destination $DemoObjectsDEUOnlyPath
 
 $MergeResult = Merge-NAVUpgradeObjects `
-    -OriginalObjects $OriginalObjectsPath `    -ModifiedObjects $FastFitObjectsWithDEUPath `
+    -OriginalObjects $OriginalObjectsPath `    -ModifiedObjects $ModifiedObjectsPath `
     -TargetObjects $TargetObjectsPath `
     -WorkingFolder $WorkingFolder `
     -VersionListPrefixes $VersionListPrefixes `
     -Force
 # Splitting Original, Modified and Target files to individua files.
-Merge-NAVCode -WorkingFolderPath $WorkingFolder -OriginalFileName $OriginalObjectsPath -ModifiedFileName $FastFitObjectsPath -TargetFileName $TargetObjectsPath -CompareObject $CompareObject -Split
+Merge-NAVCode -WorkingFolderPath $WorkingFolder -OriginalFileName $OriginalObjectsPath -ModifiedFileName $ModifiedObjectsPath -TargetFileName $TargetObjectsPath -CompareObject $CompareObject -Split
 # Copy object files with conflict to the Merged folder
 # Copy merged result items to the Merged/ToBeJoined folder. Subfolders are not included in the search.
 Compare-Folders -WorkingFolderPath $WorkingFolder -CompareFolder1Path $MergeResultPath -CompareFolder2Path $TargetPath -CompareObjectFilter $CompareObjectFilter `

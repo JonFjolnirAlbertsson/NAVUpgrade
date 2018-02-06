@@ -44,7 +44,7 @@ $BackupfileDemoOriginalDBNO = join-path $DBServerDemoPath ("$DemoOriginalDBNO.ba
 
 # Merge files parameters
 $OriginalObjects = $UpgradeFromOriginalName  + '_AllObjects.txt'$ModifiedObjects = $UpgradeFromDataBaseName + '_AllObjects.txt'
-$TargetObjects = $NAVVersion +'_' + $NAVCU + '_NO.txt'
+$TargetObjects = $NAVShortVersion +'_' + $NAVCU + '_NO.txt'
 #$DemoObjectsNO = $NAVVersion +'_' + $NAVCU + '_NO.txt'
 $OriginalObjectsPath = (join-path $WorkingFolder $OriginalObjects)
 $ModifiedObjectsPath = (join-path $WorkingFolder $ModifiedObjects)
