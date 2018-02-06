@@ -35,7 +35,7 @@ $LogPath = join-path $WorkingFolder 'Log'
 $DemoDBNO = 'Demo Database NAV (11-0) NO CU01'
 # Database backup common
 $BackupPath = $DBServerRootPath
-$BackupfileDemoDBNO = join-path $BackupPath ("$DemoDBNO.bak")
+$BackupfileDemoDBNO = join-path $DBServerDemoPath ("$DemoDBNO.bak")
 # NAV Server Instances
 
 # Merge files parameters
