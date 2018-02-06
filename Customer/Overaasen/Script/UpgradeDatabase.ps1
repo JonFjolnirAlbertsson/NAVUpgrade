@@ -38,8 +38,9 @@ if(!(Test-Path -Path $BackupPath )){
 $BackupFileName = $UpgradeFromDataBaseName + "_BeforeUpgradeTo$UpgradeDataBaseName.bak"
 $BackupFilePath = join-path $BackupPath $BackupFileName 
 Backup-SqlDatabase -ServerInstance $DBServer -Database $UpgradeFromDataBaseName -BackupAction Database -BackupFile $BackupFilePath -CompressionOption Default
-# Remember to manually add the NAV Instance user as DBOwner for all databases
+# Add the NAV Instance user as DBOwner for all databases
 New-SQLUser-INC -DatabaseServer $DBServer -DatabaseName $UpgradeDataBaseName -DatabaseUser $DBNAVServiceUserName 
+New-SQLUser-INC -DatabaseServer $DBServer -DatabaseName $DemoOriginalDBNO -DatabaseUser $DBNAVServiceUserName 
  
 # Creating Credential for the NAV Server Instance user
 $InstanceSecurePassword = ConvertTo-SecureString $InstancePassword -AsPlainText -Force
@@ -47,8 +48,10 @@ $InstanceCredential = New-Object -TypeName System.Management.Automation.PSCreden
 # Creating NAV Server Instances
 Write-host "Create Service Instance"
 New-NAVEnvironment  -EnablePortSharing -ServerInstance $UpgradeName  -DatabaseServer $DBServer
+New-NAVEnvironment  -EnablePortSharing -ServerInstance $UpgradeFromOriginalName  -DatabaseServer $DBServer
 # Set instance to Multitenant
 $CurrentServerInstance = Get-NAVServerInstance -ServerInstance $UpgradeName
+$ServerInstanceOriginal = Get-NAVServerInstance -ServerInstance $UpgradeFromOriginalName
 
 Write-host "Set instance parameters"
 # Set instance parameters
@@ -59,20 +62,32 @@ $CurrentServerInstance | Set-NAVServerConfiguration -KeyName DatabaseName -KeyVa
 $CurrentServerInstance | Set-NAVServerInstance -ServiceAccountCredential $InstanceCredential -ServiceAccount User
 $CurrentServerInstance | Set-NAVServerInstance -start
 
+$ServerInstanceOriginal | Set-NAVServerInstance -stop
+$ServerInstanceOriginal | Set-NAVServerConfiguration -KeyName MultiTenant -KeyValue "false"
+$ServerInstanceOriginal | Set-NAVServerConfiguration -KeyName DatabaseServer -KeyValue $DBServer
+$ServerInstanceOriginal | Set-NAVServerConfiguration -KeyName DatabaseName -KeyValue $UpgradeName
+$ServerInstanceOriginal | Set-NAVServerInstance -ServiceAccountCredential $InstanceCredential -ServiceAccount User
+$ServerInstanceOriginal | Set-NAVServerInstance -start
+
 # Import License
 $CurrentServerInstance | Import-NAVServerLicense -LicenseFile $NAVLicense
 $CurrentServerInstance | Set-NAVServerInstance -Restart
+$ServerInstanceOriginal | Import-NAVServerLicense -LicenseFile $NAVLicense
+$ServerInstanceOriginal | Set-NAVServerInstance -Restart
 
 # Sync database
 $CurrentServerInstance | Sync-NAVTenant -Mode Sync
+$ServerInstanceOriginal | Sync-NAVTenant -Mode Sync
 #Sync-NAVTenant -ServerInstance $UpgradeName -Tenant $Dealer1TenantNO -Mode ForceSync
 
 # Add user to database
 New-NAVUser-INC -NavServiceInstance $UpgradeName -User $UserName 
-New-NAVUser-INC -NavServiceInstance $UpgradeName -User $DBNAVServiceUserName 
+New-NAVUser-INC -NavServiceInstance $UpgradeFromOriginalName -User $DBNAVServiceUserName 
 # Export all objects to text files. Remember that the objects will be created on the $NAVServer.
 # To be able to export the object file, a correct zup file for finsql.exe has to be copied. It points to DB, Server Instance and tenant.
 #Copy-Item -Path (join-path (join-path $NAVEnvZupFilePath $UpgradeFromW1DBName) 'fin.zup') -Destination $NAVZupFilePath -Force
+Import-Module "$env:ProgramFiles\Microsoft Dynamics NAV\100\Service CU03\NavAdminTool.ps1" -Force -WarningAction SilentlyContinue | Out-Null
+Import-Module "${env:ProgramFiles(x86)}\Microsoft Dynamics NAV\100\RTC CU03\Microsoft.Dynamics.Nav.Model.Tools.psd1" -Force -WarningAction SilentlyContinue | out-null
 Export-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $DemoOriginalDBNO -Path $OriginalObjectsPath -LogPath $LogPath -ExportTxtSkipUnlicensed
 #Copy-Item -Path (join-path (join-path $NAVEnvZupFilePath $UpgradeFromDataBaseName) 'fin.zup') -Destination $NAVZupFilePath -Force
 Export-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $UpgradeFromDataBaseName -Path $ModifiedObjectsPath -LogPath $LogPath -ExportTxtSkipUnlicensed
