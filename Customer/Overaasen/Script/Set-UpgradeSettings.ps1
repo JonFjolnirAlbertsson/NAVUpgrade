@@ -3,7 +3,7 @@ $RootDrive = 'C:\'
 $RootFolderName = 'incadea'
 $RootFolderPath = join-path $RootDrive $RootFolderName
 $CompanyName = 'Overaasen'
-$DBServerRootPath = "\\NO01DEVSQL01\$CompanyName"
+$DBServerRootPath = "\\NO01DEVSQL01\Backup\$CompanyName"
 $DBServerDemoPath = 'C:\MSSQL\Backup\Demo\'
 $GitPath = join-path $RootDrive 'Git'
 # Servers
