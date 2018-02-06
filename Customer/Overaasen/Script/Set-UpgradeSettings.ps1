@@ -20,13 +20,14 @@ $InstanceUserName = 'nav_user@si-dev.local'
 $InstancePassword = '1378Nesbru'
 $DBUser = 'NAV_Service'
 $NAVVersion = 'NAV2018'
+$NAVShortVersion = 'NAV110'
 $NAVCU = 'CU01'
 # Company data
 $CompanyFolder = "Customer\$CompanyName"
 $RootFolder = join-path $RootFolderPath $CompanyFolder
 $WorkingFolder = join-path $RootFolder "\$NAVVersion\$NAVCU\Upgrade_$CompanyName"
 $ClientWorkingFolder = "\\$NAVServerClientName\c$\$RootFolderName\$CompanyFolder\$NAVVersion\$NAVCU\Upgrade_$CompanyName"
-$UpgradeName = $NAVVersion  + $NAVCU + '_' + $CompanyName
+$UpgradeName = $NAVShortVersion  + $NAVCU + '_' + $CompanyName
 $UpgradeDataBaseName = $UpgradeName
 $UpgradeFromDataBaseName = "NAV100CU3_$CompanyName"
 $UpgradeObjectsName = $NAVVersion  + $NAVCU + $CompanyName + 'Objects'																 

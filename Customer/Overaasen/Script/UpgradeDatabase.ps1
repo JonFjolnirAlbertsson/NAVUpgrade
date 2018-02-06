@@ -31,6 +31,9 @@ Import-module (Join-Path "$GitPath\IncadeaNorway" 'LoadModules.ps1') -Force -War
 # Create Customer Upgrade NAV NO database
 Restore-SQLBackupFile-INC -BackupFile $BackupfileDemoDBNO  -DatabaseServer $DBServer -DatabaseName $UpgradeDataBaseName
 # Backup the development database that will be upgraded
+if(!(Test-Path -Path $BackupPath )){
+    New-Item -ItemType directory -Path $BackupPath
+}
 $BackupFileName = $UpgradeFromDataBaseName + "_BeforeUpgradeTo$UpgradeDataBaseName.bak"
 $BackupFilePath = join-path $BackupPath $BackupFileName 
 Backup-SqlDatabase -ServerInstance $DBServer -Database $UpgradeFromDataBaseName -BackupAction Database -BackupFile $BackupFilePath -CompressionOption Default
