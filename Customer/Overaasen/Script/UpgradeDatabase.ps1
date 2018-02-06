@@ -84,14 +84,14 @@ $ServerInstanceOriginal | Sync-NAVTenant -Mode Sync
 New-NAVUser-INC -NavServiceInstance $UpgradeName -User $UserName 
 New-NAVUser-INC -NavServiceInstance $UpgradeFromOriginalName -User $DBNAVServiceUserName 
 # Export all objects to text files. Remember that the objects will be created on the $NAVServer.
-# To be able to export the object file, a correct zup file for finsql.exe has to be copied. It points to DB, Server Instance and tenant.
-#Copy-Item -Path (join-path (join-path $NAVEnvZupFilePath $UpgradeFromW1DBName) 'fin.zup') -Destination $NAVZupFilePath -Force
+# Import Module for original DB
 Import-Module "$env:ProgramFiles\Microsoft Dynamics NAV\100\Service CU03\NavAdminTool.ps1" -Force -WarningAction SilentlyContinue | Out-Null
 Import-Module "${env:ProgramFiles(x86)}\Microsoft Dynamics NAV\100\RTC CU03\Microsoft.Dynamics.Nav.Model.Tools.psd1" -Force -WarningAction SilentlyContinue | out-null
 Export-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $DemoOriginalDBNO -Path $OriginalObjectsPath -LogPath $LogPath -ExportTxtSkipUnlicensed
-#Copy-Item -Path (join-path (join-path $NAVEnvZupFilePath $UpgradeFromDataBaseName) 'fin.zup') -Destination $NAVZupFilePath -Force
 Export-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $UpgradeFromDataBaseName -Path $ModifiedObjectsPath -LogPath $LogPath -ExportTxtSkipUnlicensed
-#Copy-Item -Path (join-path (join-path $NAVEnvZupFilePath $DEALER1DBNameNODev) 'fin.zup') -Destination $NAVZupFilePath -Force
+# Import Module for Target DB
+Import-Module "${env:ProgramFiles(x86)}\Microsoft Dynamics NAV\110\RoleTailored Client\Microsoft.Dynamics.Nav.Model.Tools.psd1" -Force -WarningAction SilentlyContinue | out-null
+Import-Module "$env:ProgramFiles\Microsoft Dynamics NAV\110\Service\NavAdminTool.ps1" -Force -WarningAction SilentlyContinue | Out-Null
 Export-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $DemoDBNO -Path $TargetObjectsPath -LogPath $LogPath -ExportTxtSkipUnlicensed
 
 # Copy from remote server
