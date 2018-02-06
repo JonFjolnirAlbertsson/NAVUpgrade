@@ -29,6 +29,7 @@ Import-Module SQLPS -DisableNameChecking
 Import-module (Join-Path "$GitPath\Cloud.Ready.Software.PowerShell\PSModules" 'LoadModules.ps1') -Force -WarningAction SilentlyContinue | Out-Null
 Import-module (Join-Path "$GitPath\IncadeaNorway" 'LoadModules.ps1') -Force -WarningAction SilentlyContinue | Out-Null
 # Create Customer Upgrade NAV NO database
+Restore-SQLBackupFile-INC -BackupFile $BackupfileDemoDBNO  -DatabaseServer $DBServer -DatabaseName $DemoDBNO
 Restore-SQLBackupFile-INC -BackupFile $BackupfileDemoDBNO  -DatabaseServer $DBServer -DatabaseName $UpgradeDataBaseName
 Restore-SQLBackupFile-INC -BackupFile $BackupfileDemoOriginalDBNO  -DatabaseServer $DBServer -DatabaseName $DemoOriginalDBNO
 # Backup the development database that will be upgraded
