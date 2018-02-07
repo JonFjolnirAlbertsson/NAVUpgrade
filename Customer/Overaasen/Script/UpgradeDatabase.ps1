@@ -72,10 +72,11 @@ New-NAVUser-INC -NavServiceInstance $UpgradeName -User $UserName
 #Import-Module "$env:ProgramFiles\Microsoft Dynamics NAV\100\Service CU03\NavAdminTool.ps1" -Force -WarningAction SilentlyContinue | Out-Null
 #Import-Module "${env:ProgramFiles(x86)}\Microsoft Dynamics NAV\100\RTC CU03\Microsoft.Dynamics.Nav.Model.Tools.psd1" -Force -WarningAction SilentlyContinue | out-null
 Import-NAVModules-INC -ShortVersion '100' -ServiceFolder 'Service CU03' -RTCFolder 'RTC CU03' -ImportRTCModule
-
+Get-Module
 New-NAVEnvironment  -EnablePortSharing -ServerInstance $UpgradeFromOriginalName  -DatabaseServer $DBServer
 New-NAVUser-INC -NavServiceInstance $UpgradeFromOriginalName -User $DBNAVServiceUserName 
-#$ServerInstanceOriginal = Get-NAVServerInstance -ServerInstance 'nav100_overaasen'
+# Converting the database
+Invoke-NAVDatabaseConversion  $DemoOriginalDBNO -DatabaseServer $DBServer
 $ServerInstanceOriginal = Get-NAVServerInstance -ServerInstance $UpgradeFromOriginalName
 $ServerInstanceOriginal | Set-NAVServerInstance -stop
 $ServerInstanceOriginal | Set-NAVServerConfiguration -KeyName MultiTenant -KeyValue "false"
