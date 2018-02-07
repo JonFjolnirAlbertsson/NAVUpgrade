@@ -34,7 +34,7 @@ $UpgradeFromDataBaseName = $UpgradeFromOriginalName +'_' + $CompanyName
 $UpgradeObjectsName = $NAVVersion  + $NAVCU + $CompanyName + 'Objects'																 
 $LogPath = join-path $WorkingFolder 'Log'
 # Database backup NO
-$DemoOriginalDBNO = 'Demo Database NAV (10-0) NO CU03'
+$DemoOriginalDBNO = 'Demo Database NAV (10-0) CU03 NO'
 $DemoDBNO = "Demo Database NAV (11-0) $NAVCU NO"
 # Database backup common
 $BackupPath = $DBServerRootPath

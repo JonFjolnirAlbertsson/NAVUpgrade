@@ -28,7 +28,7 @@ Enable-WSManCredSSP -Role server -Force
 Import-Module SQLPS -DisableNameChecking 
 Import-module (Join-Path "$GitPath\Cloud.Ready.Software.PowerShell\PSModules" 'LoadModules.ps1') -Force -WarningAction SilentlyContinue | Out-Null
 Import-module (Join-Path "$GitPath\IncadeaNorway" 'LoadModules.ps1') -Force -WarningAction SilentlyContinue | Out-Null
-Import-NAVModule-INC -ShortVersion '110' -ImportRTCModule
+Import-NAVModules-INC -ShortVersion '110' -ImportRTCModule 
 # Create Customer Upgrade NAV NO database
 Restore-SQLBackupFile-INC -BackupFile $BackupfileDemoDBNO  -DatabaseServer $DBServer -DatabaseName $DemoDBNO
 Restore-SQLBackupFile-INC -BackupFile $BackupfileDemoDBNO  -DatabaseServer $DBServer -DatabaseName $UpgradeDataBaseName
@@ -71,7 +71,8 @@ New-NAVUser-INC -NavServiceInstance $UpgradeName -User $UserName
 # Import Module for original DB
 #Import-Module "$env:ProgramFiles\Microsoft Dynamics NAV\100\Service CU03\NavAdminTool.ps1" -Force -WarningAction SilentlyContinue | Out-Null
 #Import-Module "${env:ProgramFiles(x86)}\Microsoft Dynamics NAV\100\RTC CU03\Microsoft.Dynamics.Nav.Model.Tools.psd1" -Force -WarningAction SilentlyContinue | out-null
-Import-NAVModule-INC -ShortVersion '100' -ServiceFolder 'Service CU03' -RTCFolder 'RTC CU03' -ImportRTCModule
+Import-NAVModules-INC -ShortVersion '100' -ServiceFolder 'Service CU03' -RTCFolder 'RTC CU03' -ImportRTCModule
+
 New-NAVEnvironment  -EnablePortSharing -ServerInstance $UpgradeFromOriginalName  -DatabaseServer $DBServer
 New-NAVUser-INC -NavServiceInstance $UpgradeFromOriginalName -User $DBNAVServiceUserName 
 #$ServerInstanceOriginal = Get-NAVServerInstance -ServerInstance 'nav100_overaasen'
@@ -79,7 +80,7 @@ $ServerInstanceOriginal = Get-NAVServerInstance -ServerInstance $UpgradeFromOrig
 $ServerInstanceOriginal | Set-NAVServerInstance -stop
 $ServerInstanceOriginal | Set-NAVServerConfiguration -KeyName MultiTenant -KeyValue "false"
 $ServerInstanceOriginal | Set-NAVServerConfiguration -KeyName DatabaseServer -KeyValue $DBServer
-$ServerInstanceOriginal | Set-NAVServerConfiguration -KeyName DatabaseName -KeyValue $UpgradeName
+$ServerInstanceOriginal | Set-NAVServerConfiguration -KeyName DatabaseName -KeyValue $DemoOriginalDBNO
 $ServerInstanceOriginal | Set-NAVServerInstance -ServiceAccountCredential $InstanceCredential -ServiceAccount User
 $ServerInstanceOriginal | Set-NAVServerInstance -start
 $ServerInstanceOriginal | Import-NAVServerLicense -LicenseFile $NAVLicense
@@ -90,12 +91,12 @@ Export-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $DemoOrigina
 # Import Module for Modified DB
 #Import-Module "${env:ProgramFiles(x86)}\Microsoft Dynamics NAV\100\RoleTailored Client\Microsoft.Dynamics.Nav.Model.Tools.psd1" -Force -WarningAction SilentlyContinue | out-null
 #Import-Module "$env:ProgramFiles\Microsoft Dynamics NAV\100\Service\NavAdminTool.ps1" -Force -WarningAction SilentlyContinue | Out-Null
-Import-NAVModule-INC -ShortVersion '100' -ImportRTCModule
-Export-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $UpgradeFromDataBaseName -Path $ModifiedObjectsPath -LogPath $LogPath -ExportTxtSkipUnlicensed
+Import-NAVModules-INC -ShortVersion '100' -ImportRTCModule
+Export-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $UpgradeFromDataBaseName -Path $ModifiedObjectsPath -Filter $ExportObjectFilter -LogPath $LogPath -ExportTxtSkipUnlicensed
 # Import Module for Target DB
 #Import-Module "${env:ProgramFiles(x86)}\Microsoft Dynamics NAV\110\RoleTailored Client\Microsoft.Dynamics.Nav.Model.Tools.psd1" -Force -WarningAction SilentlyContinue | out-null
 #Import-Module "$env:ProgramFiles\Microsoft Dynamics NAV\110\Service\NavAdminTool.ps1" -Force -WarningAction SilentlyContinue | Out-Null
-Import-NAVModule-INC -ShortVersion '110' -ImportRTCModule
+Import-NAVModules-INC -ShortVersion '110' -ImportRTCModule
 Export-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $DemoDBNO -Path $TargetObjectsPath -LogPath $LogPath -ExportTxtSkipUnlicensed
 # Copy from remote server
 if(!(Test-Path -Path $ClientWorkingFolder )){
