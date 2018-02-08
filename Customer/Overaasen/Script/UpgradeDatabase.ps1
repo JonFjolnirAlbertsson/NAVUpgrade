@@ -19,6 +19,9 @@ $scriptLocationPath = join-path $Location 'Set-UpgradeSettings.ps1'
 Import-Certificate -Filepath $CertificateFile -CertStoreLocation "Cert:\LocalMachine\Root"
 ## Server Enabling WSManCredSSP to be able to do a double hop with authentication.
 Enable-WSManCredSSP -Role server -Force
+# Creating Credential for the NAV Server Instance user
+$InstanceSecurePassword = ConvertTo-SecureString $InstancePassword -AsPlainText -Force
+$InstanceCredential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $InstanceUserName , $InstanceSecurePassword 
 
 # Import NAV, cloud.ready and incadea modules
 # To be able to import the moduel sqlps
@@ -44,9 +47,6 @@ Backup-SqlDatabase -ServerInstance $DBServer -Database $UpgradeFromDataBaseName 
 New-SQLUser-INC -DatabaseServer $DBServer -DatabaseName $DemoDBNO -DatabaseUser $DBNAVServiceUserName
 New-SQLUser-INC -DatabaseServer $DBServer -DatabaseName $UpgradeDataBaseName -DatabaseUser $DBNAVServiceUserName 
 New-SQLUser-INC -DatabaseServer $DBServer -DatabaseName $DemoOriginalDBNO -DatabaseUser $DBNAVServiceUserName 
-# Creating Credential for the NAV Server Instance user
-$InstanceSecurePassword = ConvertTo-SecureString $InstancePassword -AsPlainText -Force
-$InstanceCredential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $InstanceUserName , $InstanceSecurePassword 
 # Creating NAV Server Instances
 Write-host "Create Service Instance"
 New-NAVEnvironment  -EnablePortSharing -ServerInstance $UpgradeName  -DatabaseServer $DBServer
@@ -75,8 +75,7 @@ Import-NAVModules-INC -ShortVersion '100' -ServiceFolder 'Service CU03' -RTCFold
 Get-Module
 New-NAVEnvironment  -EnablePortSharing -ServerInstance $UpgradeFromOriginalName  -DatabaseServer $DBServer
 New-NAVUser-INC -NavServiceInstance $UpgradeFromOriginalName -User $DBNAVServiceUserName 
-# Converting the database
-Invoke-NAVDatabaseConversion  $DemoOriginalDBNO -DatabaseServer $DBServer
+# Set instance parameters
 $ServerInstanceOriginal = Get-NAVServerInstance -ServerInstance $UpgradeFromOriginalName
 $ServerInstanceOriginal | Set-NAVServerInstance -stop
 $ServerInstanceOriginal | Set-NAVServerConfiguration -KeyName MultiTenant -KeyValue "false"
@@ -110,6 +109,8 @@ Copy-Item -Path $TargetObjectsPath -Destination (Join-Path $ClientWorkingFolder 
 Remove-Item -Path "$MergeResultPath\*.*"
 Remove-Item -Path "$MergedPath\*.*"
 Remove-Item -Path "$ToBeJoinedPath\*.*"
+Remove-Item -Path "$TargetPath\*.*"
+Remove-Item -Path "$ModifiedPath\*.*"
 # I got out of memory error on the $NAVServer, so I copied the files and run the merge code from NO01DEVTS02.si-dev.local server.
 #winrm get winrm/config/winrs # Get memory size
 #Set-Item WSMan:\localhost\Shell\MaxMemoryPerShellMB 2048 # Change memory size
@@ -121,15 +122,15 @@ $MergeResult = Merge-NAVUpgradeObjects `
     -VersionListPrefixes $VersionListPrefixes `
     -Force
 # Splitting Original, Modified and Target files to individua files.
-Merge-NAVCode -WorkingFolderPath $WorkingFolder -OriginalFileName $OriginalObjectsPath -ModifiedFileName $ModifiedObjectsPath -TargetFileName $TargetObjectsPath -CompareObject $CompareObject -Split
+Merge-NAVCode-INC -WorkingFolderPath $WorkingFolder -OriginalFileName $OriginalObjectsPath -ModifiedFileName $ModifiedObjectsPath -TargetFileName $TargetObjectsPath -CompareObject $CompareObject -Split
 # Copy object files with conflict to the Merged folder
 # Copy merged result items to the Merged/ToBeJoined folder. Subfolders are not included in the search.
 Compare-Folders -WorkingFolderPath $WorkingFolder -CompareFolder1Path $MergeResultPath -CompareFolder2Path $TargetPath -CompareObjectFilter $CompareObjectFilter `
                 -CopyMergeResult2ToBeJoined -MoveConflictItemsFromToBeJoined2Merged -CompareContent -DropObjectProperty 
 # Remove Original standard objects that have been removed or that we do not have license to import to DB as text files
 Remove-OriginalFilesNotInTarget -WorkingFolderPath $WorkingFolder -WriteResultToFile
-# Join ToBeJoined folder
-Join-NAVApplicationObjectFile -Source $ToBeJoinedPath  -Destination $ToBeJoinedDestinationFile -Force  
+# Join ToBeJoined folder and not including files from Merged
+Merge-NAVCode-INC -Join -WorkingFolderPath $WorkingFolder 
 # Compare the $ToBeJoinedDestinationFile file to the $TargetObjects in the "NAV Object Compare" application from Rune Sigurdsen
 $NAVObjectCompareWinClient = join-path 'C:\Users\DevJAL\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\NAVObjectCompareWinClient' 'NAVObjectCompareWinClient.appref-ms'
 & $NAVObjectCompareWinClient  
@@ -137,15 +138,13 @@ $NAVObjectCompareWinClient = join-path 'C:\Users\DevJAL\AppData\Roaming\Microsof
 # Copy file with merged objects to NAV Server
 Copy-Item -Path (join-path $ClientWorkingFolder $JoinFileName ) -Destination $JoinFile -Force
 # Import the objects to the development database
-Import-NAVApplicationObject2 -Path $JoinFile -ServerInstance $FastFitInstanceNODev -ImportAction Overwrite -LogPath $LogPath -NavServerName $NAVServer -SynchronizeSchemaChanges Force
-
+Import-NAVApplicationObject2 -Path $JoinFile -ServerInstance $UpgradeName -ImportAction Overwrite -LogPath $LogPath -NavServerName $NAVServer -SynchronizeSchemaChanges Force
+# Compile objects and fix all errors
+Compile-NAVApplicationObject2 -ServerInstance $UpgradeName -LogPath $LogPath -SynchronizeSchemaChanges Yes
 #Create Web client instance
-New-NAVWebServerInstance -WebServerInstance $FastFitInstanceNO  -Server $NAVServer -ServerInstance $FastFitInstanceNO 
-New-NAVWebServerInstance -WebServerInstance $FastFitInstanceNODev  -Server $NAVServer -ServerInstance $FastFitInstanceNODev 
+New-NAVWebServerInstance -WebServerInstance $UpgradeName  -Server $NAVServer -ServerInstance $UpgradeName 
 # Backup
-$BackupFileName = $AppDBNameNO + "_Without_DEU.bak"
+$BackupFileName = $UpgradeName + "_AfterMerge.bak"
 $BackupFilePath = join-path $BackupPath $BackupFileName 
-Backup-SqlDatabase -ServerInstance $DBServer -Database $AppDBNameNO -BackupAction Database -BackupFile $BackupFilePath -CompressionOption Default
-$BackupFileName = $DEALER1DBNameNO + "_Without_DEU.bak"
-$BackupFilePath = join-path $BackupPath $BackupFileName 
-Backup-SqlDatabase -ServerInstance $DBServer -Database $DEALER1DBNameNO -BackupAction Database -BackupFile $BackupFilePath -CompressionOption Default
+Backup-SqlDatabase -ServerInstance $DBServer -Database $UpgradeName -BackupAction Database -BackupFile $BackupFilePath -CompressionOption Default
+

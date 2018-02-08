@@ -5,11 +5,11 @@ $Location = join-path (Split-Path $psise.CurrentFile.FullPath) "$CompanyName\Scr
 . (join-path $Location ('Set-UpgradeSettings.ps1'))
 #Open Files with conflict. Using the Merge Folder to merge the conflict
 #$ObjectName ='COD430'
-#<#
-$ObjectName ='REP712'
+#<
+$ObjectName ='TAB72330'
 #Open-File-INC -WorkingFolder $WorkingFolder -ObjectName $ObjectName -OpenInNotepadPlus -OpenMerged 
-Open-File-INC -WorkingFolder $WorkingFolder -ObjectName $ObjectName -OpenInNotepadPlus -OpenMerged -OpenTarget -OpenModified -OpenOriginal -OpenToBeJoined
-Open-File-INC -WorkingFolder $WorkingFolder -ObjectName $ObjectName -OpenModified -OpenOriginal -OpenTarget -UseWaldoFolders -OpenInNotepadPlus
-
+#Open-File-INC -WorkingFolder $WorkingFolder -ObjectName $ObjectName -OpenInNotepadPlus -OpenMerged -OpenTarget -OpenModified -OpenOriginal -OpenToBeJoined
+Open-File-INC -WorkingFolder $WorkingFolder -ObjectName $ObjectName -OpenInBCompare -OpenModified -OpenOriginal -UseWaldoFolders 
+Open-File-INC -WorkingFolder $WorkingFolder -ObjectName $ObjectName -OpenInBCompare -OpenTarget -OpenMerged 
 #>
 
