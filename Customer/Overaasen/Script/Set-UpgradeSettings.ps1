@@ -61,6 +61,7 @@ $ModifiedPath = join-path $WorkingFolder 'Modified'
 $TargetPath = join-path $WorkingFolder 'Target' 
 $ToBeJoinedPath = Join-Path $MergedPath 'ToBeJoined'
 $JoinFileName = 'all-merged-objects.txt'
+$MergedFolderFileName = 'AllMergedObjectsFromMergedFolder.txt'
 $JoinFile = join-path $WorkingFolder $JoinFileName
 $CopyResultFile =  join-path $WorkingFolder 'Copy Results.txt' 
 $ToBeJoinedDestinationFile = join-path $WorkingFolder 'ToBeJoined_Objects.TXT'

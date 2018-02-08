@@ -139,6 +139,8 @@ $NAVObjectCompareWinClient = join-path 'C:\Users\DevJAL\AppData\Roaming\Microsof
 Copy-Item -Path (join-path $ClientWorkingFolder $JoinFileName ) -Destination $JoinFile -Force
 # Import the objects to the development database
 Import-NAVApplicationObject2 -Path $JoinFile -ServerInstance $UpgradeName -ImportAction Overwrite -LogPath $LogPath -NavServerName $NAVServer -SynchronizeSchemaChanges Force
+# Join the Merged folder files without ToBeJoined
+Join-NAVApplicationObjectFile -Source $MergedPath  -Destination $MergedFolderFileName -Force  
 # Compile objects and fix all errors
 Compile-NAVApplicationObject2 -ServerInstance $UpgradeName -LogPath $LogPath -SynchronizeSchemaChanges Yes
 #Create Web client instance
