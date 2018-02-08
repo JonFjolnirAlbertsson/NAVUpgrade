@@ -23,11 +23,8 @@ Enable-WSManCredSSP -Role server -Force
 $InstanceSecurePassword = ConvertTo-SecureString $InstancePassword -AsPlainText -Force
 $InstanceCredential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $InstanceUserName , $InstanceSecurePassword 
 
-# Import NAV, cloud.ready and incadea modules
-# To be able to import the moduel sqlps
+# Import NAV, cloud.ready and incadea modules. To be able to import the moduel sqlps
 # files had to be copied from folder "C:\Program Files (x86)\Microsoft SQL Server\130\Tools\PowerShell\Modules" to the folder "C:\Windows\System32\WindowsPowerShell\v1.0\Modules" 
-#Import-Module "${env:ProgramFiles(x86)}\Microsoft Dynamics NAV\110\RoleTailored Client\Microsoft.Dynamics.Nav.Model.Tools.psd1" -Force -WarningAction SilentlyContinue | out-null
-#Import-Module "$env:ProgramFiles\Microsoft Dynamics NAV\110\Service\NavAdminTool.ps1" -Force -WarningAction SilentlyContinue | Out-Null
 Import-Module SQLPS -DisableNameChecking 
 Import-module (Join-Path "$GitPath\Cloud.Ready.Software.PowerShell\PSModules" 'LoadModules.ps1') -Force -WarningAction SilentlyContinue | Out-Null
 Import-module (Join-Path "$GitPath\IncadeaNorway" 'LoadModules.ps1') -Force -WarningAction SilentlyContinue | Out-Null
@@ -69,8 +66,6 @@ $CurrentServerInstance | Sync-NAVTenant -Mode Sync
 New-NAVUser-INC -NavServiceInstance $UpgradeName -User $UserName 
 # Export all objects to text files. Remember that the objects will be created on the $NAVServer.
 # Import Module for original DB
-#Import-Module "$env:ProgramFiles\Microsoft Dynamics NAV\100\Service CU03\NavAdminTool.ps1" -Force -WarningAction SilentlyContinue | Out-Null
-#Import-Module "${env:ProgramFiles(x86)}\Microsoft Dynamics NAV\100\RTC CU03\Microsoft.Dynamics.Nav.Model.Tools.psd1" -Force -WarningAction SilentlyContinue | out-null
 Import-NAVModules-INC -ShortVersion '100' -ServiceFolder 'Service CU03' -RTCFolder 'RTC CU03' -ImportRTCModule
 Get-Module
 New-NAVEnvironment  -EnablePortSharing -ServerInstance $UpgradeFromOriginalName  -DatabaseServer $DBServer
@@ -89,13 +84,9 @@ $ServerInstanceOriginal | Sync-NAVTenant -Mode Sync
 #$ServerInstanceOriginal | Sync-NAVTenant -Mode ForceSync
 Export-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $DemoOriginalDBNO -Path $OriginalObjectsPath -Filter $ExportObjectFilter -LogPath $LogPath -ExportTxtSkipUnlicensed
 # Import Module for Modified DB
-#Import-Module "${env:ProgramFiles(x86)}\Microsoft Dynamics NAV\100\RoleTailored Client\Microsoft.Dynamics.Nav.Model.Tools.psd1" -Force -WarningAction SilentlyContinue | out-null
-#Import-Module "$env:ProgramFiles\Microsoft Dynamics NAV\100\Service\NavAdminTool.ps1" -Force -WarningAction SilentlyContinue | Out-Null
 Import-NAVModules-INC -ShortVersion '100' -ImportRTCModule
 Export-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $UpgradeFromDataBaseName -Path $ModifiedObjectsPath -Filter $ExportObjectFilter -LogPath $LogPath -ExportTxtSkipUnlicensed
 # Import Module for Target DB
-#Import-Module "${env:ProgramFiles(x86)}\Microsoft Dynamics NAV\110\RoleTailored Client\Microsoft.Dynamics.Nav.Model.Tools.psd1" -Force -WarningAction SilentlyContinue | out-null
-#Import-Module "$env:ProgramFiles\Microsoft Dynamics NAV\110\Service\NavAdminTool.ps1" -Force -WarningAction SilentlyContinue | Out-Null
 Import-NAVModules-INC -ShortVersion '110' -ImportRTCModule
 Export-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $DemoDBNO -Path $TargetObjectsPath -LogPath $LogPath -ExportTxtSkipUnlicensed
 # Copy from remote server
@@ -135,15 +126,17 @@ Merge-NAVCode-INC -Join -WorkingFolderPath $WorkingFolder
 $NAVObjectCompareWinClient = join-path 'C:\Users\DevJAL\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\NAVObjectCompareWinClient' 'NAVObjectCompareWinClient.appref-ms'
 & $NAVObjectCompareWinClient  
 
-# Copy file with merged objects to NAV Server
-Copy-Item -Path (join-path $ClientWorkingFolder $JoinFileName ) -Destination $JoinFile -Force
-# Import the objects to the development database
-Import-NAVApplicationObject2 -Path $JoinFile -ServerInstance $UpgradeName -ImportAction Overwrite -LogPath $LogPath -NavServerName $NAVServer -SynchronizeSchemaChanges Force
-# Join the Merged folder files without ToBeJoined
+# Join the Merged folder files without ToBeJoined and import to Dev database
 Join-NAVApplicationObjectFile -Source (join-path $MergedPath $CompareObjectFilter)  -Destination $MergedFolderFile -Force  
+# Copy file with merged objects to NAV Server
+Copy-Item -Path (join-path $ClientWorkingFolder $JoinFileName) -Destination $JoinFile -Force
+Copy-Item -Path (join-path $ClientWorkingFolder $MergedFolderFileName) -Destination $MergedFolderFile -Force
+# Import the objects to the development database
+Import-NAVApplicationObject2 -Path $MergedFolderFile -ServerInstance $UpgradeName -ImportAction Overwrite -LogPath $LogPath -NavServerName $NAVServer -SynchronizeSchemaChanges Force
+Import-NAVApplicationObject2 -Path $JoinFile -ServerInstance $UpgradeName -ImportAction Overwrite -LogPath $LogPath -NavServerName $NAVServer -SynchronizeSchemaChanges Force
 # Compile objects and fix all errors
-Compile-NAVApplicationObject2 -ServerInstance $UpgradeName -LogPath $LogPath -SynchronizeSchemaChanges Yes
-#Create Web client instance
+Compile-NAVApplicationObject2 -ServerInstance $UpgradeName -LogPath $LogPath -SynchronizeSchemaChanges No
+# Create Web client instance
 New-NAVWebServerInstance -WebServerInstance $UpgradeName  -Server $NAVServer -ServerInstance $UpgradeName 
 # Backup
 $BackupFileName = $UpgradeName + "_AfterMerge.bak"
