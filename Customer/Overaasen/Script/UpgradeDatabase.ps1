@@ -136,10 +136,14 @@ Import-NAVApplicationObject2 -Path $MergedFolderFile -ServerInstance $UpgradeNam
 Import-NAVApplicationObject2 -Path $JoinFile -ServerInstance $UpgradeName -ImportAction Overwrite -LogPath $LogPath -NavServerName $NAVServer -SynchronizeSchemaChanges Force
 # Compile objects and fix all errors
 Compile-NAVApplicationObject2 -ServerInstance $UpgradeName -LogPath $LogPath -SynchronizeSchemaChanges No
+# Sync database
+$CurrentServerInstance | Sync-NAVTenant -Mode Sync
+$CurrentServerInstance | Sync-NAVTenant -Mode ForceSync
 # Create Web client instance
 New-NAVWebServerInstance -WebServerInstance $UpgradeName  -Server $NAVServer -ServerInstance $UpgradeName 
 # Backup
 $BackupFileName = $UpgradeName + "_AfterMerge.bak"
 $BackupFilePath = join-path $BackupPath $BackupFileName 
 Backup-SqlDatabase -ServerInstance $DBServer -Database $UpgradeName -BackupAction Database -BackupFile $BackupFilePath -CompressionOption Default
+
 
