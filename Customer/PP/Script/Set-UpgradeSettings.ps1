@@ -1,11 +1,16 @@
 ﻿#Base Path
-$RootFolderPath = Join-Path (Split-Path $psise.CurrentFile.FullPath -Qualifier) 'incadea'
+$RootDrive = 'C:\'
+$RootFolderName = 'incadea'
+$RootFolderPath = join-path $RootDrive $RootFolderName
 $CompanyName = 'PP'
-#Servers
-$DBServer = 'NO01DEVSQL01'
-$NAVServer = 'NO01DEV03'
-$DBServer = 'localhost'
-$NAVServer = 'localhost'
+$GitPath = join-path $RootDrive 'Git'
+# Servers
+$DBServer = 'NO01DEVSQL01.si-dev.local'
+$NAVServer = 'NO01DEV03.si-dev.local'
+$NAVServerRSName = 'NO01DEV03'
+$NAVServerClientName = 'No01devts02'
+$NAVLicense = join-path $RootFolderPath "License\NAV2018.flf"
+$CertificateFile = join-path ("$GitPath\NAVUpgrade\Certificate") 'cert'
 # Database
 $UpgradeDataBaseName = 'NAV2009R2_PP_ToUpgrade'
 $BackupPath = Join-Path (Get-Location).providerpath  'Backup'

@@ -1,11 +1,23 @@
-﻿#To start remote session on application server
-$SetupScript = "C:\Git\NAVUpgrade\Customer\PP\Script\Set-UpgradeSettings.ps1"
-import-module $SetupScript
-
+﻿# Client script to start remote session on application server
+Set-Location -Path (Split-Path $psise.CurrentFile.FullPath -Qualifier)
+$Location = (Split-Path $psise.CurrentFile.FullPath)
+$scriptLocationPath = (join-path $Location 'Set-UpgradeSettings.ps1')
+. $scriptLocationPath
+# Client Enabling WSManCredSSP to be able to do a double hop with authentication.
+Enable-WSManCredSSP -Role Client -DelegateComputer $NAVServerRSName  -Force
 $InstanceSecurePassword = ConvertTo-SecureString $InstancePassword -AsPlainText -Force
 $UserCredential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $UserName , $InstanceSecurePassword 
-Enter-PSSession -ComputerName NO01DEV03 -UseSSL -Credential $UserCredential
-Import-Certificate -Filepath "C:\Git\NAVUpgrade\Customer\Incadea\FastFit\cert" -CertStoreLocation "Cert:\LocalMachine\Root"
+Enter-PSSession -ComputerName $NAVServerRSName -UseSSL -Credential $UserCredential –Authentication CredSSP
+
+# Server Site script
+clear-host
+$StartedDateTime = Get-Date
+Set-Location 'C:\'
+$Location = join-path $pwd.drive.Root 'Git\NAVUpgrade\Customer\PP\Script'
+$scriptLocationPath = join-path $Location 'Set-UpgradeSettings.ps1'
+. $scriptLocationPath
+Import-Certificate -Filepath $CertificateFile -CertStoreLocation "Cert:\LocalMachine\Root"
+## Server Enabling WSManCredSSP to be able
 
 # NAV 2015 
 #Import-Module "${env:ProgramFiles(x86)}\Microsoft Dynamics NAV\80\RoleTailored Client\Microsoft.Dynamics.Nav.Model.Tools.psd1" -WarningAction SilentlyContinue | out-null
@@ -30,7 +42,12 @@ $DemoInstance = 'DynamicsNAV110'
 $NAV2015Instance = 'NAV80_PP'
 $NAV2018Instance = 'NAV110_PP'
 $ADUserName = 'si-dev\devjal'
-CreateNAVUser -NavServiceInstance $NAV2015Instance -User $ADUserName
+$ADUserName = 'si-dev\devMAF'
+$CurrentServerInstance = Get-NAVServerInstance -ServerInstance $NAV2018Instance
+$DatabaseName = (Get-NAVServerConfiguration2 -ServerInstance $CurrentServerInstance.ServerInstance | Where Key -eq DatabaseName).Value
+$DatabaseServer = (Get-NAVServerConfiguration2 -ServerInstance $CurrentServerInstance.ServerInstance | Where Key -eq DatabaseServer).Value
+New-NAVUser-INC -NavServiceInstance $NAV2018Instance -User $ADUserName
+New-SQLUser-INC -DatabaseServer $DatabaseServer -DatabaseName $DatabaseName -DatabaseUser $ADUserName
 #Get-NAVServerInstance -ServerInstance $DemoInstance | Copy-NAVEnvironment -ToServerInstance $NAV2018Instance
 #Sync-NAVTenant -ServerInstance $DemoInstance 
 Import-NAVServerLicenseToDatabase -LicenseFile $NAVLicense -Scope Database -ServerInstance $DemoInstance
