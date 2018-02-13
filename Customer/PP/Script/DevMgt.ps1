@@ -24,15 +24,11 @@ Import-Certificate -Filepath $CertificateFile -CertStoreLocation "Cert:\LocalMac
 #Import-Module "$env:ProgramFiles\Microsoft Dynamics NAV\80\Service\NavAdminTool.ps1" -WarningAction SilentlyContinue | Out-Null 
 
 # NAV 2018 
-Import-Module "${env:ProgramFiles(x86)}\Microsoft Dynamics NAV\110\RoleTailored Client\Microsoft.Dynamics.Nav.Model.Tools.psd1" -WarningAction SilentlyContinue | out-null
-Import-Module "${env:ProgramFiles(x86)}\Microsoft Dynamics NAV\110\RoleTailored Client\Microsoft.Dynamics.Nav.Apps.Tools.psd1" -WarningAction SilentlyContinue | Out-Null
-Import-Module "$env:ProgramFiles\Microsoft Dynamics NAV\110\Service\NavAdminTool.ps1" -WarningAction SilentlyContinue | Out-Null 
+Import-Module SQLPS -DisableNameChecking 
+Import-module (Join-Path "$GitPath\Cloud.Ready.Software.PowerShell\PSModules" 'LoadModules.ps1') -Force -WarningAction SilentlyContinue | Out-Null
+Import-module (Join-Path "$GitPath\IncadeaNorway" 'LoadModules.ps1') -Force -WarningAction SilentlyContinue | Out-Null
+Import-NAVModules-INC -ShortVersion '110' -ImportRTCModule 
 
-#Cloud.Ready.Software and Incadea
-$gitpath = "C:\Git"
-$scriptfolderpath = "C:\Git\IncadeaNorway"   
-Import-module (Join-Path "$gitpath\Cloud.Ready.Software.PowerShell\PSModules" 'LoadModules.ps1')  
-Import-module (Join-Path $scriptfolderpath 'LoadModules.ps1')  
 # Get Sript config for remote session
 $SetupScript = "C:\Git\NAVUpgrade\Customer\PP\Script\Set-UpgradeSettings.ps1"
 import-module $SetupScript
