@@ -67,7 +67,6 @@ New-NAVUser-INC -NavServiceInstance $UpgradeName -User $UserName
 # Export all objects to text files. Remember that the objects will be created on the $NAVServer.
 # Import Module for original DB
 Import-NAVModules-INC -ShortVersion '100' -ServiceFolder 'Service CU03' -RTCFolder 'RTC CU03' -ImportRTCModule
-Get-Module
 New-NAVEnvironment  -EnablePortSharing -ServerInstance $UpgradeFromOriginalName  -DatabaseServer $DBServer
 New-NAVUser-INC -NavServiceInstance $UpgradeFromOriginalName -User $DBNAVServiceUserName 
 # Set instance parameters
@@ -153,10 +152,69 @@ Backup-SqlDatabase -ServerInstance $DBServer -Database $UpgradeName -BackupActio
 Export-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $UpgradeName -Path $MergedFobFile -Filter $ExportObjectFilter -LogPath $LogPath -ExportTxtSkipUnlicensed
 Copy-Item -Path $MergedFobFile -Destination (Join-Path $ClientWorkingFolder $MergedFobFileName) -Force
 
-# Sync
-Sync-NAVTenant -ServerInstance $UpgradeFromInstance  -Mode Sync
-# Backup DB to Upgrade
+# Task 1: Prepare the old database
+Import-NAVModules-INC -ShortVersion '100' -ImportRTCModule
+$CurrentUpgradeFromInstance = Get-NAVServerInstance -ServerInstance $UpgradeFromInstance
+$CurrentUpgradeFromInstance | Sync-NAVTenant -Mode Sync
+# Task 2: Create a full SQL backup of the old database on SQL Server
 $BackupFileName = $UpgradeFromDataBaseName + "_BeforeUpgrade.bak"
 $BackupFilePath = join-path $BackupPath $BackupFileName 
 Backup-SqlDatabase -ServerInstance $DBServer -Database $UpgradeName -BackupAction Database -BackupFile $BackupFilePath -CompressionOption Default
-
+# Task 3 Uninstall all V1 extensions in old database
+Get-NAVAppInfo -ServerInstance $UpgradeFromInstance | ft -AutoSize
+Uninstall-NAVApp -ServerInstance $UpgradeFromInstance -Name 'Sales and Inventory Forecast' -Version 1.0.0.0
+Uninstall-NAVApp -ServerInstance $UpgradeFromInstance -Name 'PayPal Payments Standard' -Version 1.0.0.0
+# Task 4: Upload the Microsoft Dynamics NAV 2018 license to the old database
+$CurrentUpgradeFromInstance | Import-NAVServerLicense -LicenseFile $NAVLicense
+$CurrentUpgradeFromInstance | Set-NAVServerInstance -Restart
+# Task 5: Delete all objects except tables from the old database
+$Filter = 'Type=Codeunit|Page|Report|XMLport|Query'
+Delete-NAVApplicationObject -DatabaseName $UpgradeFromDataBaseName -DatabaseServer $DBServer -Filter $Filter -SynchronizeSchemaChanges No
+# Task 7: Clear Dynamics NAV Server instance records from old database
+$CurrentUpgradeFromInstance | Set-NAVServerInstance -Stop
+$SQLCommand = 'DELETE FROM [' + $UpgradeFromDataBaseName + '].[dbo].[Server Instance]'
+Invoke-SQL-INC -DatabaseName $UpgradeName -DatabaseServer $DBServer -SQLCommand $SQLCommand -TimeOut 0 -TrustedConnection $True
+$SQLCommand = 'DELETE FROM [' + $UpgradeFromDataBaseName + '].[dbo].[Debugger Breakpoint]'
+Invoke-SQL-INC -DatabaseName $UpgradeName -DatabaseServer $DBServer -SQLCommand $SQLCommand -TimeOut 0 -TrustedConnection $True
+# Task 8: Convert the old database to the Microsoft Dynamics NAV 2018 format
+Import-NAVModules-INC -ShortVersion '110' -ImportRTCModule 
+Invoke-NAVDatabaseConversion -DatabaseName $UpgradeFromDataBaseName -DatabaseServer $DBServer -LogPath $LogPath
+# Task 9: Import the application objects to the converted database
+Import-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $UpgradeFromDataBaseName -Path $MergedFobFile -ImportAction Overwrite -LogPath $LogPath -SynchronizeSchemaChanges No
+$UpgradeFobFile = '\\NO01DEVSQL01\install\NAV2018\CU 02 NO\DVD\UpgradeToolKit\Local Objects\Upgrade10001100.NO.fob'
+Import-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $UpgradeFromDataBaseName -Path $UpgradeFobFile -ImportAction Overwrite -LogPath $LogPath -SynchronizeSchemaChanges No
+# Task 10: Connect a Microsoft Dynamics NAV 2018 Server instance to the converted database
+Import-NAVModules-INC -ShortVersion '100' -ImportRTCModule
+Remove-NAVServerInstance -ServerInstance $UpgradeFromInstance  -VERBOSE 
+Import-NAVModules-INC -ShortVersion '110' -ImportRTCModule 
+New-NAVEnvironment  -EnablePortSharing -ServerInstance $UpgradeFromInstance  -DatabaseServer $DBServer
+#Restore-SQLBackupFile-INC -BackupFile $BackupFilePath  -DatabaseServer $DBServer -DatabaseName $UpgradeFromDataBaseName
+# Set instance parameters
+$CurrentUpgradeFromInstance = Get-NAVServerInstance -ServerInstance $UpgradeFromInstance
+$CurrentUpgradeFromInstance | Set-NAVServerInstance -stop
+$CurrentUpgradeFromInstance | Set-NAVServerConfiguration -KeyName MultiTenant -KeyValue "false"
+$CurrentUpgradeFromInstance | Set-NAVServerConfiguration -KeyName DatabaseServer -KeyValue $DBServer
+$CurrentUpgradeFromInstance | Set-NAVServerConfiguration -KeyName DatabaseName -KeyValue $UpgradeFromDataBaseName
+$CurrentUpgradeFromInstance | Set-NAVServerConfiguration -KeyName SQLCommandTimeout -KeyValue 120
+$CurrentUpgradeFromInstance | Set-NAVServerInstance -ServiceAccountCredential $InstanceCredential -ServiceAccount User
+$CurrentUpgradeFromInstance | Set-NAVServerInstance -start
+# Task 11: Compile all objects that are not already compiled
+# Compile system tables. Synchronize Schema option to Later.
+$Filter = 'ID=2000000000..2000000199'
+Compile-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $UpgradeDataBaseName -Filter $Filter -LogPath $LogPath -Recompile -SynchronizeSchemaChanges No
+$Filter = 'Version List=*UPGTK*'
+Compile-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $UpgradeDataBaseName -Filter $Filter -LogPath $LogPath -Recompile -SynchronizeSchemaChanges No
+$Filter = 'Compiled=Nei'
+Compile-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $UpgradeDataBaseName -Filter $Filter -LogPath $LogPath -SynchronizeSchemaChanges No
+# Task 12: Recompile published extensions
+Get-NAVAppInfo -ServerInstance $UpgradeFromInstance | Repair-NAVApp
+# Task 13: Run the schema synchronization on the imported objects
+$CurrentUpgradeFromInstance | Sync-NAVTenant -Mode Sync
+# Task 14: Run the data upgrade process
+$CurrentUpgradeFromInstance | Get-NAVServerConfiguration 
+Start-NavDataUpgrade -ServerInstance $UpgradeFromInstance -FunctionExecutionMode Serial -SkipAppVersionCheck
+Get-NAVDataUpgrade -ServerInstance $UpgradeFromInstance -Detailed
+Get-NAVDataUpgradeContinuous -ServerInstance $UpgradeFromInstance
+# Task 15: Delete the upgrade objects
+$Filter = 'Version List=*UPGTK*'
+Delete-NAVApplicationObject -DatabaseName $UpgradeFromDataBaseName -DatabaseServer $DBServer -Filter $Filter -SynchronizeSchemaChanges Force
