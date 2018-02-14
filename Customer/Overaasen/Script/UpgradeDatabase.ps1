@@ -190,12 +190,14 @@ Import-NAVModules-INC -ShortVersion '110' -ImportRTCModule
 New-NAVEnvironment  -EnablePortSharing -ServerInstance $UpgradeFromInstance  -DatabaseServer $DBServer
 #Restore-SQLBackupFile-INC -BackupFile $BackupFilePath  -DatabaseServer $DBServer -DatabaseName $UpgradeFromDataBaseName
 # Set instance parameters
+Get-NAVServerConfiguration -ServerInstance $UpgradeFromInstance
 $CurrentUpgradeFromInstance = Get-NAVServerInstance -ServerInstance $UpgradeFromInstance
 $CurrentUpgradeFromInstance | Set-NAVServerInstance -stop
 $CurrentUpgradeFromInstance | Set-NAVServerConfiguration -KeyName MultiTenant -KeyValue "false"
 $CurrentUpgradeFromInstance | Set-NAVServerConfiguration -KeyName DatabaseServer -KeyValue $DBServer
 $CurrentUpgradeFromInstance | Set-NAVServerConfiguration -KeyName DatabaseName -KeyValue $UpgradeFromDataBaseName
 $CurrentUpgradeFromInstance | Set-NAVServerConfiguration -KeyName SQLCommandTimeout -KeyValue 120
+$CurrentUpgradeFromInstance | Set-NAVServerConfiguration -KeyName EnableSymbolLoadingAtServerStartup -KeyValue "true"
 $CurrentUpgradeFromInstance | Set-NAVServerInstance -ServiceAccountCredential $InstanceCredential -ServiceAccount User
 $CurrentUpgradeFromInstance | Set-NAVServerInstance -start
 # Task 11: Compile all objects that are not already compiled
@@ -218,3 +220,17 @@ Get-NAVDataUpgradeContinuous -ServerInstance $UpgradeFromInstance
 # Task 15: Delete the upgrade objects
 $Filter = 'Version List=*UPGTK*'
 Delete-NAVApplicationObject -DatabaseName $UpgradeFromDataBaseName -DatabaseServer $DBServer -Filter $Filter -SynchronizeSchemaChanges Force
+# Task 16: Import upgraded permission sets and permissions by using the Roles and Permissions XMLports
+# Manual import with XMLport from file
+# Task 17: Set the language of the customer database
+# In the development environment, choose Tools, choose Language, and then select the language of the original customer database
+# Task 18: Register client control add-ins
+# The database is now fully upgraded and is ready for use. However, Microsoft Dynamics NAV 2018 includes the following client control add-ins
+#Task 19: Publish and install/upgrade extensions
+$ModenDevFolder = '\\NO01DEVSQL01\install\NAV2018\CU 02 NO\DVD\ModernDev\program files\Microsoft Dynamics NAV\110\Modern Development Environment'
+$SystemSymbolFile = join-path $ModenDevFolder 'System.app'
+$TestSymbolFile = join-path $ModenDevFolder 'Test.app'
+Publish-NAVApp -ServerInstance $UpgradeFromInstance -Path $SystemSymbolFile -PackageType SymbolsOnly
+Publish-NAVApp -ServerInstance $UpgradeFromInstance -Path $TestSymbolFile -PackageType SymbolsOnly
+$FinSQL = join-path 'C:\Program Files (x86)\Microsoft Dynamics NAV\110\RoleTailored Client' 'finsql.exe'
+& $FinSQL Command=generatesymbolreference, Database=$UpgradeFromDataBaseName, ServerName=$DBServer
