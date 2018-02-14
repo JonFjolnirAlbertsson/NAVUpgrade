@@ -153,11 +153,10 @@ Backup-SqlDatabase -ServerInstance $DBServer -Database $UpgradeName -BackupActio
 Export-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $UpgradeName -Path $MergedFobFile -Filter $ExportObjectFilter -LogPath $LogPath -ExportTxtSkipUnlicensed
 Copy-Item -Path $MergedFobFile -Destination (Join-Path $ClientWorkingFolder $MergedFobFileName) -Force
 
+# Sync
+Sync-NAVTenant -ServerInstance $UpgradeFromInstance  -Mode Sync
 # Backup DB to Upgrade
 $BackupFileName = $UpgradeFromDataBaseName + "_BeforeUpgrade.bak"
 $BackupFilePath = join-path $BackupPath $BackupFileName 
 Backup-SqlDatabase -ServerInstance $DBServer -Database $UpgradeName -BackupAction Database -BackupFile $BackupFilePath -CompressionOption Default
-# Sync
-Sync-NAVTenant -ServerInstance $UpgradeFromOriginalName  -Mode Sync
-
 
