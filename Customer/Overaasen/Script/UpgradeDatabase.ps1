@@ -145,5 +145,12 @@ New-NAVWebServerInstance -WebServerInstance $UpgradeName  -Server $NAVServer -Se
 $BackupFileName = $UpgradeName + "_AfterMerge.bak"
 $BackupFilePath = join-path $BackupPath $BackupFileName 
 Backup-SqlDatabase -ServerInstance $DBServer -Database $UpgradeName -BackupAction Database -BackupFile $BackupFilePath -CompressionOption Default
+# Backup after all merging, import of OMA and test module
+$BackupFileName = $UpgradeName + "_AfterMerge_WithOMA.bak"
+$BackupFilePath = join-path $BackupPath $BackupFileName 
+Backup-SqlDatabase -ServerInstance $DBServer -Database $UpgradeName -BackupAction Database -BackupFile $BackupFilePath -CompressionOption Default
+# Export all application objects to Fob file without OMA and Test
+Export-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $UpgradeName -Path $MergedFobFile -Filter $ExportObjectFilter -LogPath $LogPath -ExportTxtSkipUnlicensed
+
 
 
