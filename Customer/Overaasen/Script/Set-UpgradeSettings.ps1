@@ -41,7 +41,7 @@ $BackupPath = $DBServerRootPath
 $BackupfileDemoDBNO = join-path $DBServerDemoPath ("$DemoDBNO.bak")
 $BackupfileDemoOriginalDBNO = join-path $DBServerDemoPath ("$DemoOriginalDBNO.bak")
 # NAV Server Instances
-
+$UpgradeFromInstance = 'NAV100_Overaaseb'
 # Merge files parameters
 $OriginalObjects = $UpgradeFromOriginalName  + '_AllObjects.txt'$ModifiedObjects = $UpgradeFromDataBaseName + '_AllObjects.txt'
 $TargetObjects = $NAVShortVersion +'_' + $NAVCU + '_NO.txt'
