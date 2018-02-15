@@ -40,6 +40,14 @@ if(!(Test-Path -Path $BackupPath )){
 $BackupFileName = $UpgradeFromDataBaseName + "_BeforeUpgradeTo$UpgradeDataBaseName.bak"
 $BackupFilePath = join-path $BackupPath $BackupFileName 
 Backup-SqlDatabase -ServerInstance $DBServer -Database $UpgradeFromDataBaseName -BackupAction Database -BackupFile $BackupFilePath -CompressionOption Default
+<#
+Remove-SQLDatabase  -DatabaseServer $DBServer -DatabaseName $UpgradeFromDataBaseName
+$BackupFileName = 'NAV_Overaasen' + "_BeforeUpgrade.bak"
+$BackupFilePath = join-path $BackupPath $BackupFileName 
+Restore-SQLBackupFile-INC -BackupFile $BackupFilePath  -DatabaseServer $DBServer -DatabaseName $UpgradeFromDataBaseName
+New-SQLUser-INC -DatabaseServer $DBServer -DatabaseName $UpgradeFromDataBaseName -DatabaseUser $DBNAVServiceUserName 
+New-SQLUser-INC -DatabaseServer $DBServer -DatabaseName $UpgradeFromDataBaseName -DatabaseUser $UserName 
+#>
 # Add the NAV Instance user as DBOwner for all databases
 New-SQLUser-INC -DatabaseServer $DBServer -DatabaseName $DemoDBNO -DatabaseUser $DBNAVServiceUserName
 New-SQLUser-INC -DatabaseServer $DBServer -DatabaseName $UpgradeDataBaseName -DatabaseUser $DBNAVServiceUserName 
