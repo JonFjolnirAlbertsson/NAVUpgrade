@@ -179,6 +179,8 @@ $CurrentUpgradeFromInstance | Set-NAVServerInstance -Restart
 $Filter = 'Type=Codeunit|Page|Report|XMLport|Query'
 Delete-NAVApplicationObject -DatabaseName $UpgradeFromDataBaseName -DatabaseServer $DBServer -Filter $Filter -SynchronizeSchemaChanges No
 # Task 7: Clear Dynamics NAV Server instance records from old database
+Import-NAVModules-INC -ShortVersion '100' -ImportRTCModule
+Remove-NAVServerInstance -ServerInstance $UpgradeFromInstance  -VERBOSE 
 $CurrentUpgradeFromInstance | Set-NAVServerInstance -Stop
 $SQLCommand = 'DELETE FROM [' + $UpgradeFromDataBaseName + '].[dbo].[Server Instance]'
 Invoke-SQL-INC -DatabaseName $UpgradeName -DatabaseServer $DBServer -SQLCommand $SQLCommand -TimeOut 0 -TrustedConnection $True
@@ -191,9 +193,17 @@ Invoke-NAVDatabaseConversion -DatabaseName $UpgradeFromDataBaseName -DatabaseSer
 Import-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $UpgradeFromDataBaseName -Path $MergedFobFile -ImportAction Overwrite -LogPath $LogPath -SynchronizeSchemaChanges No
 $UpgradeFobFile = '\\NO01DEVSQL01\install\NAV2018\CU 02 NO\DVD\UpgradeToolKit\Local Objects\Upgrade10001100.NO.fob'
 Import-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $UpgradeFromDataBaseName -Path $UpgradeFobFile -ImportAction Overwrite -LogPath $LogPath -SynchronizeSchemaChanges No
+# OMA Objects
+$OMAFobFile = '\\NO01DEVSQL01\install\Tools\OMA\OMA12\OMA12 NAV2018.fob'
+Import-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $UpgradeFromDataBaseName -Path $OMAFobFile -ImportAction Overwrite -LogPath $LogPath -SynchronizeSchemaChanges No
+# Test Objects
+$TestFobFile1 = '\\NO01DEVSQL01\install\NAV2018\CU 02 NO\DVD\TestToolKit\CALTestRunner.fob'
+$TestFobFile2 = '\\NO01DEVSQL01\install\NAV2018\CU 02 NO\DVD\TestToolKit\CALTestLibraries.NO.fob'
+$TestFobFile3 = '\\NO01DEVSQL01\install\NAV2018\CU 02 NO\DVD\TestToolKit\CALTestCodeunits.NO.fob'
+Import-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $UpgradeFromDataBaseName -Path $TestFobFile1 -ImportAction Overwrite -LogPath $LogPath -SynchronizeSchemaChanges No
+Import-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $UpgradeFromDataBaseName -Path $TestFobFile2 -ImportAction Overwrite -LogPath $LogPath -SynchronizeSchemaChanges No
+Import-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $UpgradeFromDataBaseName -Path $TestFobFile3 -ImportAction Overwrite -LogPath $LogPath -SynchronizeSchemaChanges No
 # Task 10: Connect a Microsoft Dynamics NAV 2018 Server instance to the converted database
-Import-NAVModules-INC -ShortVersion '100' -ImportRTCModule
-Remove-NAVServerInstance -ServerInstance $UpgradeFromInstance  -VERBOSE 
 Import-NAVModules-INC -ShortVersion '110' -ImportRTCModule 
 New-NAVEnvironment  -EnablePortSharing -ServerInstance $UpgradeFromInstance  -DatabaseServer $DBServer
 #Restore-SQLBackupFile-INC -BackupFile $BackupFilePath  -DatabaseServer $DBServer -DatabaseName $UpgradeFromDataBaseName
@@ -211,11 +221,11 @@ $CurrentUpgradeFromInstance | Set-NAVServerInstance -start
 # Task 11: Compile all objects that are not already compiled
 # Compile system tables. Synchronize Schema option to Later.
 $Filter = 'ID=2000000000..2000000199'
-Compile-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $UpgradeDataBaseName -Filter $Filter -LogPath $LogPath -Recompile -SynchronizeSchemaChanges No
+Compile-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $UpgradeFromDataBaseName -Filter $Filter -LogPath $LogPath -Recompile -SynchronizeSchemaChanges No
 $Filter = 'Version List=*UPGTK*'
-Compile-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $UpgradeDataBaseName -Filter $Filter -LogPath $LogPath -Recompile -SynchronizeSchemaChanges No
-$Filter = 'Compiled=Nei'
-Compile-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $UpgradeDataBaseName -Filter $Filter -LogPath $LogPath -SynchronizeSchemaChanges No
+Compile-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $UpgradeFromDataBaseName -Filter $Filter -LogPath $LogPath -Recompile -SynchronizeSchemaChanges No
+$Filter = 'Compiled=0'
+Compile-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $UpgradeFromDataBaseName -Filter $Filter -LogPath $LogPath -SynchronizeSchemaChanges No
 # Task 12: Recompile published extensions
 Get-NAVAppInfo -ServerInstance $UpgradeFromInstance | Repair-NAVApp
 # Task 13: Run the schema synchronization on the imported objects
