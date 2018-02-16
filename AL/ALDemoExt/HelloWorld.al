@@ -9,3 +9,25 @@ pageextension 50100 CustomerListExt extends "Customer List"
         Message('App published: Hello world');
     end;
 }
+pageextension 50101 ItemList extends "Item List" 
+{
+    layout
+    {
+        // Add changes to page layout here
+    }
+
+    actions
+    {
+        // Add changes to page actions here
+    }
+    
+    var
+        myInt : Integer;
+    trigger OnAfterGetRecord();
+    begin
+        if(Rec."No." == '1000') then
+        begin
+            Message('Price for Item No. %1 is %2.', Rec."No.", Rec."Unit Price");
+        end;          
+    end;
+}
