@@ -30,4 +30,8 @@ pageextension 50101 ItemList extends "Item List"
             //Message('Price for Item No. %1 is %2.', Rec."No.", Rec."Unit Price");
         end;          
     end;
+    trigger OnOpenPage();
+    begin
+        Message('Opening page %1 in client type %2.', CurrPage.ObjectId(true), CurrentClientType);
+    end;
 }

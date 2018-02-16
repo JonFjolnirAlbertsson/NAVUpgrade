@@ -94,7 +94,6 @@ $BackupFilePath = join-path $BackupPath $BackupFileName
 Backup-SqlDatabase -ServerInstance $DBServer -Database $UpgradeDataBaseName -BackupAction Database -BackupFile $BackupFilePath -CompressionOption Default
 $StoppedDateTime = Get-Date
 Write-Host 'Start at: ' + $StartedDateTime + ' . Finished at: ' + $StoppedDateTime + ' . Total time' + ($StoppedDateTime-$StartedDateTime) -ForegroundColor Yellow 
-$StoppedDateTime = Get-Date
 #Step 3
 $StartedDateTime = Get-Date
 $BackupFileName = $UpgradeDataBaseName + "_Step3.bak"
