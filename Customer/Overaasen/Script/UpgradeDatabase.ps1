@@ -21,7 +21,7 @@ Import-Certificate -Filepath $CertificateFile -CertStoreLocation "Cert:\LocalMac
 Enable-WSManCredSSP -Role server -Force
 # Creating Credential for the NAV Server Instance user
 $InstanceSecurePassword = ConvertTo-SecureString $InstancePassword -AsPlainText -Force
-$InstanceCredential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $InstanceUserName , $InstanceSecurePassword 
+$InstanceCredential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $InstanceUserName, $InstanceSecurePassword 
 
 # Import NAV, cloud.ready and incadea modules. To be able to import the moduel sqlps
 # files had to be copied from folder "C:\Program Files (x86)\Microsoft SQL Server\130\Tools\PowerShell\Modules" to the folder "C:\Windows\System32\WindowsPowerShell\v1.0\Modules" 
@@ -47,6 +47,8 @@ $BackupFilePath = join-path $BackupPath $BackupFileName
 Restore-SQLBackupFile-INC -BackupFile $BackupFilePath  -DatabaseServer $DBServer -DatabaseName $UpgradeFromDataBaseName
 New-SQLUser-INC -DatabaseServer $DBServer -DatabaseName $UpgradeFromDataBaseName -DatabaseUser $DBNAVServiceUserName 
 New-SQLUser-INC -DatabaseServer $DBServer -DatabaseName $UpgradeFromDataBaseName -DatabaseUser $UserName 
+New-NAVUser-INC -NavServiceInstance $UpgradeFromInstance -User $UserName 
+New-NAVUser-INC -NavServiceInstance $UpgradeFromInstance -User $DBNAVServiceUserName 
 #>
 # Add the NAV Instance user as DBOwner for all databases
 New-SQLUser-INC -DatabaseServer $DBServer -DatabaseName $DemoDBNO -DatabaseUser $DBNAVServiceUserName
@@ -224,12 +226,15 @@ $Filter = 'ID=2000000000..2000000199'
 Compile-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $UpgradeFromDataBaseName -Filter $Filter -LogPath $LogPath -Recompile -SynchronizeSchemaChanges No
 $Filter = 'Version List=*UPGTK*'
 Compile-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $UpgradeFromDataBaseName -Filter $Filter -LogPath $LogPath -Recompile -SynchronizeSchemaChanges No
+$Filter = 'Version List=*OMA*|*Test*'
+Compile-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $UpgradeFromDataBaseName -Filter $Filter -LogPath $LogPath -Recompile -SynchronizeSchemaChanges No
 $Filter = 'Compiled=0'
 Compile-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $UpgradeFromDataBaseName -Filter $Filter -LogPath $LogPath -SynchronizeSchemaChanges No
 # Task 12: Recompile published extensions
 Get-NAVAppInfo -ServerInstance $UpgradeFromInstance | Repair-NAVApp
 # Task 13: Run the schema synchronization on the imported objects
 $CurrentUpgradeFromInstance | Sync-NAVTenant -Mode Sync
+#$CurrentUpgradeFromInstance | Sync-NAVTenant -Mode ForceSync
 # Task 14: Run the data upgrade process
 $CurrentUpgradeFromInstance | Get-NAVServerConfiguration 
 Start-NavDataUpgrade -ServerInstance $UpgradeFromInstance -FunctionExecutionMode Serial -SkipAppVersionCheck
@@ -245,10 +250,39 @@ Delete-NAVApplicationObject -DatabaseName $UpgradeFromDataBaseName -DatabaseServ
 # Task 18: Register client control add-ins
 # The database is now fully upgraded and is ready for use. However, Microsoft Dynamics NAV 2018 includes the following client control add-ins
 #Task 19: Publish and install/upgrade extensions
+Get-NAVAppInfo -ServerInstance $UpgradeFromInstance
+Uninstall-NAVApp -ServerInstance $UpgradeFromInstance -Name 'Sales and Inventory Forecast' -Version 1.0.0.0
+Uninstall-NAVApp -ServerInstance $UpgradeFromInstance -Name 'PayPal Payments Standard' -Version 1.0.0.0
+Unpublish-NAVApp -ServerInstance $UpgradeFromInstance -Name 'Sales and Inventory Forecast' -Version 1.0.0.0
+Unpublish-NAVApp -ServerInstance $UpgradeFromInstance -Name 'PayPal Payments Standard' -Version 1.0.0.0
+$ImageAnalysis = '\\NO01DEVSQL01\install\NAV2018\CU 02 NO\DVD\Extensions\ImageAnalysis\ImageAnalysis.app'
+$MSWalletPayments = '\\NO01DEVSQL01\install\NAV2018\CU 02 NO\DVD\Extensions\MSWalletPayments\MSWalletPayments.navx'
+$PayPalPaymentsStandard = '\\NO01DEVSQL01\install\NAV2018\CU 02 NO\DVD\Extensions\PayPalPaymentsStandard\PayPalPaymentsStandard.navx'
+$SalesAndInventoryForecast = '\\NO01DEVSQL01\install\NAV2018\CU 02 NO\DVD\Extensions\SalesAndInventoryForecast\SalesAndInventoryForecast.navx'
+Get-NAVAppInfo -ServerInstance $UpgradeFromInstance 
+# Had to delete Test objects to be able to import the Image Analyzer extension
+$Filter = 'Version List=*Test*'
+Delete-NAVApplicationObject -DatabaseName $UpgradeFromDataBaseName -DatabaseServer $DBServer -Filter $Filter -SynchronizeSchemaChanges Force
+
+$CurrentUpgradeFromInstance | Publish-NAVApp -Path $ImageAnalysis
+$CurrentUpgradeFromInstance | Publish-NAVApp -Path $MSWalletPayments
+$CurrentUpgradeFromInstance | Publish-NAVApp -Path $PayPalPaymentsStandard
+$CurrentUpgradeFromInstance | Publish-NAVApp -Path $SalesAndInventoryForecast
+Sync-NAVApp -ServerInstance $UpgradeFromInstance -Name 'Image Analyzer' -Version 1.0.20348.0
+Get-NAVAppInfo -ServerInstance $UpgradeFromInstance -SymbolsOnly
 $ModenDevFolder = '\\NO01DEVSQL01\install\NAV2018\CU 02 NO\DVD\ModernDev\program files\Microsoft Dynamics NAV\110\Modern Development Environment'
 $SystemSymbolFile = join-path $ModenDevFolder 'System.app'
 $TestSymbolFile = join-path $ModenDevFolder 'Test.app'
 Publish-NAVApp -ServerInstance $UpgradeFromInstance -Path $SystemSymbolFile -PackageType SymbolsOnly
 Publish-NAVApp -ServerInstance $UpgradeFromInstance -Path $TestSymbolFile -PackageType SymbolsOnly
+
 $FinSQL = join-path 'C:\Program Files (x86)\Microsoft Dynamics NAV\110\RoleTailored Client' 'finsql.exe'
 & $FinSQL Command=generatesymbolreference, Database=$UpgradeFromDataBaseName, ServerName=$DBServer
+
+# Create Web client instance
+New-NAVWebServerInstance -WebServerInstance $UpgradeFromInstance  -Server $NAVServer -ServerInstance $UpgradeFromInstance 
+
+# Backup Merged, OMA and upgraded DB
+$BackupFileName = $UpgradeFromDataBaseName + "_AfterUpgrade.bak"
+$BackupFilePath = join-path $BackupPath $BackupFileName 
+Backup-SqlDatabase -ServerInstance $DBServer -Database $UpgradeName -BackupAction Database -BackupFile $BackupFilePath -CompressionOption Default
