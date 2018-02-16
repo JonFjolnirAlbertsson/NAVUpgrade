@@ -4,6 +4,7 @@ $RootFolderName = 'incadea'
 $RootFolderPath = join-path $RootDrive $RootFolderName
 $CompanyName = 'PP'
 $GitPath = join-path $RootDrive 'Git'
+$DBServerRootPath = "\\NO01DEVSQL01\Backup\$CompanyName"
 # Servers
 $DBServer = 'NO01DEVSQL01.si-dev.local'
 $NAVServer = 'NO01DEV03.si-dev.local'
@@ -13,7 +14,7 @@ $NAVLicense = join-path $RootFolderPath "License\NAV2018.flf"
 $CertificateFile = join-path ("$GitPath\NAVUpgrade\Certificate") 'cert'
 # Database
 $UpgradeDataBaseName = 'NAV2009R2_PP_ToUpgrade'
-$BackupPath = Join-Path (Get-Location).providerpath  'Backup'
+$BackupPath = $DBServerRootPath
 #NAV Specific data
 $NAVShortVersion = 'NAV110'
 $NavServiceInstance = "NAV110_$CompanyName"

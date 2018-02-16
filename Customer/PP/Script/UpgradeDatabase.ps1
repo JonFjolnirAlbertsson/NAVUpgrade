@@ -16,13 +16,15 @@ Set-Location 'C:\'
 $Location = join-path $pwd.drive.Root 'Git\NAVUpgrade\Customer\PP\Script'
 $scriptLocationPath = join-path $Location 'Set-UpgradeSettings.ps1'
 . $scriptLocationPath
-Import-Certificate -Filepath $CertificateFile -CertStoreLocation "Cert:\LocalMachine\Root"
 ## Server Enabling WSManCredSSP to be able to do a double hop with authentication.
 Enable-WSManCredSSP -Role server -Force
 # Creating Credential for the NAV Server Instance user
 $InstanceSecurePassword = ConvertTo-SecureString $InstancePassword -AsPlainText -Force
 $InstanceCredential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $InstanceUserName, $InstanceSecurePassword 
-
+Import-Module SQLPS -DisableNameChecking 
+Import-module (Join-Path "$GitPath\Cloud.Ready.Software.PowerShell\PSModules" 'LoadModules.ps1') -Force -WarningAction SilentlyContinue | Out-Null
+Import-module (Join-Path "$GitPath\IncadeaNorway" 'LoadModules.ps1') -Force -WarningAction SilentlyContinue | Out-Null
+Import-NAVModules-INC -ShortVersion '110' -ImportRTCModule 
 #<#
 # Reset Workingfolder
 if (test-path $WorkingFolder){
