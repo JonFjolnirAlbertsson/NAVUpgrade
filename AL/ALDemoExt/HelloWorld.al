@@ -25,9 +25,9 @@ pageextension 50101 ItemList extends "Item List"
         myInt : Integer;
     trigger OnAfterGetRecord();
     begin
-        if(Rec."No." == '1000') then
+        if(Rec."No." = '1000') then
         begin
-            Message('Price for Item No. %1 is %2.', Rec."No.", Rec."Unit Price");
+            //Message('Price for Item No. %1 is %2.', Rec."No.", Rec."Unit Price");
         end;          
     end;
 }
