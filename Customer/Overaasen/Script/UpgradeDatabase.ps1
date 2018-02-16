@@ -16,7 +16,7 @@ Set-Location 'C:\'
 $Location = join-path $pwd.drive.Root 'Git\NAVUpgrade\Customer\Overaasen\Script'
 $scriptLocationPath = join-path $Location 'Set-UpgradeSettings.ps1'
 . $scriptLocationPath
-Import-Certificate -Filepath $CertificateFile -CertStoreLocation "Cert:\LocalMachine\Root"
+#Import-Certificate -Filepath $CertificateFile -CertStoreLocation "Cert:\LocalMachine\Root"
 ## Server Enabling WSManCredSSP to be able to do a double hop with authentication.
 Enable-WSManCredSSP -Role server -Force
 # Creating Credential for the NAV Server Instance user

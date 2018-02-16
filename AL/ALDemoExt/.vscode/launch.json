@@ -1,0 +1,14 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "al",
+            "request": "launch",
+            "name": "no01dev03.si-dev.local",
+            "server": "http://no01dev03.si-dev.local",
+            "serverInstance": "DynamicsNAV110",
+            "authentication": "Windows",
+            "startupObjectId": 22
+        }
+    ]
+}

@@ -1,8 +1,28 @@
-﻿Set-Location -Path (Split-Path $psise.CurrentFile.FullPath -Qualifier)
+﻿# Client script to start remote session on application server
+Set-Location -Path (Split-Path $psise.CurrentFile.FullPath -Qualifier)
 $Location = (Split-Path $psise.CurrentFile.FullPath)
-. (join-path $Location 'Set-UpgradeSettings.ps1')
+$scriptLocationPath = (join-path $Location 'Set-UpgradeSettings.ps1')
+. $scriptLocationPath
+# Client Enabling WSManCredSSP to be able to do a double hop with authentication.
+Enable-WSManCredSSP -Role Client -DelegateComputer $NAVServerRSName  -Force
+$InstanceSecurePassword = ConvertTo-SecureString $InstancePassword -AsPlainText -Force
+$UserCredential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $UserName , $InstanceSecurePassword 
+Enter-PSSession -ComputerName $NAVServerRSName -UseSSL -Credential $UserCredential –Authentication CredSSP
+
+# Server Site script
 clear-host
 $StartedDateTime = Get-Date
+Set-Location 'C:\'
+$Location = join-path $pwd.drive.Root 'Git\NAVUpgrade\Customer\PP\Script'
+$scriptLocationPath = join-path $Location 'Set-UpgradeSettings.ps1'
+. $scriptLocationPath
+Import-Certificate -Filepath $CertificateFile -CertStoreLocation "Cert:\LocalMachine\Root"
+## Server Enabling WSManCredSSP to be able to do a double hop with authentication.
+Enable-WSManCredSSP -Role server -Force
+# Creating Credential for the NAV Server Instance user
+$InstanceSecurePassword = ConvertTo-SecureString $InstancePassword -AsPlainText -Force
+$InstanceCredential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $InstanceUserName, $InstanceSecurePassword 
+
 #<#
 # Reset Workingfolder
 if (test-path $WorkingFolder){
