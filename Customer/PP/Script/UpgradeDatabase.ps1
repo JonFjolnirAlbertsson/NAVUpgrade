@@ -87,6 +87,7 @@ $BackupFilePath = join-path $BackupPath $BackupFileName
 Backup-SqlDatabase -ServerInstance $DBServer -Database $UpgradeDataBaseName -BackupAction Database -BackupFile $BackupFilePath -CompressionOption Default
 $StoppedDateTime = Get-Date
 Write-Host 'Start at: ' + $StartedDateTime + ' . Finished at: ' + $StoppedDateTime + ' . Total time' + ($StoppedDateTime-$StartedDateTime) -ForegroundColor Yellow
+#Restore-SQLBackupFile-INC -BackupFile $BackupFilePath   -DatabaseServer $DBServer -DatabaseName 'NAV2009R2_PP_Master'
 #Step 2
 $StartedDateTime = Get-Date
 $BackupFileName = $UpgradeDataBaseName + "_Step2.bak"
