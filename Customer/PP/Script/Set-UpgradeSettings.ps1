@@ -17,7 +17,7 @@ $UpgradeDataBaseName = 'NAV2009R2_PP_ToUpgrade'
 $BackupPath = $DBServerRootPath
 #NAV Specific data
 $NAVShortVersion = 'NAV110'
-$NavServiceInstance = "NAV110_$CompanyName"
+$UpgradeFromInstance = "NAV110_$CompanyName"
 $Nav2015ServiceInstance = "NAV80_$CompanyName"
 $NAVVersion = 'NAV2018'
 $NAVCU = 'CU01'
