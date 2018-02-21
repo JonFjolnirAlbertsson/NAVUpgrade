@@ -102,7 +102,6 @@ $BackupFilePath = join-path $BackupPath $BackupFileName
 Backup-SqlDatabase -ServerInstance $DBServer -Database $UpgradeDataBaseName -BackupAction Database -BackupFile $BackupFilePath -CompressionOption Default
 $StoppedDateTime = Get-Date
 Write-Host 'Start at: ' + $StartedDateTime + ' . Finished at: ' + $StoppedDateTime + ' . Total time' + ($StoppedDateTime-$StartedDateTime) -ForegroundColor Yellow 
-$StoppedDateTime = Get-Date
 # Step 4
 $StartedDateTime = Get-Date
 $BackupFileName = $UpgradeDataBaseName + "_Step4.bak"
@@ -110,7 +109,6 @@ $BackupFilePath = join-path $BackupPath $BackupFileName
 Backup-SqlDatabase -ServerInstance $DBServer -Database $UpgradeDataBaseName -BackupAction Database -BackupFile $BackupFilePath -CompressionOption Default
 $StoppedDateTime = Get-Date
 Write-Host 'Start at: ' + $StartedDateTime + ' . Finished at: ' + $StoppedDateTime + ' . Total time' + ($StoppedDateTime-$StartedDateTime) -ForegroundColor Yellow 
-$StoppedDateTime = Get-Date 
 # Sync and correct errors in NAV 2015
 # Remember to load NAV 2015 modules
 Import-NAVModules-INC -ShortVersion '80' -ImportRTCModule 
@@ -122,7 +120,6 @@ $BackupFilePath = join-path $BackupPath $BackupFileName
 Backup-SqlDatabase -ServerInstance $DBServer -Database $UpgradeDataBaseName -BackupAction Database -BackupFile $BackupFilePath -CompressionOption Default
 $StoppedDateTime = Get-Date
 Write-Host 'Start at: ' + $StartedDateTime + ' . Finished at: ' + $StoppedDateTime + ' . Total time' + ($StoppedDateTime-$StartedDateTime) -ForegroundColor Yellow 
-$StoppedDateTime = Get-Date 
 # Start Data upgrade NAV 2015
 Start-NAVDataUpgrade -ServerInstance $Nav2015ServiceInstance -FunctionExecutionMode Serial
 
@@ -141,7 +138,6 @@ $BackupFilePath = join-path $BackupPath $BackupFileName
 Backup-SqlDatabase -ServerInstance $DBServer -Database $UpgradeDataBaseName -BackupAction Database -BackupFile $BackupFilePath -CompressionOption Default
 $StoppedDateTime = Get-Date
 Write-Host 'Start at: ' + $StartedDateTime + ' . Finished at: ' + $StoppedDateTime + ' . Total time' + ($StoppedDateTime-$StartedDateTime) -ForegroundColor Yellow 
-$StoppedDateTime = Get-Date 
 
 # Start upgrading to NAV 2018
 # Task 5: Delete all objects except tables from the old database
@@ -164,11 +160,16 @@ $BackupFilePath = join-path $BackupPath $BackupFileName
 Backup-SqlDatabase -ServerInstance $DBServer -Database $UpgradeDataBaseName -BackupAction Database -BackupFile $BackupFilePath -CompressionOption Default
 $StoppedDateTime = Get-Date
 Write-Host 'Start at: ' + $StartedDateTime + ' . Finished at: ' + $StoppedDateTime + ' . Total time' + ($StoppedDateTime-$StartedDateTime) -ForegroundColor Yellow 
-$StoppedDateTime = Get-Date 
 
 # Task 9: Import the application objects to the converted database
+$MergedFobFileName = 'NAV2018_CU01_NO_PP.fob'
+$MergedFobFile = join-path $WorkingFolder $MergedFobFileName
+if(!(Test-Path -Path $WorkingFolder )){
+    New-Item -ItemType directory -Path $WorkingFolder
+}
+Copy-Item -Path (Join-Path $ClientWorkingFolder $MergedFobFileName) -Destination $MergedFobFile -Force
 Import-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $UpgradeDataBaseName -Path $MergedFobFile -ImportAction Overwrite -LogPath $LogPath -SynchronizeSchemaChanges No
-$UpgradeFobFile = '\\NO01DEVSQL01\install\NAV2018\CU 02 NO\DVD\UpgradeToolKit\Local Objects\Upgrade10001100.NO.fob'
+$UpgradeFobFile = '\\NO01DEVSQL01\install\NAV2018\CU 02 NO\DVD\UpgradeToolKit\Local Objects\Upgrade8001100.NO.fob'
 Import-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $UpgradeDataBaseName -Path $UpgradeFobFile -ImportAction Overwrite -LogPath $LogPath -SynchronizeSchemaChanges No
 # OMA Objects
 $OMAFobFile = '\\NO01DEVSQL01\install\Tools\OMA\OMA12\OMA12 NAV2018.fob'
@@ -206,15 +207,37 @@ Compile-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $UpgradeDat
 $Filter = 'Compiled=0'
 Compile-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $UpgradeDataBaseName -Filter $Filter -LogPath $LogPath -SynchronizeSchemaChanges No
 # Task 12: Recompile published extensions
-Get-NAVAppInfo -ServerInstance $UpgradeFromInstance | Repair-NAVApp
+#Get-NAVAppInfo -ServerInstance $UpgradeFromInstance | Repair-NAVApp
 # Task 13: Run the schema synchronization on the imported objects
 $CurrentUpgradeFromInstance | Sync-NAVTenant -Mode Sync
 #$CurrentUpgradeFromInstance | Sync-NAVTenant -Mode ForceSync
+Compile-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $UpgradeDataBaseName -LogPath $LogPath -Recompile -SynchronizeSchemaChanges Yes
+$Filter = 'Type=Table;Id=355|104050|104052|104055|104073..104075|104080|104089'
+Compile-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $UpgradeDataBaseName -Filter $Filter -LogPath $LogPath -Recompile -SynchronizeSchemaChanges Force
+# Deleting objects from previous versions
+$Filter = 'Type=Table;Id=239|470|680..685|824..830|150020..150027'
+Delete-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $UpgradeDataBaseName -Filter $Filter -LogPath $LogPath -SynchronizeSchemaChanges Force
+$CurrentUpgradeFromInstance | Sync-NAVTenant -Mode Sync
+# Step 8
+$StartedDateTime = Get-Date
+$BackupFileName = $UpgradeDataBaseName + "_Step8.bak"
+$BackupFileName = $UpgradeDataBaseName + "_Step8_1.bak" # Had to delete tables and merge because of error when running sync.
+$BackupFilePath = join-path $BackupPath $BackupFileName 
+Backup-SqlDatabase -ServerInstance $DBServer -Database $UpgradeDataBaseName -BackupAction Database -BackupFile $BackupFilePath -CompressionOption Default
+$StoppedDateTime = Get-Date
+Write-Host 'Start at: ' + $StartedDateTime + ' . Finished at: ' + $StoppedDateTime + ' . Total time' + ($StoppedDateTime-$StartedDateTime) -ForegroundColor Yellow 
 # Task 14: Run the data upgrade process
 $CurrentUpgradeFromInstance | Get-NAVServerConfiguration 
 Start-NavDataUpgrade -ServerInstance $UpgradeFromInstance -FunctionExecutionMode Serial -SkipAppVersionCheck
 Get-NAVDataUpgrade -ServerInstance $UpgradeFromInstance -Detailed
 Get-NAVDataUpgradeContinuous -ServerInstance $UpgradeFromInstance
+# Step 9
+$StartedDateTime = Get-Date
+$BackupFileName = $UpgradeDataBaseName + "_Step9.bak"
+$BackupFilePath = join-path $BackupPath $BackupFileName 
+Backup-SqlDatabase -ServerInstance $DBServer -Database $UpgradeDataBaseName -BackupAction Database -BackupFile $BackupFilePath -CompressionOption Default
+$StoppedDateTime = Get-Date
+Write-Host 'Start at: ' + $StartedDateTime + ' . Finished at: ' + $StoppedDateTime + ' . Total time' + ($StoppedDateTime-$StartedDateTime) -ForegroundColor Yellow 
 # Task 15: Delete the upgrade objects
 $Filter = 'Version List=*UPGTK*'
 Delete-NAVApplicationObject -DatabaseName $UpgradeDataBaseName -DatabaseServer $DBServer -Filter $Filter -SynchronizeSchemaChanges Force

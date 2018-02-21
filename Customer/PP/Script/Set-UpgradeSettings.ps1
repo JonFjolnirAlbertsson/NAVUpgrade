@@ -32,6 +32,7 @@ $InstancePassword = '1378Nesbru'
 $CompanyFolder = join-path 'Customer' $CompanyName
 $RootFolder = join-path $RootFolderPath $CompanyFolder
 $WorkingFolder = join-path $RootFolder "\$NAVVersion\$NAVCU\Upgrade_$CompanyName"
+$ClientWorkingFolder = "\\$NAVServerClientName\c$\$RootFolderName\$CompanyFolder\$NAVVersion\$NAVCU\Upgrade_$CompanyName"
 $ObjectLibrary = "$RootFolder\DB"
 #Original DB objects
 $OriginalObjectLibrary = "$RootFolder\DB Original"
