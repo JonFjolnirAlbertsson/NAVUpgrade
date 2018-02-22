@@ -5,6 +5,8 @@ $RootFolderPath = join-path $RootDrive $RootFolderName
 $CompanyName = 'PP'
 $GitPath = join-path $RootDrive 'Git'
 $DBServerRootPath = "\\NO01DEVSQL01\Backup\$CompanyName"
+#Original DB objects
+$OriginalObjectLibrary = "$RootFolderPath\DB Original"
 # Servers
 $DBServer = 'NO01DEVSQL01.si-dev.local'
 $NAVServer = 'NO01DEV03.si-dev.local'
@@ -20,7 +22,7 @@ $NAVShortVersion = 'NAV110'
 $UpgradeFromInstance = "NAV110_$CompanyName"
 $Nav2015ServiceInstance = "NAV80_$CompanyName"
 $NAVVersion = 'NAV2018'
-$NAVCU = 'CU01'
+$NAVCU = 'CU02'
 $NAVLandCode = 'NO'
 $VersionListPrefixes = 'NAVW1', 'NAVNO', 'I'
 $NAVLicense = "$RootFolderPath\License\NAV2018.flf"
@@ -34,8 +36,6 @@ $RootFolder = join-path $RootFolderPath $CompanyFolder
 $WorkingFolder = join-path $RootFolder "\$NAVVersion\$NAVCU\Upgrade_$CompanyName"
 $ClientWorkingFolder = "\\$NAVServerClientName\c$\$RootFolderName\$CompanyFolder\$NAVVersion\$NAVCU\Upgrade_$CompanyName"
 $ObjectLibrary = "$RootFolder\DB"
-#Original DB objects
-$OriginalObjectLibrary = "$RootFolder\DB Original"
 #Merging parameters
 $SourcePath = join-path $WorkingFolder 'MergeResult' 
 $ConflictTarget = join-path $SourcePath  'ConflictTarget' 
@@ -54,12 +54,12 @@ $InstallLogFolder = "$NAVRootFolder\Log"
 $InstallLog = "$InstallLogFolder\install.log"
 
 #Original Version
-$OriginalVersion = '2009R2NO_6_00_32012_AllObjects'
+$OriginalVersion = $NAVVersion + '_CU01_' + $NAVLandCode
 $OriginalObjects = join-path  $OriginalObjectLibrary "$($OriginalVersion).txt"
 $OriginalFolder = join-path $WorkingFolder 'Original'
 
 #Modified Version
-$ModifiedVersion = 'NAV2009R2_' + $CompanyName
+$ModifiedVersion = $NAVVersion + '_CU01_' + $NAVLandCode +'_' + $CompanyName
 $ModifiedObjects = join-path $ObjectLibrary "$($ModifiedVersion).txt"
 $ModifiedFolder = join-path $WorkingFolder 'Modified'
 

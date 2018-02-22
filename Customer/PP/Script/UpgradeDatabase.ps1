@@ -55,7 +55,7 @@ $ToBeJoinedFolderPath = join-path $MergedFolderPath 'ToBeJoined'
 $ResultDestinationFile = join-path $WorkingFolder 'Result_Objects.TXT'
 $ToBeJoinedDestinationFile = join-path $WorkingFolder 'ToBeJoined_Objects.TXT'
 # Split Original, Modified and Target object files
-Merge-NAVCode -WorkingFolderPath $WorkingFolder -OriginalFileName $OriginalObjects -ModifiedFileName $ModifiedObjects -TargetFileName $TargetObjects -CompareObject $CompareObjectFilter -Split
+Merge-NAVCode-INC -WorkingFolderPath $WorkingFolder -OriginalFileName $OriginalObjects -ModifiedFileName $ModifiedObjects -TargetFileName $TargetObjects -CompareObject $CompareObjectFilter -Split
 # Merge object file to new file in the Result folder
 Merge-NAVCode -WorkingFolderPath $WorkingFolder -CompareObject $CompareObjectFilter -Merge
 # Compare MergeResult (Waldo) and Result (Standard NAV) and write result to file
@@ -221,14 +221,14 @@ $CurrentUpgradeFromInstance | Sync-NAVTenant -Mode Sync
 # Step 8
 $StartedDateTime = Get-Date
 $BackupFileName = $UpgradeDataBaseName + "_Step8.bak"
-$BackupFileName = $UpgradeDataBaseName + "_Step8_1.bak" # Had to delete tables and merge because of error when running sync.
+#$BackupFileName = $UpgradeDataBaseName + "_Step8_1.bak" # Had to delete tables and merge because of error when running sync.
 $BackupFilePath = join-path $BackupPath $BackupFileName 
 Backup-SqlDatabase -ServerInstance $DBServer -Database $UpgradeDataBaseName -BackupAction Database -BackupFile $BackupFilePath -CompressionOption Default
 $StoppedDateTime = Get-Date
 Write-Host 'Start at: ' + $StartedDateTime + ' . Finished at: ' + $StoppedDateTime + ' . Total time' + ($StoppedDateTime-$StartedDateTime) -ForegroundColor Yellow 
 # Task 14: Run the data upgrade process
 $CurrentUpgradeFromInstance | Get-NAVServerConfiguration 
-Start-NavDataUpgrade -ServerInstance $UpgradeFromInstance -FunctionExecutionMode Serial -SkipAppVersionCheck
+Start-NavDataUpgrade -ServerInstance $UpgradeFromInstance -FunctionExecutionMode Serial
 Get-NAVDataUpgrade -ServerInstance $UpgradeFromInstance -Detailed
 Get-NAVDataUpgradeContinuous -ServerInstance $UpgradeFromInstance
 # Step 9
@@ -239,7 +239,7 @@ Backup-SqlDatabase -ServerInstance $DBServer -Database $UpgradeDataBaseName -Bac
 $StoppedDateTime = Get-Date
 Write-Host 'Start at: ' + $StartedDateTime + ' . Finished at: ' + $StoppedDateTime + ' . Total time' + ($StoppedDateTime-$StartedDateTime) -ForegroundColor Yellow 
 # Task 15: Delete the upgrade objects
-$Filter = 'Version List=*UPGTK*'
+$Filter = 'Version List=*UPGTK*|Old Unused Table - marked for deletion.'
 Delete-NAVApplicationObject -DatabaseName $UpgradeDataBaseName -DatabaseServer $DBServer -Filter $Filter -SynchronizeSchemaChanges Force
 # Task 16: Import upgraded permission sets and permissions by using the Roles and Permissions XMLports
 # Manual import with XMLport from file
@@ -262,11 +262,10 @@ Get-NAVAppInfo -ServerInstance $UpgradeFromInstance
 $Filter = 'Version List=*Test*'
 Delete-NAVApplicationObject -DatabaseName $UpgradeDataBaseName -DatabaseServer $DBServer -Filter $Filter -SynchronizeSchemaChanges Force
 
-$CurrentUpgradeFromInstance | Publish-NAVApp -Path $ImageAnalysis
 $CurrentUpgradeFromInstance | Publish-NAVApp -Path $MSWalletPayments
 $CurrentUpgradeFromInstance | Publish-NAVApp -Path $PayPalPaymentsStandard
 $CurrentUpgradeFromInstance | Publish-NAVApp -Path $SalesAndInventoryForecast
-Sync-NAVApp -ServerInstance $UpgradeFromInstance -Name 'Image Analyzer' -Version 1.0.20348.0
+
 Get-NAVAppInfo -ServerInstance $UpgradeFromInstance -SymbolsOnly
 $ModenDevFolder = '\\NO01DEVSQL01\install\NAV2018\CU 02 NO\DVD\ModernDev\program files\Microsoft Dynamics NAV\110\Modern Development Environment'
 $SystemSymbolFile = join-path $ModenDevFolder 'System.app'
@@ -277,14 +276,18 @@ Publish-NAVApp -ServerInstance $UpgradeFromInstance -Path $TestSymbolFile -Packa
 $FinSQL = join-path 'C:\Program Files (x86)\Microsoft Dynamics NAV\110\RoleTailored Client' 'finsql.exe'
 & $FinSQL Command=generatesymbolreference, Database=$UpgradeDataBaseName, ServerName=$DBServer
 
+$CurrentUpgradeFromInstance | Publish-NAVApp -Path $ImageAnalysis
+Sync-NAVApp -ServerInstance $UpgradeFromInstance -Name 'Image Analyzer' -Version 1.0.20348.0
 # Create Web client instance
 New-NAVWebServerInstance -WebServerInstance $UpgradeFromInstance  -Server $NAVServer -ServerInstance $UpgradeFromInstance 
 
 # Backup Merged, OMA and upgraded DB
+$StartedDateTime = Get-Date
 $BackupFileName = $UpgradeDataBaseName + "_AfterUpgrade.bak"
 $BackupFilePath = join-path $BackupPath $BackupFileName 
-Backup-SqlDatabase -ServerInstance $DBServer -Database $UpgradeName -BackupAction Database -BackupFile $BackupFilePath -CompressionOption Default
-
+Backup-SqlDatabase -ServerInstance $DBServer -Database $UpgradeDataBaseName -BackupAction Database -BackupFile $BackupFilePath -CompressionOption Default
+$StoppedDateTime = Get-Date
+Write-Host 'Start at: ' + $StartedDateTime + ' . Finished at: ' + $StoppedDateTime + ' . Total time' + ($StoppedDateTime-$StartedDateTime) -ForegroundColor Yellow
 Write-Host ''
 Write-Host ''    
 Write-Host '****************************************************' -ForegroundColor Yellow
