@@ -22,7 +22,7 @@ $NAVShortVersion = 'NAV110'
 $UpgradeFromInstance = "NAV110_$CompanyName"
 $Nav2015ServiceInstance = "NAV80_$CompanyName"
 $NAVVersion = 'NAV2018'
-$NAVCU = 'CU02'
+$NAVCU = 'CU03'
 $NAVLandCode = 'NO'
 $VersionListPrefixes = 'NAVW1', 'NAVNO', 'I'
 $NAVLicense = "$RootFolderPath\License\NAV2018.flf"
@@ -54,12 +54,12 @@ $InstallLogFolder = "$NAVRootFolder\Log"
 $InstallLog = "$InstallLogFolder\install.log"
 
 #Original Version
-$OriginalVersion = $NAVVersion + '_CU01_' + $NAVLandCode
+$OriginalVersion = 'NAV2009_R2_32012_' + $NAVLandCode
 $OriginalObjects = join-path  $OriginalObjectLibrary "$($OriginalVersion).txt"
 $OriginalFolder = join-path $WorkingFolder 'Original'
 
 #Modified Version
-$ModifiedVersion = $NAVVersion + '_CU01_' + $NAVLandCode +'_' + $CompanyName
+$ModifiedVersion = 'NAV2009_R2_' + $NAVLandCode +'_' + $CompanyName
 $ModifiedObjects = join-path $ObjectLibrary "$($ModifiedVersion).txt"
 $ModifiedFolder = join-path $WorkingFolder 'Modified'
 

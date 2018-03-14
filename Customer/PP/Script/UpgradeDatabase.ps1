@@ -55,11 +55,11 @@ $ToBeJoinedFolderPath = join-path $MergedFolderPath 'ToBeJoined'
 $ResultDestinationFile = join-path $WorkingFolder 'Result_Objects.TXT'
 $ToBeJoinedDestinationFile = join-path $WorkingFolder 'ToBeJoined_Objects.TXT'
 # Split Original, Modified and Target object files
-Merge-NAVCode-INC -WorkingFolderPath $WorkingFolder -OriginalFileName $OriginalObjects -ModifiedFileName $ModifiedObjects -TargetFileName $TargetObjects -CompareObject $CompareObjectFilter -Split
+Merge-NAVCode-INC -Split -WorkingFolderPath $WorkingFolder -OriginalFileName $OriginalObjects -ModifiedFileName $ModifiedObjects -TargetFileName $TargetObjects -CompareObject $CompareObjectFilter
 # Merge object file to new file in the Result folder
-Merge-NAVCode -WorkingFolderPath $WorkingFolder -CompareObject $CompareObjectFilter -Merge
+Merge-NAVCode -Merge -WorkingFolderPath $WorkingFolder -CompareObject $CompareObjectFilter
 # Compare MergeResult (Waldo) and Result (Standard NAV) and write result to file
-Compare-Folders -WorkingFolderPath $WorkingFolder -CompareObjectFilter $CompareObjectFilter -CopyMergeResult2ToBeJoined -MoveConflictItemsFromToBeJoined2Merged -CompareContent -CompareMergeResult2Result -DropObjectProperty 
+Compare-Folders -WorkingFolderPath $WorkingFolder -CompareObjectFilter $CompareObjectFilter -CopyMergeResult2ToBeJoined -MoveConflictItemsFromToBeJoined2Merged -CompareContent -CompareMergeResult2Result -DropObjectProperty
 # Remove Original standard objects that have been removed or that we do not have license to import to DB as text files
 Remove-OriginalFilesNotInTarget -WorkingFolderPath $WorkingFolder -WriteResultToFile
 # Join Result folder
@@ -287,6 +287,7 @@ $BackupFileName = $UpgradeDataBaseName + "_AfterUpgrade.bak"
 $BackupFilePath = join-path $BackupPath $BackupFileName 
 Backup-SqlDatabase -ServerInstance $DBServer -Database $UpgradeDataBaseName -BackupAction Database -BackupFile $BackupFilePath -CompressionOption Default
 $StoppedDateTime = Get-Date
+
 Write-Host 'Start at: ' + $StartedDateTime + ' . Finished at: ' + $StoppedDateTime + ' . Total time' + ($StoppedDateTime-$StartedDateTime) -ForegroundColor Yellow
 Write-Host ''
 Write-Host ''    
@@ -295,4 +296,10 @@ write-host 'Done!' -ForegroundColor Yellow
 Write-host "$($UpgradedServerInstance.ServerInstance) created!" -ForegroundColor Yellow
 Write-Host 'Total Duration' ([Math]::Round(($StoppedDateTime - $StartedDateTime).TotalSeconds)) 'seconds' -ForegroundColor Yellow
 Write-Host '****************************************************' -ForegroundColor Yellow
+#Remove-SQLDatabase -DatabaseServer $DBServer -DatabaseName $UpgradeDataBaseName
+$NewDBName = 'NAV110_CU02_PP'
+$BackupFileName = "$NewDBName.bak"
+$BackupFilePath = join-path $BackupPath $BackupFileName 
+#Restore-SQLBackupFile-INC -BackupFile $BackupFilePath  -DatabaseServer $DBServer -DatabaseName $NewDBName 
+Backup-SqlDatabase -ServerInstance $DBServer -Database $NewDBName -BackupAction Database -BackupFile $BackupFilePath -CompressionOption Default
 

@@ -39,10 +39,11 @@ $NAV2015Instance = 'NAV80_PP'
 $NAV2018Instance = 'NAV110_PP'
 $ADUserName = 'si-dev\devjal'
 $ADUserName = 'si-dev\devMAF'
-$CurrentServerInstance = Get-NAVServerInstance -ServerInstance $NAV2018Instance
+$ADUserName = 'si-dev\nav_user'
+$CurrentServerInstance = Get-NAVServerInstance -ServerInstance $DemoInstance
 $DatabaseName = (Get-NAVServerConfiguration2 -ServerInstance $CurrentServerInstance.ServerInstance | Where Key -eq DatabaseName).Value
 $DatabaseServer = (Get-NAVServerConfiguration2 -ServerInstance $CurrentServerInstance.ServerInstance | Where Key -eq DatabaseServer).Value
-New-NAVUser-INC -NavServiceInstance $NAV2018Instance -User $ADUserName
+New-NAVUser-INC -NavServiceInstance $DemoInstance -User $ADUserName
 New-SQLUser-INC -DatabaseServer $DatabaseServer -DatabaseName $DatabaseName -DatabaseUser $ADUserName
 #Get-NAVServerInstance -ServerInstance $DemoInstance | Copy-NAVEnvironment -ToServerInstance $NAV2018Instance
 #Sync-NAVTenant -ServerInstance $DemoInstance 
