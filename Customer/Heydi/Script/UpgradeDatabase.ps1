@@ -1,5 +1,5 @@
 ﻿# Client script to start remote session on application server
-Set-Location -Path (Split-Path $psise.CurrentFile.FullPath -Qualifier)
+Set-Location -Path (Split-Path $psise.CurrentFile.FullPath)
 $Location = (Split-Path $psise.CurrentFile.FullPath)
 $scriptLocationPath = (join-path $Location 'Set-UpgradeSettings.ps1')
 . $scriptLocationPath
@@ -12,8 +12,7 @@ Enter-PSSession -ComputerName $NAVServerRSName -UseSSL -Credential $UserCredenti
 # Server Site script
 clear-host
 $StartedDateTime = Get-Date
-Set-Location 'C:\'
-$Location = join-path $pwd.drive.Root 'Git\NAVUpgrade\Customer\Overaasen\Script'
+$Location = join-path '\\NO01DEV03\Temp' 'Git\NAVUpgrade\Customer\Heydi\Script'
 $scriptLocationPath = join-path $Location 'Set-UpgradeSettings.ps1'
 . $scriptLocationPath
 #Import-Certificate -Filepath $CertificateFile -CertStoreLocation "Cert:\LocalMachine\Root"
@@ -30,9 +29,7 @@ Import-module (Join-Path "$GitPath\Cloud.Ready.Software.PowerShell\PSModules" 'L
 Import-module (Join-Path "$GitPath\IncadeaNorway" 'LoadModules.ps1') -Force -WarningAction SilentlyContinue | Out-Null
 Import-NAVModules-INC -ShortVersion '110' -ImportRTCModule 
 # Create Customer Upgrade NAV NO database
-Restore-SQLBackupFile-INC -BackupFile $BackupfileDemoDBNO  -DatabaseServer $DBServer -DatabaseName $DemoDBNO
-Restore-SQLBackupFile-INC -BackupFile $BackupfileDemoDBNO  -DatabaseServer $DBServer -DatabaseName $UpgradeDataBaseName
-Restore-SQLBackupFile-INC -BackupFile $BackupfileDemoOriginalDBNO  -DatabaseServer $DBServer -DatabaseName $DemoOriginalDBNO
+Restore-SQLBackupFile-INC -BackupFile $BackupfileDemoDBNO  -DatabaseServer $DBServer -DatabaseName $UpgradeName
 # Backup the development database that will be upgraded
 if(!(Test-Path -Path $BackupPath )){
     New-Item -ItemType directory -Path $BackupPath
@@ -51,9 +48,7 @@ New-NAVUser-INC -NavServiceInstance $UpgradeFromInstance -User $UserName
 New-NAVUser-INC -NavServiceInstance $UpgradeFromInstance -User $DBNAVServiceUserName 
 #>
 # Add the NAV Instance user as DBOwner for all databases
-New-SQLUser-INC -DatabaseServer $DBServer -DatabaseName $DemoDBNO -DatabaseUser $DBNAVServiceUserName
-New-SQLUser-INC -DatabaseServer $DBServer -DatabaseName $UpgradeDataBaseName -DatabaseUser $DBNAVServiceUserName 
-New-SQLUser-INC -DatabaseServer $DBServer -DatabaseName $DemoOriginalDBNO -DatabaseUser $DBNAVServiceUserName 
+New-SQLUser-INC -DatabaseServer $DBServer -DatabaseName $UpgradeName -DatabaseUser $DBNAVServiceUserName
 # Creating NAV Server Instances
 Write-host "Create Service Instance"
 New-NAVEnvironment  -EnablePortSharing -ServerInstance $UpgradeName  -DatabaseServer $DBServer
@@ -65,6 +60,10 @@ $CurrentServerInstance | Set-NAVServerInstance -stop
 $CurrentServerInstance | Set-NAVServerConfiguration -KeyName MultiTenant -KeyValue "false"
 $CurrentServerInstance | Set-NAVServerConfiguration -KeyName DatabaseServer -KeyValue $DBServer
 $CurrentServerInstance | Set-NAVServerConfiguration -KeyName DatabaseName -KeyValue $UpgradeName
+$CurrentServerInstance | Set-NAVServerConfiguration -KeyName EnableSymbolLoadingAtServerStartup -KeyValue "True"
+$CurrentServerInstance | Set-NAVServerConfiguration -KeyName CompileBusinessApplicationAtStartup -KeyValue "True"
+$CurrentServerInstance | Set-NAVServerConfiguration -KeyName DeveloperServicesEnabled -KeyValue "True"
+$CurrentServerInstance | Set-NAVServerConfiguration -KeyName EnableDebugging -KeyValue "True"
 $CurrentServerInstance | Set-NAVServerInstance -ServiceAccountCredential $InstanceCredential -ServiceAccount User
 $CurrentServerInstance | Set-NAVServerInstance -start
 # Import License
@@ -75,36 +74,18 @@ $CurrentServerInstance | Sync-NAVTenant -Mode Sync
 # Add user to database
 New-NAVUser-INC -NavServiceInstance $UpgradeName -User $UserName 
 # Export all objects to text files. Remember that the objects will be created on the $NAVServer.
-# Import Module for original DB
-Import-NAVModules-INC -ShortVersion '100' -ServiceFolder 'Service CU03' -RTCFolder 'RTC CU03' -ImportRTCModule
-New-NAVEnvironment  -EnablePortSharing -ServerInstance $UpgradeFromOriginalName  -DatabaseServer $DBServer
-New-NAVUser-INC -NavServiceInstance $UpgradeFromOriginalName -User $DBNAVServiceUserName 
-# Set instance parameters
-$ServerInstanceOriginal = Get-NAVServerInstance -ServerInstance $UpgradeFromOriginalName
-$ServerInstanceOriginal | Set-NAVServerInstance -stop
-$ServerInstanceOriginal | Set-NAVServerConfiguration -KeyName MultiTenant -KeyValue "false"
-$ServerInstanceOriginal | Set-NAVServerConfiguration -KeyName DatabaseServer -KeyValue $DBServer
-$ServerInstanceOriginal | Set-NAVServerConfiguration -KeyName DatabaseName -KeyValue $DemoOriginalDBNO
-$ServerInstanceOriginal | Set-NAVServerInstance -ServiceAccountCredential $InstanceCredential -ServiceAccount User
-$ServerInstanceOriginal | Set-NAVServerInstance -start
-$ServerInstanceOriginal | Import-NAVServerLicense -LicenseFile $NAVLicense
-$ServerInstanceOriginal | Set-NAVServerInstance -Restart
-$ServerInstanceOriginal | Sync-NAVTenant -Mode Sync
-#$ServerInstanceOriginal | Sync-NAVTenant -Mode ForceSync
-Export-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $DemoOriginalDBNO -Path $OriginalObjectsPath -Filter $ExportObjectFilter -LogPath $LogPath -ExportTxtSkipUnlicensed
-# Import Module for Modified DB
-Import-NAVModules-INC -ShortVersion '100' -ImportRTCModule
-Export-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $UpgradeFromDataBaseName -Path $ModifiedObjectsPath -Filter $ExportObjectFilter -LogPath $LogPath -ExportTxtSkipUnlicensed
-# Import Module for Target DB
-Import-NAVModules-INC -ShortVersion '110' -ImportRTCModule
-Export-NAVApplicationObject -DatabaseServer $DBServer -DatabaseName $DemoDBNO -Path $TargetObjectsPath -LogPath $LogPath -ExportTxtSkipUnlicensed
-# Copy from remote server
+
+# Copy TO remote server
 if(!(Test-Path -Path $ClientWorkingFolder )){
     New-Item -ItemType directory -Path $ClientWorkingFolder
 }
-Copy-Item -Path $OriginalObjectsPath -Destination (Join-Path $ClientWorkingFolder $OriginalObjects) -Force
-Copy-Item -Path $ModifiedObjectsPath -Destination (Join-Path $ClientWorkingFolder $ModifiedObjects) -Force
-Copy-Item -Path $TargetObjectsPath -Destination (Join-Path $ClientWorkingFolder $TargetObjects) -Force
+if(!(Test-Path -Path $WorkingFolder )){
+    New-Item -ItemType directory -Path $WorkingFolder
+}
+Copy-Item -Path (Join-Path $ClientWorkingFolder $OriginalObjects)  -Destination $OriginalObjectsPath -Force
+Copy-Item -Path (Join-Path $ClientWorkingFolder $ModifiedObjects)  -Destination $ModifiedObjectsPath -Force
+Copy-Item -Path (Join-Path $ClientWorkingFolder $TargetObjects)  -Destination $TargetObjectsPath -Force
+
 # Merge Customer database objects and NAV 2018 objects.
 Remove-Item -Path "$MergeResultPath\*.*"
 Remove-Item -Path "$MergedPath\*.*"
@@ -129,6 +110,8 @@ Compare-Folders -WorkingFolderPath $WorkingFolder -CompareFolder1Path $MergeResu
                 -CopyMergeResult2ToBeJoined -MoveConflictItemsFromToBeJoined2Merged -CompareContent -DropObjectProperty 
 # Remove Original standard objects that have been removed or that we do not have license to import to DB as text files
 Remove-OriginalFilesNotInTarget -WorkingFolderPath $WorkingFolder -WriteResultToFile
+# Splitting file to get all target objects to the ToBeJoined folder
+#Split-NAVApplicationObjectFile -Source $TargetObjectsPath -Destination $ToBeJoinedPath
 # Join ToBeJoined folder and not including files from Merged
 Merge-NAVCode-INC -Join -WorkingFolderPath $WorkingFolder 
 # Compare the $ToBeJoinedDestinationFile file to the $TargetObjects in the "NAV Object Compare" application from Rune Sigurdsen
@@ -137,6 +120,28 @@ $NAVObjectCompareWinClient = join-path 'C:\Users\DevJAL\AppData\Roaming\Microsof
 
 # Join the Merged folder files without ToBeJoined and import to Dev database
 Join-NAVApplicationObjectFile -Source (join-path $MergedPath $CompareObjectFilter)  -Destination $MergedFolderFile -Force  
+# Merge NAV 2015 tables
+$VersionListPrefixes = 'NAVW1','NAVNO','INC','SER','OPC'
+$VersionListPrefixes = 'INC','SER','OPC'
+$NAV2015OriginalObjectsPath = 'C:\incadea\Customer\Heydi\NAV2015\CU42\NAV2018_CU04_NO.txt'
+$NAV2015ModifiedObjectsPath = 'C:\incadea\Customer\Heydi\NAV2015\CU42\NAV2018_CU04_NO_Heydi.txt'
+$NAV2015TargetObjectsPath = 'C:\incadea\Customer\Heydi\NAV2015\CU42\NAV2015_CU42_NO.txt'
+$NAV2015WorkingFolder = 'C:\incadea\Customer\Heydi\NAV2015\CU42' 
+$NAV2015TargetFolder = join-path $NAV2015WorkingFolder 'Target'
+$NAV2015MergedFolder = join-path $NAV2015WorkingFolder 'Merged'
+$NAV2015ResultFolder = join-path $NAV2015WorkingFolder 'Result'
+$MergeResult = Merge-NAVUpgradeObjects `
+    -OriginalObjects $NAV2015OriginalObjectsPath `    -ModifiedObjects $NAV2015ModifiedObjectsPath `
+    -TargetObjects $NAV2015TargetObjectsPath `
+    -WorkingFolder $NAV2015WorkingFolder `
+    -VersionListPrefixes $VersionListPrefixes `
+    -Force
+Merge-NAVApplicationObject -ModifiedPath $NAV2015ModifiedObjectsPath -OriginalPath $NAV2015OriginalObjectsPath -ResultPath $NAV2015ResultFolder -TargetPath $NAV2015TargetObjectsPath -DateTimeProperty FromTarget -ModifiedProperty FromModified -VersionListProperty FromTarget
+Split-NAVApplicationObjectFile -Source $NAV2015TargetObjectsPath -Destination $NAV2015TargetFolder
+Copy-Item -Path "$NAV2015WorkingFolder\MergeResult\TAB*.TXT" -Destination $NAV2015MergedFolder -Force
+Join-NAVApplicationObjectFile -Source $NAV2015MergedFolder -Destination "$NAV2015WorkingFolder\NAV2015_CU42_NO_Heydi_TAB.txt" -Force  
+Join-NAVApplicationObjectFile -Source  "$NAV2015WorkingFolder\Target\TAB*.TXT"  -Destination "$NAV2015WorkingFolder\NAV2015_CU42_NO_TAB.txt" -Force  
+
 # Copy file with merged objects to NAV Server
 Copy-Item -Path (join-path $ClientWorkingFolder $JoinFileName) -Destination $JoinFile -Force
 Copy-Item -Path (join-path $ClientWorkingFolder $MergedFolderFileName) -Destination $MergedFolderFile -Force

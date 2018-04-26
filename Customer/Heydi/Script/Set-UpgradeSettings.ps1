@@ -2,10 +2,11 @@
 $RootDrive = 'C:\'
 $RootFolderName = 'incadea'
 $RootFolderPath = join-path $RootDrive $RootFolderName
-$CompanyName = 'Overaasen'
+$CompanyName = 'Heydi'
 $DBServerRootPath = "\\NO01DEVSQL01\Backup\$CompanyName"
-$DBServerDemoPath = 'C:\MSSQL\Backup\Demo\'
-$GitPath = join-path $RootDrive 'Git'
+$DBServerDemoPath = '\\NO01DEVSQL01\backup\Demo'
+$GitRootDrive = '\\NO01DEV03\Temp'
+$GitPath = join-path $GitRootDrive 'Git'
 # Servers
 $DBServer = 'NO01DEVSQL01.si-dev.local'
 $NAVServer = 'NO01DEV03.si-dev.local'
@@ -21,7 +22,7 @@ $InstancePassword = '1378Nesbru'
 $DBUser = 'NAV_Service'
 $NAVVersion = 'NAV2018'
 $NAVShortVersion = 'NAV110'
-$NAVCU = 'CU02'
+$NAVCU = 'CU04'
 # Company data
 $CompanyFolder = "Customer\$CompanyName"
 $RootFolder = join-path $RootFolderPath $CompanyFolder
@@ -29,22 +30,22 @@ $WorkingFolder = join-path $RootFolder "\$NAVVersion\$NAVCU\Upgrade_$CompanyName
 $ClientWorkingFolder = "\\$NAVServerClientName\c$\$RootFolderName\$CompanyFolder\$NAVVersion\$NAVCU\Upgrade_$CompanyName"
 $UpgradeName = $NAVShortVersion  + $NAVCU + '_' + $CompanyName
 $UpgradeDataBaseName = $UpgradeName
-$UpgradeFromOriginalName = 'NAV100CU03'
+$UpgradeFromOriginalName = 'NAV2009_R2_32012_NO'
 $UpgradeFromDataBaseName = $UpgradeFromOriginalName +'_' + $CompanyName
 $UpgradeObjectsName = $NAVVersion  + $NAVCU + $CompanyName + 'Objects'																 
 $LogPath = join-path $WorkingFolder 'Log'
 # Database backup NO
-$DemoOriginalDBNO = 'Demo Database NAV (10-0) CU03 NO'
+$DemoOriginalDBNO = 'Demo Database NAV (6-0)'
 $DemoDBNO = "Demo Database NAV (11-0) $NAVCU NO"
 # Database backup common
 $BackupPath = $DBServerRootPath
 $BackupfileDemoDBNO = join-path $DBServerDemoPath ("$DemoDBNO.bak")
 $BackupfileDemoOriginalDBNO = join-path $DBServerDemoPath ("$DemoOriginalDBNO.bak")
 # NAV Server Instances
-$UpgradeFromInstance = 'NAV100_Overaasen'
+$UpgradeFromInstance = 'Not in use now'
 # Merge files parameters
-$OriginalObjects = $UpgradeFromOriginalName  + '_AllObjects.txt'$ModifiedObjects = $UpgradeFromDataBaseName + '_AllObjects.txt'
-$TargetObjects = $NAVShortVersion +'_' + $NAVCU + '_NO.txt'
+$OriginalObjects = $UpgradeFromOriginalName  + '.txt'$ModifiedObjects = $UpgradeFromDataBaseName + '_AllObjects.txt'
+$TargetObjects = $NAVVersion +'_' + $NAVCU + '_NO.txt'
 #$DemoObjectsNO = $NAVVersion +'_' + $NAVCU + '_NO.txt'
 $OriginalObjectsPath = (join-path $WorkingFolder $OriginalObjects)
 $ModifiedObjectsPath = (join-path $WorkingFolder $ModifiedObjects)
