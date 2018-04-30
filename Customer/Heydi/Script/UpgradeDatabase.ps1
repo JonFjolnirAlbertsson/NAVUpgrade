@@ -124,23 +124,51 @@ Join-NAVApplicationObjectFile -Source (join-path $MergedPath $CompareObjectFilte
 $VersionListPrefixes = 'NAVW1','NAVNO','INC','SER','OPC'
 $VersionListPrefixes = 'INC','SER','OPC'
 $NAV2015OriginalObjectsPath = 'C:\incadea\Customer\Heydi\NAV2015\CU42\NAV2018_CU04_NO.txt'
-$NAV2015ModifiedObjectsPath = 'C:\incadea\Customer\Heydi\NAV2015\CU42\NAV2018_CU04_NO_Heydi.txt'
+$NAV2015ModifiedObjectsPath = 'C:\incadea\Customer\Heydi\NAV2015\CU42\NAV2018_CU04_NO_Heydi_TAB_Modified.txt'
 $NAV2015TargetObjectsPath = 'C:\incadea\Customer\Heydi\NAV2015\CU42\NAV2015_CU42_NO.txt'
 $NAV2015WorkingFolder = 'C:\incadea\Customer\Heydi\NAV2015\CU42' 
 $NAV2015TargetFolder = join-path $NAV2015WorkingFolder 'Target'
 $NAV2015MergedFolder = join-path $NAV2015WorkingFolder 'Merged'
-$NAV2015ResultFolder = join-path $NAV2015WorkingFolder 'Result'
+$NAV2015ModifiedFolder = join-path $NAV2015WorkingFolder 'Modified'
+$NAV2015OriginalFolder = join-path $NAV2015WorkingFolder 'Original'
+$NAV2015ResultFolder = join-path $NAV2015WorkingFolder 'Result\'
 $MergeResult = Merge-NAVUpgradeObjects `
     -OriginalObjects $NAV2015OriginalObjectsPath `    -ModifiedObjects $NAV2015ModifiedObjectsPath `
     -TargetObjects $NAV2015TargetObjectsPath `
     -WorkingFolder $NAV2015WorkingFolder `
     -VersionListPrefixes $VersionListPrefixes `
     -Force
-Merge-NAVApplicationObject -ModifiedPath $NAV2015ModifiedObjectsPath -OriginalPath $NAV2015OriginalObjectsPath -ResultPath $NAV2015ResultFolder -TargetPath $NAV2015TargetObjectsPath -DateTimeProperty FromTarget -ModifiedProperty FromModified -VersionListProperty FromTarget
-Split-NAVApplicationObjectFile -Source $NAV2015TargetObjectsPath -Destination $NAV2015TargetFolder
-Copy-Item -Path "$NAV2015WorkingFolder\MergeResult\TAB*.TXT" -Destination $NAV2015MergedFolder -Force
+Merge-NAVApplicationObject -ModifiedPath $NAV2015ModifiedObjectsPath -OriginalPath $NAV2015OriginalObjectsPath -ResultPath $NAV2015ResultFolder -TargetPath $NAV2015TargetObjectsPath -DateTimeProperty FromTarget -ModifiedProperty FromModified -VersionListProperty FromTarget -Force
+
+Split-NAVApplicationObjectFile -Source $NAV2015TargetObjectsPath -Destination $NAV2015TargetFolder -Force
+Split-NAVApplicationObjectFile -Source $NAV2015ModifiedObjectsPath -Destination $NAV2015ModifiedFolder -PreserveFormatting -Force
+Split-NAVApplicationObjectFile -Source $NAV2015OriginalObjectsPath -Destination $NAV2015OriginalFolder -PreserveFormatting -Force
+Split-NAVApplicationObjectFile -Source $NAV2015ResultFolder -Destination $NAV2015ResultFolder -Force
+Copy-Item -Path "$NAV2015WorkingFolder\MergeResult\TAB*.TXT" -Destination $NAV2015ResultFolder -Force
+$RemoveFolder = $NAV2015ModifiedFolder
+$RemoveFolder = $NAV2015OriginalFolder
+$RemoveFolder = $NAV2015ResultFolder
+$RemoveFolder = $NAV2015TargetFolder
+#Remove-Item -Path "$RemoveFolder\TAB*.*"
+#Remove-Item -Path "$NAV2015WorkingFolder\MergeResult"
+Remove-Item -Path $NAV2015ResultFolder
+Remove-Item -Path "$RemoveFolder\COD*.*"
+Remove-Item -Path "$RemoveFolder\PAG*.*"
+Remove-Item -Path "$RemoveFolder\REP*.*"
+Remove-Item -Path "$RemoveFolder\MEN*.*"
+Remove-Item -Path "$RemoveFolder\QUE*.*"
+Remove-Item -Path "$RemoveFolder\XML*.*"
+Merge-NAVApplicationObject -ModifiedPath "$NAV2015WorkingFolder\Modified\TAB*.TXT"-OriginalPath "$NAV2015WorkingFolder\Original\TAB*.TXT" -ResultPath $NAV2015ResultFolder -TargetPath "$NAV2015WorkingFolder\Target\TAB*.TXT" -DateTimeProperty FromTarget -ModifiedProperty FromModified -VersionListProperty FromTarget -Force
+$MergeResult = Merge-NAVUpgradeObjects `
+    -OriginalObjects "$NAV2015WorkingFolder\Original\TAB*.TXT" `    -ModifiedObjects "$NAV2015WorkingFolder\Modified\TAB*.TXT" `
+    -TargetObjects "$NAV2015WorkingFolder\Target\TAB*.TXT" `
+    -WorkingFolder $NAV2015WorkingFolder `
+    -VersionListPrefixes $VersionListPrefixes `
+    -Force
 Join-NAVApplicationObjectFile -Source $NAV2015MergedFolder -Destination "$NAV2015WorkingFolder\NAV2015_CU42_NO_Heydi_TAB.txt" -Force  
+Join-NAVApplicationObjectFile -Source $NAV2015ResultFolder -Destination "$NAV2015WorkingFolder\NAV2015_CU42_NO_Heydi_TAB.txt" -Force  
 Join-NAVApplicationObjectFile -Source  "$NAV2015WorkingFolder\Target\TAB*.TXT"  -Destination "$NAV2015WorkingFolder\NAV2015_CU42_NO_TAB.txt" -Force  
+Join-NAVApplicationObjectFile -Source  "$NAV2015WorkingFolder\Result\Custom\TAB*.TXT"  -Destination "$NAV2015WorkingFolder\NAV2015_CU42_NO_Heydi_TAB_Custom.txt" -Force  
 
 # Copy file with merged objects to NAV Server
 Copy-Item -Path (join-path $ClientWorkingFolder $JoinFileName) -Destination $JoinFile -Force
